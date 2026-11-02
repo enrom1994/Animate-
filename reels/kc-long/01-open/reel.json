@@ -1,0 +1,234 @@
+{
+ "title": "Cold open",
+ "script": [
+  "At seven fifteen on a Saturday morning in June 1933, a train pulled into Union Station in Kansas City.",
+  "On board were three lawmen and one prisoner.",
+  "Minutes later, five men lay dead beside a parked car.",
+  "The newspapers called it the Union Station Massacre.",
+  "It made a famous outlaw the most hunted man in America.",
+  "And it changed federal law enforcement for good.",
+  "But to understand that morning, you have to start with the prisoner.",
+  "A man who walked out of one of America's toughest prisons, and simply never came back."
+ ],
+ "say": {
+  "1924": "nineteen twenty-four",
+  "1930": "nineteen thirty",
+  "1930,": "nineteen thirty,",
+  "1931": "nineteen thirty-one",
+  "1933": "nineteen thirty-three",
+  "1934": "nineteen thirty-four",
+  "1938": "nineteen thirty-eight",
+  "19": "nineteenth",
+  "16": "sixteenth",
+  "17": "seventeenth"
+ },
+ "shots": [
+  {
+   "line": 0,
+   "img": "station",
+   "layout": "clip",
+   "clip": {
+    "box": [
+     0.07,
+     0.06,
+     0.88,
+     0.94
+    ]
+   },
+   "from": {
+    "box": [
+     0.05,
+     0.04,
+     0.9,
+     0.96
+    ]
+   },
+   "to": {
+    "box": [
+     0.2,
+     0.25,
+     0.8,
+     0.8
+    ]
+   },
+   "rot": -1,
+   "label": "UNION STATION \u00b7 c. 1910-30",
+   "stamp": "KANSAS CITY \u00b7 JUNE 17, 1933",
+   "sfx": [
+    "paper"
+   ]
+  },
+  {
+   "line": 1,
+   "img": "es0617",
+   "layout": "clip",
+   "rot": -2,
+   "clip": {
+    "box": [
+     0.148,
+     0.268,
+     0.262,
+     0.402
+    ]
+   },
+   "sfx": [
+    "paper"
+   ]
+  },
+  {
+   "line": 2,
+   "img": "wt0617",
+   "in": "flash",
+   "sfx": [
+    "flash",
+    "hit"
+   ],
+   "from": {
+    "find": "GUNMEN KILL 4",
+    "pad": 0.04
+   },
+   "to": {
+    "find": "AND PRISONER",
+    "pad": 0.06
+   },
+   "marks": [
+    {
+     "find": "4 OFFICERS",
+     "line": 2,
+     "word": 3
+    }
+   ]
+  },
+  {
+   "line": 3,
+   "img": "bt330617",
+   "sfx": [
+    "paper"
+   ],
+   "from": {
+    "box": [
+     0.83,
+     0.135,
+     0.945,
+     0.195
+    ],
+    "pad": 0.6
+   },
+   "to": {
+    "box": [
+     0.83,
+     0.135,
+     0.945,
+     0.195
+    ],
+    "pad": 0.25
+   }
+  },
+  {
+   "line": 4,
+   "img": "bt341022",
+   "sfx": [
+    "paper"
+   ],
+   "from": {
+    "find": "Floyd Again Evades Capture",
+    "pad": 0.02
+   },
+   "to": {
+    "find": "Floyd Again Evades Capture",
+    "pad": 0.02,
+    "zoom": 1.15
+   }
+  },
+  {
+   "line": 5,
+   "img": "bt340519",
+   "sfx": [
+    "paper"
+   ],
+   "from": "page",
+   "to": {
+    "find": "PRESIDENT CALLING ON ALL CITIZENS TO JOIN WAR ON CRIME",
+    "pad": 0.3
+   }
+  },
+  {
+   "line": 6,
+   "img": "es0617",
+   "from": "page",
+   "to": {
+    "box": [
+     0.12,
+     0.24,
+     0.29,
+     0.42
+    ]
+   },
+   "sfx": [
+    "paper"
+   ]
+  },
+  {
+   "line": 7,
+   "kind": "map",
+   "title": "U.S. Penitentiary \u00b7 Leavenworth, Kansas",
+   "sfx": [],
+   "drawings": [
+    {
+     "type": "prison",
+     "x": 0.5,
+     "y": 0.62,
+     "w": 0.9
+    },
+    {
+     "type": "figure",
+     "path": [
+      [
+       0.5,
+       0.62
+      ],
+      [
+       0.5,
+       0.82
+      ],
+      [
+       0.95,
+       0.9
+      ]
+     ],
+     "at": 1.0,
+     "dur": 4.5,
+     "size": 1.5
+    }
+   ],
+   "push": {
+    "x": 0.5,
+    "y": 0.66,
+    "z": 1.35,
+    "at": 0.5
+   }
+  },
+  {
+   "line": 7,
+   "word": 15,
+   "offset": 0.9,
+   "kind": "card",
+   "style": "title",
+   "text": "The Kansas City Massacre",
+   "sub": "June 17, 1933",
+   "in": "black",
+   "sfx": [
+    "hit"
+   ]
+  }
+ ],
+ "assets": {
+  "station": "https://www.loc.gov/item/2016818238/",
+  "es0617": "https://www.loc.gov/resource/sn83045462/1933-06-17/ed-1/?sp=1",
+  "wt0617": "https://www.loc.gov/resource/sn84026749/1933-06-17/ed-1/?sp=1",
+  "bt330617": "https://www.loc.gov/resource/sn85042243/1933-06-17/ed-1/?sp=1",
+  "bt341022": "https://www.loc.gov/resource/sn85042243/1934-10-22/ed-1/?sp=1",
+  "bt340519": "https://www.loc.gov/resource/sn85042243/1934-05-19/ed-1/?sp=1"
+ },
+ "tail": 4.0
+}

@@ -2,6 +2,21 @@
  "title": "The Kansas City Massacre",
  "format": "16:9",
  "outro": false,
- "voice": { "engine": "chatterbox", "ref": "../../voices/ref_onyx.wav", "exaggeration": 0.35, "cfg": 0.35, "gap": 0.4 },
- "chapters": ["05-station"]
+ "voice": {
+  "engine": "chatterbox",
+  "ref": "../../voices/ref_onyx.wav",
+  "exaggeration": 0.35,
+  "cfg": 0.35,
+  "gap": 0.4
+ },
+ "chapters": [
+  "01-open",
+  "02-trusty",
+  "03-hotsprings",
+  "04-word",
+  "05-station",
+  "06-thirty",
+  "07-hunt",
+  "08-after"
+ ]
 }

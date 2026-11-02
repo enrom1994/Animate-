@@ -1,0 +1,209 @@
+{
+ "title": "The hunt",
+ "script": [
+  "The Bureau named three suspects.",
+  "Vernon Miller, the hired gun. Adam Richetti. And the most famous outlaw in the Midwest, Charles \"Pretty Boy\" Floyd.",
+  "Miller never stood trial. In November 1933, his body was found in a ditch outside Detroit.",
+  "Floyd was shot dead on an Ohio farm in October 1934. With his last breath, he reportedly denied any part in the massacre.",
+  "Richetti was captured in Ohio that same month. He was convicted, and in 1938 he died in Missouri's gas chamber.",
+  "He was the only man ever convicted for the killings.",
+  "To this day, historians argue over whether Floyd and Richetti were there at all.",
+  "One writer, Robert Unger, went further. He argued that some of the fatal shots came from a lawman's own shotgun, fired in panic.",
+  "The official account still blames the gunmen."
+ ],
+ "say": {
+  "1924": "nineteen twenty-four",
+  "1930": "nineteen thirty",
+  "1930,": "nineteen thirty,",
+  "1931": "nineteen thirty-one",
+  "1933": "nineteen thirty-three",
+  "1934": "nineteen thirty-four",
+  "1938": "nineteen thirty-eight",
+  "19": "nineteenth",
+  "16": "sixteenth",
+  "17": "seventeenth"
+ },
+ "intro": {
+  "part": "Part six",
+  "title": "The hunt",
+  "sub": "1933 to 1938",
+  "dur": 6
+ },
+ "shots": [
+  {
+   "line": 0,
+   "kind": "timeline",
+   "span": [
+    1933,
+    1939
+   ],
+   "years": [
+    1933,
+    1934,
+    1938
+   ],
+   "text": "three suspects",
+   "sfx": [],
+   "events": [
+    {
+     "year": 1933.9,
+     "label": "Miller",
+     "sub": "",
+     "line": 1,
+     "word": 0
+    },
+    {
+     "year": 1934.8,
+     "label": "Floyd",
+     "line": 1,
+     "word": 15
+    },
+    {
+     "year": 1938.77,
+     "label": "Richetti",
+     "line": 1,
+     "word": 5
+    }
+   ]
+  },
+  {
+   "line": 2,
+   "img": "wd331201",
+   "stamp": "DETROIT \u00b7 NOVEMBER 1933",
+   "sfx": [
+    "paper"
+   ],
+   "from": "page",
+   "to": {
+    "find": "Trail Of Gangster",
+    "pad": 0.4
+   }
+  },
+  {
+   "line": 3,
+   "img": "it341023",
+   "stamp": "OHIO \u00b7 OCTOBER 22, 1934",
+   "in": "flash",
+   "sfx": [
+    "flash"
+   ],
+   "from": "page",
+   "to": {
+    "find": "BULLET-TORN BODY",
+    "pad": 0.25,
+    "grow": [
+     0,
+     0.03,
+     0,
+     0.03
+    ]
+   }
+  },
+  {
+   "line": 4,
+   "img": "hd381007",
+   "stamp": "MISSOURI \u00b7 OCTOBER 7, 1938",
+   "sfx": [
+    "paper"
+   ],
+   "from": "page",
+   "to": {
+    "find": "Gangster Trio Gassed",
+    "pad": 0.3,
+    "grow": [
+     0,
+     0.03,
+     0,
+     0
+    ]
+   },
+   "marks": [
+    {
+     "find": "Gangster Trio Gassed",
+     "line": 4,
+     "word": 13
+    }
+   ]
+  },
+  {
+   "line": 5,
+   "kind": "timeline",
+   "span": [
+    1933,
+    1939
+   ],
+   "years": [
+    1933,
+    1934,
+    1938
+   ],
+   "text": "one conviction",
+   "in": "cut",
+   "sfx": [
+    "drop"
+   ],
+   "events": [
+    {
+     "year": 1933.9,
+     "label": "Miller",
+     "sub": "murdered",
+     "at": 0.1,
+     "out_at": 0.4
+    },
+    {
+     "year": 1934.8,
+     "label": "Floyd",
+     "sub": "shot dead",
+     "at": 0.1,
+     "out_at": 0.7
+    },
+    {
+     "year": 1938.77,
+     "label": "Richetti",
+     "sub": "executed",
+     "at": 0.1,
+     "out_at": 1.1
+    }
+   ]
+  },
+  {
+   "line": 6,
+   "kind": "card",
+   "style": "title",
+   "text": "Were they there?",
+   "sub": "historians still argue",
+   "sfx": [
+    "stamp"
+   ]
+  },
+  {
+   "line": 7,
+   "kind": "card",
+   "style": "title",
+   "text": "A lawman's own shotgun?",
+   "sub": "Robert Unger \u00b7 The Union Station Massacre (1997)",
+   "in": "cut",
+   "sfx": [
+    "stamp"
+   ]
+  },
+  {
+   "line": 8,
+   "img": "wt0617",
+   "sfx": [
+    "paper"
+   ],
+   "from": {
+    "find": "GUNMEN KILL 4 OFFICERS AND PRISONER",
+    "pad": 0.03
+   },
+   "to": "page"
+  }
+ ],
+ "assets": {
+  "wd331201": "https://www.loc.gov/resource/sn82014085/1933-12-01/ed-1/?sp=1",
+  "it341023": "https://www.loc.gov/resource/sn82015313/1934-10-23/ed-1/?sp=1",
+  "hd381007": "https://www.loc.gov/resource/sn91068401/1938-10-07/ed-1/?sp=1",
+  "wt0617": "https://www.loc.gov/resource/sn84026749/1933-06-17/ed-1/?sp=1"
+ }
+}

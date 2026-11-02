@@ -82,11 +82,11 @@ if __name__ == "__main__":
                 cx, cy = (base[0] + base[2]) / 2, (base[1] + base[3]) / 2
                 to = [cx - (cx - base[0]) / 1.08, cy - (cy - base[1]) / 1.08, cx + (base[2] - cx) / 1.08, cy + (base[3] - cy) / 1.08]
             sh.update({"img": n, "layout": layout, "clip": clip, "from": fr, "to": to,
-                       "marks": [{"box": box(n, m, .04), "style": m.get("style", "box"), "t": m.get("at", .4)} for m in s.get("marks", [])]})
+                       "marks": [{"box": box(n, m, .04), "style": m.get("style", "box"), "t": m.get("at", .4), **({"line": m["line"], "word": m.get("word", 0)} if "line" in m else {})} for m in s.get("marks", [])]})
         elif kind == "footage":
             n = s["img"]; sh.update({"img": n, "src0": s.get("from_s", 0)})
-        elif kind in ("card", "map"):
-            sh.update({k2: s[k2] for k2 in ("text", "sub", "title", "blocks", "points", "route", "xs", "style", "drawings") if k2 in s})
+        elif kind in ("card", "map", "timeline"):
+            sh.update({k2: s[k2] for k2 in ("text", "sub", "title", "blocks", "points", "route", "routes", "xs", "style", "drawings", "span", "years", "move", "move_at", "move_dur", "events", "push") if k2 in s})
             if kind == "map" and not sh["label"]: sh["label"] = "ILLUSTRATION"
         else: sys.exit(f"unknown shot kind {kind}")
         shots.append(sh)
@@ -94,16 +94,27 @@ if __name__ == "__main__":
         shots.insert(0, {"kind": "chapter", "start": 0, "in": "black", "sfx": [], "marks": [], "part": I.get("part"), "text": I.get("title"),
                          "sub": I.get("sub"), "img": I.get("img", next((x["img"] for x in shots if x.get("img")), None)), "label": None})
         shots[1]["in"] = "fade"
+    for sh in shots:  # ink marks timed to a spoken word
+        for m in sh.get("marks", []):
+            if "line" in m: m["t"] = round(t_of(m) - sh["start"] + .1, 3)
     for sh in shots:  # map elements can be timed to the narration: {"line": n, "word": k}
         if sh["kind"] == "map":
             for d in sh.get("drawings", []) or []:  # drawing parts timed to words
                 for el in [d] + (d.get("occupants") or []) + ([d["driver"]] if d.get("driver") else []):
                     if "line" in el: el["at"] = round(t_of(el) - sh["start"], 3)
                     if "x_line" in el: el["x_at"] = round(t_of({"line": el["x_line"], "word": el.get("x_word", 0)}) - sh["start"], 3)
+            if sh.get("push") and "line" in sh["push"]: sh["push"]["at"] = round(t_of(sh["push"]) - sh["start"], 3)
+            for el in sh.get("routes", []) or []:
+                if "line" in el: el["at"] = round(t_of(el) - sh["start"], 3)
             for key in ("blocks", "points", "xs"):
                 for el in sh.get(key, []) or []:
                     if isinstance(el, dict) and "line" in el: el["at"] = round(t_of(el) - sh["start"], 3)
                     elif isinstance(el, list) and len(el) > 5 and isinstance(el[5], dict): el[5]["at"] = round(t_of(el[5]) - sh["start"], 3)
+    for sh in shots:  # timeline events: appear / go out on cue
+        if sh["kind"] == "timeline":
+            for e in sh.get("events", []) or []:
+                if "line" in e: e["at"] = round(t_of(e) - sh["start"], 3)
+                if "out_line" in e: e["out_at"] = round(t_of({"line": e["out_line"], "word": e.get("out_word", 0)}) - sh["start"], 3)
     for a, b in zip(shots, shots[1:]): a["end"] = b["start"]
     shots[-1]["end"] = o_start if O else dur
     for sh in shots:

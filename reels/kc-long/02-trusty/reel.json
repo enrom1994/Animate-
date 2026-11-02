@@ -1,0 +1,193 @@
+{
+ "title": "The trusty",
+ "script": [
+  "His name was Frank Nash.",
+  "In 1924, he was sentenced to twenty five years in the federal penitentiary at Leavenworth, for mail robbery.",
+  "Inside, he played the model prisoner.",
+  "By 1930 he was cooking for the deputy warden, a trusted inmate with privileges.",
+  "On October 19, 1930, he was sent outside the walls on an errand.",
+  "He never came back.",
+  "For almost three years, Frank Nash lived as a free man.",
+  "He moved through Chicago and other big cities, and kept company with the underworld.",
+  "In December 1931, he helped free seven prisoners from Fort Leavenworth.",
+  "And he fell in love with a barmaid named Frances Luce.",
+  "In May 1933, he married her, under a false name."
+ ],
+ "say": {
+  "1924": "nineteen twenty-four",
+  "1930": "nineteen thirty",
+  "1930,": "nineteen thirty,",
+  "1931": "nineteen thirty-one",
+  "1933": "nineteen thirty-three",
+  "1934": "nineteen thirty-four",
+  "1938": "nineteen thirty-eight",
+  "19": "nineteenth",
+  "16": "sixteenth",
+  "17": "seventeenth"
+ },
+ "intro": {
+  "part": "Part one",
+  "title": "The trusty",
+  "sub": "Leavenworth \u00b7 1924 to 1930",
+  "dur": 6
+ },
+ "shots": [
+  {
+   "line": 0,
+   "img": "es0617",
+   "layout": "clip",
+   "rot": -2,
+   "clip": {
+    "box": [
+     0.148,
+     0.268,
+     0.262,
+     0.402
+    ]
+   },
+   "sfx": [
+    "paper"
+   ]
+  },
+  {
+   "line": 1,
+   "kind": "card",
+   "style": "number",
+   "text": "25 years",
+   "sub": "Leavenworth \u00b7 mail robbery \u00b7 1924",
+   "sfx": [
+    "stamp"
+   ]
+  },
+  {
+   "line": 2,
+   "kind": "map",
+   "title": "U.S. Penitentiary \u00b7 Leavenworth, Kansas",
+   "sfx": [
+    "paper"
+   ],
+   "stamp": null,
+   "drawings": [
+    {
+     "type": "prison",
+     "x": 0.5,
+     "y": 0.62,
+     "w": 0.9
+    },
+    {
+     "type": "figure",
+     "path": [
+      [
+       0.5,
+       0.62
+      ],
+      [
+       0.5,
+       0.8
+      ],
+      [
+       1.02,
+       0.86
+      ]
+     ],
+     "line": 4,
+     "word": 6,
+     "dur": 6,
+     "size": 1.5,
+     "label": "Nash"
+    }
+   ],
+   "points": [],
+   "push": {
+    "x": 0.5,
+    "y": 0.66,
+    "z": 1.6,
+    "line": 3,
+    "dur": 5
+   }
+  },
+  {
+   "line": 6,
+   "kind": "timeline",
+   "span": [
+    1929.5,
+    1934
+   ],
+   "years": [
+    1930,
+    1931,
+    1932,
+    1933
+   ],
+   "move": [
+    1930.8,
+    1933.45
+   ],
+   "move_at": 0.8,
+   "text": "almost three years free",
+   "sfx": []
+  },
+  {
+   "line": 7,
+   "img": "bt301024",
+   "sfx": [
+    "paper"
+   ],
+   "from": {
+    "find": "Another Lord of Chicago's Gangland Slain",
+    "pad": 0.02
+   },
+   "to": {
+    "find": "JOE AIELLO FALLS",
+    "pad": 0.9
+   }
+  },
+  {
+   "line": 8,
+   "img": "bt311211",
+   "in": "flash",
+   "sfx": [
+    "flash"
+   ],
+   "stamp": "DECEMBER 11, 1931",
+   "from": "page",
+   "to": {
+    "find": "Federal Prison Break Is Staged",
+    "pad": 0.03
+   },
+   "marks": [
+    {
+     "find": "CONVICTS ESCAPE",
+     "line": 8,
+     "word": 7
+    }
+   ]
+  },
+  {
+   "line": 9,
+   "kind": "card",
+   "style": "title",
+   "text": "Frances Luce",
+   "sub": "a Chicago barmaid",
+   "sfx": [
+    "stamp"
+   ]
+  },
+  {
+   "line": 10,
+   "kind": "card",
+   "style": "title",
+   "text": "Mr. and Mrs. Moore",
+   "sub": "married May 26, 1933, under a false name",
+   "in": "cut",
+   "sfx": [
+    "stamp"
+   ]
+  }
+ ],
+ "assets": {
+  "es0617": "https://www.loc.gov/resource/sn83045462/1933-06-17/ed-1/?sp=1",
+  "bt301024": "https://www.loc.gov/resource/sn85042243/1930-10-24/ed-1/?sp=1",
+  "bt311211": "https://www.loc.gov/resource/sn85042243/1931-12-11/ed-1/?sp=1"
+ }
+}

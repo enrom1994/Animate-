@@ -18,3 +18,4 @@ reels/**/build/
 reels/**/*.mp4
 reels/**/*.m4a
 .claude/kit/.venv-cb/
+reels/**/_pool/

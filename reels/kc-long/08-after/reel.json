@@ -1,0 +1,238 @@
+{
+ "title": "What it changed",
+ "script": [
+  "The massacre shocked the country.",
+  "Four lawmen had died escorting one prisoner, and the federal agents with them had no clear legal power to carry guns.",
+  "In 1934, Congress changed that. Federal agents could now carry firearms and make arrests.",
+  "Their Bureau soon got a new name: the Federal Bureau of Investigation.",
+  "Many historians see that morning at Union Station as the moment the modern FBI was born.",
+  "Union Station still stands in Kansas City.",
+  "And near the east entrance, people still point out marks in the stone they say were left by the bullets.",
+  "Four lawmen. One prisoner. Thirty seconds."
+ ],
+ "say": {
+  "1924": "nineteen twenty-four",
+  "1930": "nineteen thirty",
+  "1930,": "nineteen thirty,",
+  "1931": "nineteen thirty-one",
+  "1933": "nineteen thirty-three",
+  "1934": "nineteen thirty-four",
+  "1938": "nineteen thirty-eight",
+  "19": "nineteenth",
+  "16": "sixteenth",
+  "17": "seventeenth"
+ },
+ "intro": {
+  "part": "Part seven",
+  "title": "What it changed",
+  "sub": "1934 and after",
+  "dur": 6
+ },
+ "outro": true,
+ "shots": [
+  {
+   "line": 0,
+   "img": "wd330617",
+   "sfx": [
+    "paper"
+   ],
+   "from": "page",
+   "to": {
+    "box": [
+     0.0,
+     0.135,
+     0.965,
+     0.21
+    ],
+    "pad": 0.05
+   }
+  },
+  {
+   "line": 1,
+   "img": "es0617",
+   "sfx": [
+    "paper"
+   ],
+   "from": {
+    "find": "The dead",
+    "pad": 0.1,
+    "grow": [
+     0.005,
+     0.004,
+     0.075,
+     0.032
+    ],
+    "zoom": 1.1
+   },
+   "to": {
+    "find": "The dead",
+    "pad": 0.1,
+    "grow": [
+     0.005,
+     0.004,
+     0.075,
+     0.032
+    ]
+   }
+  },
+  {
+   "line": 2,
+   "img": "bt340519",
+   "stamp": "MAY 1934",
+   "sfx": [
+    "paper",
+    "type"
+   ],
+   "from": "page",
+   "to": {
+    "find": "PRESIDENT CALLING ON ALL CITIZENS TO JOIN WAR ON CRIME",
+    "pad": 0.2
+   }
+  },
+  {
+   "line": 2,
+   "word": 5,
+   "img": "bt340519",
+   "from": {
+    "find": "In signing six bills Friday",
+    "pad": 0.18,
+    "grow": [
+     0,
+     0,
+     0,
+     0.01
+    ]
+   },
+   "to": {
+    "find": "In signing six bills Friday",
+    "pad": 0.12,
+    "grow": [
+     0,
+     0,
+     0,
+     0.01
+    ]
+   },
+   "marks": [
+    {
+     "find": "In signing six bills Friday",
+     "line": 2,
+     "word": 9
+    }
+   ]
+  },
+  {
+   "line": 3,
+   "kind": "card",
+   "style": "title",
+   "text": "Federal Bureau of Investigation",
+   "sub": "the new name, from July 1, 1935",
+   "sfx": [
+    "stamp"
+   ]
+  },
+  {
+   "line": 4,
+   "img": "station",
+   "layout": "clip",
+   "clip": {
+    "box": [
+     0.07,
+     0.06,
+     0.88,
+     0.94
+    ]
+   },
+   "from": {
+    "box": [
+     0.05,
+     0.04,
+     0.9,
+     0.96
+    ]
+   },
+   "to": {
+    "box": [
+     0.2,
+     0.25,
+     0.8,
+     0.8
+    ]
+   },
+   "rot": -1,
+   "label": "UNION STATION \u00b7 c. 1910-30",
+   "sfx": [
+    "paper"
+   ]
+  },
+  {
+   "line": 5,
+   "kind": "map",
+   "title": "Union Station \u00b7 Kansas City",
+   "sfx": [
+    "paper"
+   ],
+   "drawings": [
+    {
+     "type": "station",
+     "x": 0.5,
+     "y": 0.62,
+     "w": 0.92
+    }
+   ],
+   "points": [
+    {
+     "x": 0.93,
+     "y": 0.62,
+     "label": "East entrance",
+     "align": "right",
+     "dy": 44,
+     "line": 6,
+     "word": 3
+    }
+   ]
+  },
+  {
+   "line": 7,
+   "kind": "card",
+   "style": "title",
+   "text": "Four lawmen.",
+   "in": "cut",
+   "sfx": [
+    "stamp"
+   ]
+  },
+  {
+   "line": 7,
+   "word": 2,
+   "kind": "card",
+   "style": "title",
+   "text": "One prisoner.",
+   "in": "cut",
+   "sfx": [
+    "stamp"
+   ]
+  },
+  {
+   "line": 7,
+   "word": 4,
+   "kind": "card",
+   "style": "number",
+   "text": "Thirty seconds.",
+   "in": "cut",
+   "sfx": [
+    "hit"
+   ]
+  }
+ ],
+ "assets": {
+  "wd330617": "https://www.loc.gov/resource/sn82014085/1933-06-17/ed-1/?sp=1",
+  "es0617": "https://www.loc.gov/resource/sn83045462/1933-06-17/ed-1/?sp=1",
+  "bt340519": "https://www.loc.gov/resource/sn85042243/1934-05-19/ed-1/?sp=1",
+  "station": "https://www.loc.gov/item/2016818238/"
+ },
+ "emph": [
+  "four",
+  "thirty"
+ ]
+}

@@ -27,7 +27,7 @@ async function load() {
       IMG[n] = { full, bg, w: im.width, h: im.height }; res();
     }; im.onerror = rej; im.src = '/reel/' + m.src;
   })));
-  await document.fonts.load('800 80px "Inter Tight"'); await document.fonts.load('500 40px "JB Mono"'); await document.fonts.load('600 60px Lora');
+  await document.fonts.load('800 80px "Inter Tight"'); await document.fonts.load('500 40px "JB Mono"'); await document.fonts.load('600 60px Lora'); await document.fonts.load('500 48px Inter');
 }
 // grain frames + vignette, made once
 const GRAIN = [...Array(8)].map((_, k) => {
@@ -55,7 +55,12 @@ const toScreen = (c, x, y) => [c.fx + (x - c.cx) * c.s, c.fy + (y - c.cy) * c.s]
 
 const KINDS = {};
 function drawShot(sh, t) {
-  if (sh.kind && sh.kind !== 'page' && sh.kind !== 'photo') { KINDS[sh.kind](sh, t); if (sh.label) drawLabel(sh.label); return; }
+  if (sh.kind && sh.kind !== 'page' && sh.kind !== 'photo') {
+    if (sh.push) {  // slow camera push on a drawn shot: {x, y (0..1 of the frame), z, at, dur}
+      const pu = sh.push, k = ease.inout(clamp((t - (pu.at || 0)) / (pu.dur || Math.max(1, sh.end - sh.start - (pu.at || 0))))), z = 1 + (pu.z - 1) * k;
+      ctx.save(); ctx.translate(W * pu.x, H * pu.y); ctx.scale(z, z); ctx.translate(-W * pu.x, -H * pu.y); KINDS[sh.kind](sh, t); ctx.restore();
+    } else KINDS[sh.kind](sh, t);
+    if (sh.label) drawLabel(sh.label); return; }
   drawImageShot(sh, t); if (sh.label) drawLabel(sh.label);
 }
 function drawImageShot(sh, t) {
@@ -228,6 +233,9 @@ function drawCar(d, t, X, Y, M) {
     const ly = Y(d.y) + side * (hw + Wp * .55) + (o.dy || 0), lx = hx + (o.dx || 0);
     ctx.strokeStyle = INKC; ctx.lineWidth = 2; ctx.setLineDash([6, 6]); inkLine([[hx, hy + side * Wp * .1], [lx, ly - side * 22]]); ctx.setLineDash([]);
     ctx.font = '800 38px "Inter Tight"'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(o.label.toUpperCase(), lx, ly);
+    const tx = t - (o.x_at ?? 1e9); if (tx > 0) { const kx = ease.out(clamp(tx / .15)), r = Wp * .14 * (1.4 - .4 * kx);
+      ctx.strokeStyle = INK; ctx.lineWidth = 10; ctx.lineCap = 'round'; ctx.globalAlpha = kx; ctx.setLineDash([]);
+      inkLine([[hx - r, hy - r], [hx + r, hy + r]]); inkLine([[hx + r, hy - r], [hx - r, hy + r]]); ctx.globalAlpha = kk; ctx.fillStyle = INKC; }
     if (o.note) { ctx.font = `500 ${Math.round(L.mapFont * .8)}px "JB Mono"`; ctx.fillText(o.note.toUpperCase(), lx, ly + side * 40); }
     ctx.restore();
   }
@@ -262,6 +270,85 @@ function drawStation(d, t, X, Y, M) {  // Union Station, Kansas City: central ha
   if (d.label) { ctx.font = `500 ${L.mapFont}px "JB Mono"`; ctx.fillStyle = INKC; ctx.textAlign = 'center'; ctx.letterSpacing = '4px'; ctx.fillText(d.label.toUpperCase(), X(d.x), yb - ch - 34); }
   ctx.restore();
 }
+
+function drawPrison(d, t, X, Y, M) {  // Leavenworth: a long cellhouse front with a big central dome, a wall and a gate
+  const w = d.w * M.w, x0 = X(d.x) - w / 2, yb = Y(d.y), h = w * .22, k = clamp((t - (d.at ?? .1)) / .8); if (k <= 0) return;
+  ctx.save(); ctx.globalAlpha = k; ctx.strokeStyle = INKC; ctx.fillStyle = '#e8dfc9'; ctx.lineJoin = 'round';
+  const bw = w * .8, bx = X(d.x) - bw / 2, bh = h * .62, dw = w * .2;
+  ctx.lineWidth = 4; ctx.fillRect(bx, yb - h * .3 - bh, bw, bh); ctx.strokeRect(bx, yb - h * .3 - bh, bw, bh);   // cellhouse
+  const dcx = X(d.x), dtop = yb - h * .3 - bh;                                                                     // drum + dome
+  ctx.fillRect(dcx - dw / 2, dtop - h * .28, dw, h * .28); ctx.strokeRect(dcx - dw / 2, dtop - h * .28, dw, h * .28);
+  ctx.beginPath(); ctx.ellipse(dcx, dtop - h * .28, dw / 2, h * .42, 0, Math.PI, 0); ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.lineWidth = 2; for (let i = 1; i < 6; i++) { ctx.beginPath(); ctx.ellipse(dcx, dtop - h * .28, dw / 2 * i / 6, h * .42, 0, Math.PI, 0); ctx.stroke(); }
+  ctx.fillRect(dcx - 8, dtop - h * .28 - h * .42 - 26, 16, 26); ctx.strokeRect(dcx - 8, dtop - h * .28 - h * .42 - 26, 16, 26);   // lantern
+  ctx.lineWidth = 1.6; const rows = 3, cols = Math.floor(bw / 30);                                                  // cell windows
+  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) { const wx = bx + 10 + c * (bw - 20) / cols, wy = dtop + 12 + r * bh / rows;
+    if (Math.abs(wx - dcx) < dw / 2 + 6) continue; ctx.strokeRect(wx, wy, (bw - 20) / cols - 12, bh / rows - 22); }
+  ctx.lineWidth = 5; const wallY = yb - h * .3, gw = w * .08;                                                       // wall with a gate
+  ctx.fillStyle = '#d9cdb2'; ctx.fillRect(x0, wallY, w / 2 - gw / 2, h * .3); ctx.strokeRect(x0, wallY, w / 2 - gw / 2, h * .3);
+  ctx.fillRect(X(d.x) + gw / 2, wallY, w / 2 - gw / 2, h * .3); ctx.strokeRect(X(d.x) + gw / 2, wallY, w / 2 - gw / 2, h * .3);
+  ctx.lineWidth = 2; for (let gx = X(d.x) - gw / 2 + 8; gx < X(d.x) + gw / 2; gx += 12) inkLine([[gx, wallY], [gx, yb]]);  // gate bars
+  ctx.lineWidth = 4; inkLine([[x0 - 30, yb], [x0 + w + 30, yb]]);
+  if (d.label) { ctx.font = `500 ${L.mapFont}px "JB Mono"`; ctx.fillStyle = INKC; ctx.textAlign = 'center'; ctx.letterSpacing = '4px'; ctx.fillText(d.label.toUpperCase(), X(d.x), yb + 50); }
+  ctx.restore();
+}
+function drawFigure(d, t, X, Y, M) {  // one small person walking along a path [[x,y],...] between at and at+dur
+  const k = clamp((t - (d.at ?? .5)) / (d.dur || 3)), P_ = d.path; if (t < (d.at ?? .5)) return;
+  let Lt = 0; const seg = []; for (let i = 1; i < P_.length; i++) { const l = Math.hypot(X(P_[i][0]) - X(P_[i - 1][0]), Y(P_[i][1]) - Y(P_[i - 1][1])); seg.push(l); Lt += l; }
+  let left = Lt * ease.inout(k), x = X(P_[0][0]), y = Y(P_[0][1]);
+  ctx.save(); ctx.strokeStyle = INK; ctx.lineWidth = 4; ctx.setLineDash([10, 12]); ctx.beginPath(); ctx.moveTo(x, y);
+  for (let i = 1; i < P_.length && left > 0; i++) { const f = Math.min(1, left / seg[i - 1]); x = X(P_[i - 1][0]) + (X(P_[i][0]) - X(P_[i - 1][0])) * f; y = Y(P_[i - 1][1]) + (Y(P_[i][1]) - Y(P_[i - 1][1])) * f; ctx.lineTo(x, y); left -= seg[i - 1]; }
+  ctx.stroke(); ctx.setLineDash([]);
+  const s = (d.size || 1) * 26, step = Math.sin(t * 9) * .35;  // the walker
+  ctx.fillStyle = INKC; ctx.strokeStyle = INKC; ctx.lineCap = 'round'; ctx.lineWidth = s * .28;
+  ctx.beginPath(); ctx.arc(x, y - s * 2.2, s * .42, 0, 7); ctx.fill();
+  inkLine([[x, y - s * 1.75], [x, y - s * .9]]); inkLine([[x, y - s * .9], [x - s * step, y]]); inkLine([[x, y - s * .9], [x + s * step, y]]);
+  inkLine([[x, y - s * 1.55], [x + s * step * .8, y - s * 1.05]]); inkLine([[x, y - s * 1.55], [x - s * step * .8, y - s * 1.05]]);
+  if (d.label) { ctx.font = '800 36px "Inter Tight"'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(d.label.toUpperCase(), x + s * .9, y - s * 2.2); }
+  ctx.restore();
+}
+function drawRoutes(sh, t, X, Y) {  // several routes: style car (dashed), rail (track with ties), plan (faint dotted: never happened)
+  for (const r of sh.routes || []) {
+    const t0 = r.at ?? .6, k = ease.inout(clamp((t - t0) / (r.dur || 1.6))); if (k <= 0) continue;
+    const P_ = r.pts; let Lt = 0; const seg = []; for (let i = 1; i < P_.length; i++) { const l = Math.hypot(X(P_[i][0]) - X(P_[i - 1][0]), Y(P_[i][1]) - Y(P_[i - 1][1])); seg.push(l); Lt += l; }
+    const pts = [[X(P_[0][0]), Y(P_[0][1])]]; let left = Lt * k;
+    for (let i = 1; i < P_.length && left > 0; i++) { const f = Math.min(1, left / seg[i - 1]); pts.push([X(P_[i - 1][0]) + (X(P_[i][0]) - X(P_[i - 1][0])) * f, Y(P_[i - 1][1]) + (Y(P_[i][1]) - Y(P_[i - 1][1])) * f]); left -= seg[i - 1]; }
+    ctx.save(); ctx.lineCap = 'round';
+    if (r.style === 'rail') {
+      ctx.strokeStyle = INKC; ctx.lineWidth = 3; for (const off of [-7, 7]) { ctx.beginPath(); pts.forEach((p, i) => { const q = pts[Math.min(i + 1, pts.length - 1)], o = pts[Math.max(i - 1, 0)]; const dx = q[0] - o[0], dy = q[1] - o[1], n = Math.hypot(dx, dy) || 1; const xx = p[0] - dy / n * off, yy = p[1] + dx / n * off; i ? ctx.lineTo(xx, yy) : ctx.moveTo(xx, yy); }); ctx.stroke(); }
+      ctx.lineWidth = 2; for (let i = 1; i < pts.length; i++) { const [a, b] = [pts[i - 1], pts[i]], l = Math.hypot(b[0] - a[0], b[1] - a[1]); for (let u = 0; u < l; u += 16) { const px = a[0] + (b[0] - a[0]) * u / l, py = a[1] + (b[1] - a[1]) * u / l, nx = -(b[1] - a[1]) / l, ny = (b[0] - a[0]) / l; inkLine([[px - nx * 12, py - ny * 12], [px + nx * 12, py + ny * 12]]); } }
+      ctx.strokeStyle = INK; ctx.lineWidth = 5; ctx.beginPath(); pts.forEach((p, i) => i ? ctx.lineTo(...p) : ctx.moveTo(...p)); ctx.globalAlpha = .55; ctx.stroke();
+    } else { ctx.strokeStyle = r.style === 'plan' ? 'rgba(29,23,18,.45)' : INK; ctx.lineWidth = r.style === 'plan' ? 4 : 8; ctx.setLineDash(r.style === 'plan' ? [4, 12] : [24, 14]);
+      ctx.beginPath(); pts.forEach((p, i) => i ? ctx.lineTo(...p) : ctx.moveTo(...p)); ctx.stroke(); }
+    if (r.label && k > .6) { ctx.globalAlpha = clamp((k - .6) / .3); ctx.font = `500 ${Math.round(L.mapFont * .85)}px "JB Mono"`; ctx.fillStyle = INKC; ctx.textAlign = 'center'; const m = pts[Math.floor(pts.length / 2)]; ctx.fillText(r.label.toUpperCase(), m[0] + (r.lx || 0), m[1] + (r.ly || -24)); }
+    ctx.restore();
+  }
+}
+// minimal timeline (the minimalistic-graphics look: pure black, white hairlines, one solid dot, one quiet lowercase line)
+KINDS.timeline = (sh, t) => {
+  ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+  const [y0, y1] = sh.span, ax = W * .1, bx = W * .9, ay = H * (WIDE ? .55 : .5), X_ = yr => ax + (yr - y0) / (y1 - y0) * (bx - ax);
+  const k = ease.inout(clamp((t - .3) / .9));
+  ctx.save(); ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(ax + (bx - ax) * k, ay); ctx.stroke();
+  ctx.font = '500 30px "JB Mono"'; ctx.textAlign = 'center'; ctx.fillStyle = 'rgba(255,255,255,.75)';
+  for (let yr = Math.ceil(y0); yr <= y1; yr++) { const x = X_(yr); if (x > ax + (bx - ax) * k) break; const big = (sh.years || []).includes(yr);
+    ctx.beginPath(); ctx.moveTo(x, ay - (big ? 18 : 8)); ctx.lineTo(x, ay + (big ? 18 : 8)); ctx.stroke(); if (big) ctx.fillText(String(yr), x, ay + 64); }
+  if (sh.move) {  // one solid white dot travels from year a to year b
+    const [a, b] = sh.move, m = ease.inout(clamp((t - (sh.move_at ?? 1.0)) / (sh.move_dur ?? Math.max(1, sh.end - sh.start - 2.2)))), x = X_(a + (b - a) * m);
+    ctx.save(); ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(X_(a), ay); ctx.lineTo(x, ay); ctx.stroke(); ctx.restore();
+    ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(x, ay, 15, 0, 7); ctx.fill();
+  }
+  for (const e of sh.events || []) {  // dots that appear, then go out (hollow, red ring) on cue
+    const kin = clamp((t - (e.at ?? 1)) / .35); if (kin <= 0) continue; const x = X_(e.year), out = clamp((t - (e.out_at ?? 1e9)) / .4);
+    ctx.globalAlpha = kin; ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(x, ay, 15 * (1 - out), 0, 7); ctx.fill();
+    if (out > 0) { ctx.strokeStyle = INK; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(x, ay, 15 + 10 * out, 0, 7); ctx.stroke(); }
+    ctx.fillStyle = 'rgba(255,255,255,.95)'; ctx.font = '800 40px "Inter Tight"'; ctx.fillText(e.label.toUpperCase(), x, ay - 60);
+    if (e.sub) { ctx.font = '500 26px "JB Mono"'; ctx.fillStyle = out > 0 ? '#e0473c' : 'rgba(255,255,255,.7)'; ctx.fillText(e.sub.toUpperCase(), x, ay - 105); }
+    ctx.globalAlpha = 1;
+  }
+  if (sh.text) { const n = Math.floor(clamp((t - .6) / 1.2) * sh.text.length); ctx.font = '500 48px Inter'; ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.fillText(sh.text.toLowerCase().slice(0, n), W / 2, H * (WIDE ? .3 : .35)); }
+  ctx.restore();
+};
 KINDS.map = (sh, t) => {  // ink diagram: blocks [x0,y0,x1,y1,label], points [{x,y,label}], route [[x,y]...], xs [{x,y,at}]
   paper(t, sh);
   const M = L.map, X = x => M.x + x * M.w, Y = y => M.y + y * M.h;  // map area inside the safe zone, above the captions
@@ -278,7 +365,8 @@ KINDS.map = (sh, t) => {  // ink diagram: blocks [x0,y0,x1,y1,label], points [{x
       ctx.fillStyle = INKC; ctx.fillText(b[4], (X(b[0]) + X(b[2])) / 2, (Y(b[1]) + Y(b[3])) / 2); }
   }
   ctx.globalAlpha = 1;
-  for (const d of sh.drawings || []) (d.type === 'car' ? drawCar : drawStation)(d, t, X, Y, M);
+  for (const d of sh.drawings || []) ({ car: drawCar, station: drawStation, prison: drawPrison, figure: drawFigure }[d.type])(d, t, X, Y, M);
+  drawRoutes(sh, t, X, Y);
   const R = sh.route || []; if (R.length > 1) {  // red route draws itself
     const k = ease.inout(clamp((t - .6) / Math.max(.8, (sh.end - sh.start) * .55))); let L = 0; const seg = [];
     for (let i = 1; i < R.length; i++) { const d = Math.hypot(X(R[i][0]) - X(R[i - 1][0]), Y(R[i][1]) - Y(R[i - 1][1])); seg.push(d); L += d; }

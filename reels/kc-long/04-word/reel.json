@@ -1,0 +1,212 @@
+{
+ "title": "The word gets out",
+ "script": [
+  "News of the arrest travelled faster than the lawmen.",
+  "Nash's friends in Hot Springs learned that he had been taken, and where he was headed.",
+  "That night, the three lawmen boarded a Missouri Pacific train with their prisoner, bound for Kansas City.",
+  "From there, the plan was to drive him the last stretch, back to Leavenworth.",
+  "Somewhere ahead of them, a different plan was being made.",
+  "Kansas City in 1933 was a city where gangsters operated with little fear of the police.",
+  "Investigators later said Nash's friends turned to a hired gun there named Vernon Miller, a former South Dakota sheriff turned killer.",
+  "Miller agreed to get Nash back."
+ ],
+ "say": {
+  "1924": "nineteen twenty-four",
+  "1930": "nineteen thirty",
+  "1930,": "nineteen thirty,",
+  "1931": "nineteen thirty-one",
+  "1933": "nineteen thirty-three",
+  "1934": "nineteen thirty-four",
+  "1938": "nineteen thirty-eight",
+  "19": "nineteenth",
+  "16": "sixteenth",
+  "17": "seventeenth"
+ },
+ "intro": {
+  "part": "Part three",
+  "title": "The word gets out",
+  "sub": "Fort Smith to Kansas City \u00b7 June 16, 1933",
+  "dur": 6
+ },
+ "shots": [
+  {
+   "line": 0,
+   "kind": "map",
+   "title": "June 16, 1933 \u00b7 night",
+   "sfx": [
+    "paper"
+   ],
+   "points": [
+    {
+     "x": 0.623,
+     "y": 0.917,
+     "label": "Hot Springs",
+     "at": 0.3
+    },
+    {
+     "x": 0.508,
+     "y": 0.768,
+     "label": "Fort Smith",
+     "align": "right",
+     "at": 0.5
+    },
+    {
+     "x": 0.493,
+     "y": 0.15,
+     "label": "Kansas City",
+     "at": 0.7
+    },
+    {
+     "x": 0.464,
+     "y": 0.115,
+     "label": "Leavenworth",
+     "align": "right",
+     "line": 3
+    }
+   ],
+   "routes": [
+    {
+     "pts": [
+      [
+       0.623,
+       0.917
+      ],
+      [
+       0.493,
+       0.15
+      ]
+     ],
+     "style": "plan",
+     "line": 1,
+     "dur": 1.6,
+     "label": "word spreads",
+     "lx": 70
+    },
+    {
+     "pts": [
+      [
+       0.508,
+       0.768
+      ],
+      [
+       0.52,
+       0.5
+      ],
+      [
+       0.493,
+       0.15
+      ]
+     ],
+     "style": "rail",
+     "line": 2,
+     "word": 4,
+     "dur": 3.0,
+     "label": "Missouri Pacific",
+     "lx": -150
+    },
+    {
+     "pts": [
+      [
+       0.493,
+       0.15
+      ],
+      [
+       0.464,
+       0.115
+      ]
+     ],
+     "style": "plan",
+     "line": 3,
+     "word": 6,
+     "dur": 1.4
+    }
+   ]
+  },
+  {
+   "line": 4,
+   "img": "es0617",
+   "sfx": [
+    "paper"
+   ],
+   "from": {
+    "find": "BAND SOUGHT TO FREE",
+    "pad": 0.35
+   },
+   "to": {
+    "find": "BAND SOUGHT TO FREE",
+    "pad": 0.15
+   },
+   "marks": [
+    {
+     "find": "BAND SOUGHT TO FREE",
+     "style": "underline",
+     "at": 1.0
+    }
+   ]
+  },
+  {
+   "line": 5,
+   "img": "wd330617",
+   "sfx": [
+    "paper"
+   ],
+   "from": {
+    "box": [
+     0.6,
+     0.212,
+     0.965,
+     0.29
+    ],
+    "pad": 0.2
+   },
+   "to": {
+    "box": [
+     0.6,
+     0.212,
+     0.965,
+     0.29
+    ],
+    "pad": 0.05
+   }
+  },
+  {
+   "line": 6,
+   "img": "wd331201",
+   "sfx": [
+    "paper"
+   ],
+   "from": "page",
+   "to": {
+    "find": "Trail Of Gangster",
+    "pad": 0.5
+   }
+  },
+  {
+   "line": 6,
+   "word": 12,
+   "kind": "card",
+   "style": "title",
+   "text": "Vernon Miller",
+   "sub": "former sheriff \u00b7 Beadle County, South Dakota",
+   "in": "cut",
+   "sfx": [
+    "stamp"
+   ]
+  },
+  {
+   "line": 7,
+   "kind": "card",
+   "style": "title",
+   "text": "Union Station",
+   "sub": "Saturday \u00b7 7:15 a.m.",
+   "sfx": [
+    "hit"
+   ]
+  }
+ ],
+ "assets": {
+  "es0617": "https://www.loc.gov/resource/sn83045462/1933-06-17/ed-1/?sp=1",
+  "wd330617": "https://www.loc.gov/resource/sn82014085/1933-06-17/ed-1/?sp=1",
+  "wd331201": "https://www.loc.gov/resource/sn82014085/1933-12-01/ed-1/?sp=1"
+ }
+}

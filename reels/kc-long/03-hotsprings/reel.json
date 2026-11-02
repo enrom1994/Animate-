@@ -1,0 +1,215 @@
+{
+ "title": "Hot Springs",
+ "script": [
+  "Hot Springs, Arkansas, was a resort town, famous for its baths, its illegal casinos, and its tolerance for men like Nash.",
+  "He was often seen at the White Front Cigar Store, owned by a man named Richard Galatas.",
+  "In June 1933, two federal agents, Joe Lackey and Frank Smith, found out where he was.",
+  "But in 1933, federal agents had a problem.",
+  "By law, they had no general power to make arrests, or to carry guns.",
+  "So they brought a local lawman with them: Otto Reed, the police chief of McAlester, Oklahoma.",
+  "On June 16, they found Nash, and took him.",
+  "They didn't stay in Hot Springs.",
+  "They drove straight to Fort Smith, Arkansas, and the railroad."
+ ],
+ "say": {
+  "1924": "nineteen twenty-four",
+  "1930": "nineteen thirty",
+  "1930,": "nineteen thirty,",
+  "1931": "nineteen thirty-one",
+  "1933": "nineteen thirty-three",
+  "1934": "nineteen thirty-four",
+  "1938": "nineteen thirty-eight",
+  "19": "nineteenth",
+  "16": "sixteenth",
+  "17": "seventeenth"
+ },
+ "intro": {
+  "part": "Part two",
+  "title": "Hot Springs",
+  "sub": "Arkansas \u00b7 June 1933",
+  "dur": 6
+ },
+ "shots": [
+  {
+   "line": 0,
+   "img": "hs_central",
+   "layout": "clip",
+   "rot": 1,
+   "clip": {
+    "box": [
+     0.04,
+     0.04,
+     0.96,
+     0.96
+    ]
+   },
+   "from": {
+    "box": [
+     0.02,
+     0.02,
+     0.98,
+     0.98
+    ]
+   },
+   "to": {
+    "box": [
+     0.25,
+     0.35,
+     0.85,
+     0.9
+    ]
+   },
+   "label": "HOT SPRINGS \u00b7 c. 1890s",
+   "stamp": "HOT SPRINGS, ARKANSAS",
+   "sfx": [
+    "paper"
+   ]
+  },
+  {
+   "line": 0,
+   "word": 11,
+   "img": "hs_southern",
+   "layout": "clip",
+   "rot": -1.5,
+   "clip": {
+    "box": [
+     0.04,
+     0.04,
+     0.96,
+     0.96
+    ]
+   },
+   "label": "THE SOUTHERN CLUB, A HOT SPRINGS GAMBLING HALL \u00b7 c. 1890s",
+   "sfx": [
+    "paper"
+   ]
+  },
+  {
+   "line": 1,
+   "kind": "card",
+   "style": "title",
+   "text": "White Front Cigar Store",
+   "sub": "owned by Richard Galatas",
+   "sfx": [
+    "stamp"
+   ]
+  },
+  {
+   "line": 2,
+   "img": "es0617",
+   "layout": "clip",
+   "rot": 2,
+   "clip": {
+    "box": [
+     0.148,
+     0.112,
+     0.262,
+     0.262
+    ]
+   },
+   "sfx": [
+    "paper"
+   ]
+  },
+  {
+   "line": 4,
+   "kind": "card",
+   "style": "number",
+   "text": "No arrests. No guns.",
+   "sub": "federal agents, 1933",
+   "in": "cut",
+   "sfx": [
+    "stamp"
+   ]
+  },
+  {
+   "line": 5,
+   "img": "es0617",
+   "sfx": [
+    "paper"
+   ],
+   "from": {
+    "find": "The dead",
+    "pad": 0.1,
+    "grow": [
+     0.005,
+     0.004,
+     0.075,
+     0.032
+    ]
+   },
+   "to": {
+    "find": "Otto Reed",
+    "pad": 0.6
+   },
+   "marks": [
+    {
+     "find": "Otto Reed",
+     "line": 5,
+     "word": 7
+    }
+   ]
+  },
+  {
+   "line": 6,
+   "kind": "map",
+   "title": "Arkansas \u00b7 June 16, 1933",
+   "sfx": [
+    "paper"
+   ],
+   "points": [
+    {
+     "x": 0.623,
+     "y": 0.917,
+     "label": "Hot Springs",
+     "line": 6
+    },
+    {
+     "x": 0.508,
+     "y": 0.768,
+     "label": "Fort Smith",
+     "align": "right",
+     "line": 8
+    }
+   ],
+   "xs": [
+    {
+     "x": 0.623,
+     "y": 0.917,
+     "line": 6,
+     "word": 4,
+     "label": "Nash taken"
+    }
+   ],
+   "routes": [
+    {
+     "pts": [
+      [
+       0.623,
+       0.917
+      ],
+      [
+       0.58,
+       0.82
+      ],
+      [
+       0.508,
+       0.768
+      ]
+     ],
+     "style": "car",
+     "line": 8,
+     "word": 2,
+     "dur": 2.2,
+     "label": "by car",
+     "ly": -30
+    }
+   ]
+  }
+ ],
+ "assets": {
+  "hs_central": "https://www.loc.gov/item/2016806833/",
+  "hs_southern": "https://www.loc.gov/item/2016795327/",
+  "es0617": "https://www.loc.gov/resource/sn83045462/1933-06-17/ed-1/?sp=1"
+ }
+}

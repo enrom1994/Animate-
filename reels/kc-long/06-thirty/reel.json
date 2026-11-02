@@ -1,0 +1,279 @@
+{
+ "title": "Thirty seconds",
+ "script": [
+  "The shooting lasted about thirty seconds.",
+  "Grooms and Hermanson died where they stood.",
+  "Agent Caffrey was shot in the head.",
+  "Inside the car, Chief Reed was killed. So was Frank Nash, the man the gunmen had come to free.",
+  "Agent Lackey was hit three times in the back. Vetterli was wounded in the arm.",
+  "Only Agent Smith came through unhurt.",
+  "Then a voice called out: \"They're all dead. Let's get out of here.\"",
+  "A Kansas City officer fired at one of the gunmen as he ran. The men escaped in a dark car.",
+  "By that evening, the story was on front pages across the country."
+ ],
+ "say": {
+  "1924": "nineteen twenty-four",
+  "1930": "nineteen thirty",
+  "1930,": "nineteen thirty,",
+  "1931": "nineteen thirty-one",
+  "1933": "nineteen thirty-three",
+  "1934": "nineteen thirty-four",
+  "1938": "nineteen thirty-eight",
+  "19": "nineteenth",
+  "16": "sixteenth",
+  "17": "seventeenth"
+ },
+ "intro": {
+  "part": "Part five",
+  "title": "Thirty seconds",
+  "sub": "The east entrance",
+  "dur": 6
+ },
+ "shots": [
+  {
+   "line": 0,
+   "kind": "card",
+   "style": "number",
+   "text": "30 seconds",
+   "sfx": [
+    "burst"
+   ]
+  },
+  {
+   "line": 1,
+   "img": "es0617",
+   "sfx": [
+    "drop",
+    "paper"
+   ],
+   "from": {
+    "find": "The dead",
+    "pad": 0.1,
+    "grow": [
+     0.005,
+     0.004,
+     0.075,
+     0.032
+    ]
+   },
+   "to": {
+    "find": "The dead",
+    "pad": 0.1,
+    "grow": [
+     0.005,
+     0.004,
+     0.075,
+     0.032
+    ],
+    "zoom": 1.1
+   },
+   "marks": [
+    {
+     "find": "Grooms",
+     "line": 1,
+     "word": 0
+    },
+    {
+     "find": "Hermanson",
+     "line": 1,
+     "word": 2
+    },
+    {
+     "find": "Caffrey",
+     "line": 2,
+     "word": 1
+    },
+    {
+     "find": "Otto Reed",
+     "line": 3,
+     "word": 4
+    },
+    {
+     "find": "Frank Nash, the Federal",
+     "line": 3,
+     "word": 9
+    }
+   ]
+  },
+  {
+   "line": 4,
+   "kind": "map",
+   "title": "Caffrey's Chevrolet",
+   "sfx": [
+    "paper"
+   ],
+   "drawings": [
+    {
+     "type": "car",
+     "x": 0.5,
+     "y": 0.52,
+     "w": 0.62,
+     "face": "right",
+     "at": 0.05,
+     "occupants": [
+      {
+       "seat": "front-right",
+       "label": "Nash",
+       "at": 0.2,
+       "dx": 150,
+       "x_at": 0.5
+      },
+      {
+       "seat": "rear-left",
+       "label": "Lackey",
+       "at": 0.2,
+       "dx": -60,
+       "note": "wounded"
+      },
+      {
+       "seat": "rear-mid",
+       "label": "Smith",
+       "at": 0.2,
+       "side": 1,
+       "dx": -170,
+       "note": "unhurt",
+       "line": 5
+      },
+      {
+       "seat": "rear-right",
+       "label": "Reed",
+       "at": 0.2,
+       "x_at": 0.8
+      }
+     ],
+     "driver": {
+      "label": "Caffrey",
+      "at": 0.2,
+      "x_at": 1.1
+     }
+    }
+   ]
+  },
+  {
+   "line": 6,
+   "word": 5,
+   "kind": "card",
+   "style": "quote",
+   "text": "They're all dead. Let's get out of here.",
+   "in": "cut",
+   "sfx": [
+    "stamp"
+   ]
+  },
+  {
+   "line": 7,
+   "img": "es0617",
+   "sfx": [
+    "paper"
+   ],
+   "from": {
+    "find": "The killers fled in one or more",
+    "pad": 0.3
+   },
+   "to": {
+    "find": "The killers fled in one or more",
+    "pad": 0.12
+   },
+   "marks": [
+    {
+     "find": "The killers fled in one or more",
+     "style": "underline",
+     "line": 7,
+     "word": 13
+    }
+   ]
+  },
+  {
+   "line": 8,
+   "img": "bt330617",
+   "in": "cut",
+   "sfx": [
+    "paper"
+   ],
+   "from": {
+    "box": [
+     0.83,
+     0.135,
+     0.945,
+     0.195
+    ],
+    "pad": 0.4
+   },
+   "to": {
+    "box": [
+     0.83,
+     0.135,
+     0.945,
+     0.195
+    ],
+    "pad": 0.2
+   }
+  },
+  {
+   "line": 8,
+   "word": 4,
+   "img": "it330617",
+   "in": "cut",
+   "sfx": [
+    "paper"
+   ],
+   "from": {
+    "find": "FIVE ARE SLAIN IN",
+    "pad": 0.1,
+    "grow": [
+     0,
+     0,
+     0,
+     0.05
+    ]
+   }
+  },
+  {
+   "line": 8,
+   "word": 7,
+   "img": "kw330617",
+   "in": "cut",
+   "sfx": [
+    "paper"
+   ],
+   "from": {
+    "find": "Four Officers Slain By",
+    "pad": 0.1,
+    "grow": [
+     0,
+     0,
+     0,
+     0.03
+    ]
+   }
+  },
+  {
+   "line": 8,
+   "word": 9,
+   "img": "wd330617",
+   "in": "cut",
+   "sfx": [
+    "paper",
+    "hit"
+   ],
+   "from": {
+    "box": [
+     0.0,
+     0.135,
+     0.965,
+     0.21
+    ],
+    "pad": 0.02
+   },
+   "to": "page"
+  }
+ ],
+ "assets": {
+  "es0617": "https://www.loc.gov/resource/sn83045462/1933-06-17/ed-1/?sp=1",
+  "kw330617": "https://www.loc.gov/resource/sn83016244/1933-06-17/ed-1/?sp=1",
+  "bt330617": "https://www.loc.gov/resource/sn85042243/1933-06-17/ed-1/?sp=1",
+  "it330617": "https://www.loc.gov/resource/sn82015313/1933-06-17/ed-2/?sp=1",
+  "wd330617": "https://www.loc.gov/resource/sn82014085/1933-06-17/ed-1/?sp=1"
+ },
+ "tail": 2.0
+}
