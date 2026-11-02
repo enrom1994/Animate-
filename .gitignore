@@ -1,0 +1,13 @@
+.claude/kit/node_modules/
+.claude/kit/vendor/
+.claude/kit/models
+.claude/kit/models/
+.claude/kit/.venv/
+__pycache__/
+.work/
+*.snaps/
+.env
+.DS_Store
+.claude/skills/stick-figure/engine/template/seg/
+.claude/skills/stick-figure/engine/template/stills/
+.claude/skills/stick-figure/engine/template/silent.mp4
