@@ -1,0 +1,305 @@
+{
+ "title": "The Kansas City Massacre",
+ "series": "One front page, one crime",
+ "voice": {
+  "name": "am_onyx",
+  "speed": 0.9,
+  "pitch": -1.0,
+  "gap": 0.32
+ },
+ "script": [
+  "Four lawmen died at a train station, trying to move one prisoner.",
+  "Kansas City. Union Station. June 17, 1933.",
+  "Federal agents had caught escaped convict Frank Nash the day before.",
+  "Now they were walking him to a car, bound for Leavenworth prison.",
+  "Then gunmen came at the car and opened fire.",
+  "Investigators said they had come to set Nash free.",
+  "In about 30 seconds, four lawmen were dead.",
+  "Two police officers, a police chief, and a federal agent.",
+  "Frank Nash was dead too. The man they came to free.",
+  "Within a year, Congress gave federal agents the power to carry guns and make arrests.",
+  "Many historians see that morning as the start of the modern FBI."
+ ],
+ "say": {
+  "17": "seventeenth",
+  "1933": "nineteen thirty-three",
+  "30": "thirty"
+ },
+ "emph": [
+  "four",
+  "dead",
+  "30",
+  "free",
+  "FBI",
+  "1933"
+ ],
+ "assets": {
+  "wt0617": "https://www.loc.gov/resource/sn84026749/1933-06-17/ed-1/?sp=1",
+  "es0617": "https://www.loc.gov/resource/sn83045462/1933-06-17/ed-1/?sp=1",
+  "bt340519": "https://www.loc.gov/resource/sn85042243/1934-05-19/ed-1/?sp=1"
+ },
+ "shots": [
+  {
+   "line": 0,
+   "img": "wt0617",
+   "in": "cut",
+   "sfx": [
+    "hit"
+   ],
+   "from": {
+    "find": "GUNMEN KILL 4",
+    "pad": 0.04
+   },
+   "to": {
+    "find": "AND PRISONER",
+    "pad": 0.06
+   },
+   "marks": [
+    {
+     "find": "4 OFFICERS",
+     "style": "box",
+     "at": 1.6
+    }
+   ],
+   "ease": "inout"
+  },
+  {
+   "line": 1,
+   "img": "es0617",
+   "in": "flash",
+   "sfx": [
+    "flash",
+    "type"
+   ],
+   "stamp": "KANSAS CITY \u00b7 JUNE 17, 1933",
+   "from": "page",
+   "to": {
+    "find": "GANG GUNS SLAY FOUR OFFICERS",
+    "pad": 0.25,
+    "grow": [
+     0,
+     0,
+     0,
+     0.03
+    ]
+   }
+  },
+  {
+   "line": 2,
+   "img": "es0617",
+   "layout": "clip",
+   "rot": -2,
+   "sfx": [
+    "paper"
+   ],
+   "clip": {
+    "box": [
+     0.148,
+     0.268,
+     0.262,
+     0.402
+    ]
+   }
+  },
+  {
+   "line": 3,
+   "img": "es0617",
+   "sfx": [
+    "paper"
+   ],
+   "from": {
+    "find": "BAND SOUGHT TO FREE",
+    "pad": 0.2
+   },
+   "to": {
+    "find": "Machine Gun Fours Hail of Bullets",
+    "pad": 0.12,
+    "grow": [
+     0,
+     0,
+     0,
+     0.012
+    ]
+   }
+  },
+  {
+   "line": 4,
+   "img": "wt0617",
+   "in": "flash",
+   "sfx": [
+    "burst",
+    "flash"
+   ],
+   "from": {
+    "find": "RAIL DEPOT GANGSTER BATTLE SCENE",
+    "pad": 0.05
+   },
+   "to": {
+    "find": "RAIL DEPOT GANGSTER BATTLE SCENE",
+    "pad": 0.05,
+    "zoom": 1.2
+   }
+  },
+  {
+   "line": 5,
+   "img": "es0617",
+   "sfx": [
+    "paper"
+   ],
+   "from": {
+    "find": "BAND SOUGHT TO FREE",
+    "pad": 0.3
+   },
+   "to": {
+    "find": "BAND SOUGHT TO FREE",
+    "pad": 0.18
+   },
+   "marks": [
+    {
+     "find": "BAND SOUGHT TO FREE",
+     "style": "underline",
+     "at": 0.9
+    }
+   ]
+  },
+  {
+   "line": 6,
+   "img": "es0617",
+   "in": "cut",
+   "sfx": [
+    "drop",
+    "hit"
+   ],
+   "from": {
+    "find": "GANG GUNS SLAY FOUR OFFICERS",
+    "pad": 0.1
+   },
+   "to": {
+    "find": "GANG GUNS SLAY FOUR OFFICERS",
+    "pad": 0.1,
+    "zoom": 1.3
+   },
+   "marks": [
+    {
+     "find": "FOUR OFFICERS",
+     "style": "box",
+     "at": 1.0
+    }
+   ]
+  },
+  {
+   "line": 7,
+   "img": "es0617",
+   "sfx": [
+    "paper"
+   ],
+   "from": {
+    "find": "The dead",
+    "pad": 0.1,
+    "grow": [
+     0.005,
+     0.004,
+     0.075,
+     0.032
+    ]
+   },
+   "to": {
+    "find": "The dead",
+    "pad": 0.1,
+    "grow": [
+     0.005,
+     0.004,
+     0.075,
+     0.032
+    ],
+    "zoom": 1.12
+   }
+  },
+  {
+   "line": 8,
+   "img": "es0617",
+   "layout": "clip",
+   "rot": 1.5,
+   "sfx": [
+    "drop"
+   ],
+   "clip": {
+    "box": [
+     0.148,
+     0.268,
+     0.262,
+     0.402
+    ]
+   },
+   "marks": [
+    {
+     "find": "FRANK NASH",
+     "style": "box",
+     "at": 0.5
+    }
+   ]
+  },
+  {
+   "line": 9,
+   "img": "bt340519",
+   "in": "fade",
+   "sfx": [
+    "paper",
+    "type"
+   ],
+   "stamp": "MAY 19, 1934",
+   "from": "page",
+   "to": {
+    "find": "PRESIDENT CALLING ON ALL CITIZENS TO JOIN WAR ON CRIME",
+    "pad": 0.2
+   }
+  },
+  {
+   "line": 9,
+   "word": 8,
+   "img": "bt340519",
+   "sfx": [],
+   "from": {
+    "find": "In signing six bills Friday",
+    "pad": 0.18,
+    "grow": [
+     0,
+     0,
+     0,
+     0.01
+    ]
+   },
+   "to": {
+    "find": "In signing six bills Friday",
+    "pad": 0.12,
+    "grow": [
+     0,
+     0,
+     0,
+     0.01
+    ]
+   },
+   "marks": [
+    {
+     "find": "In signing six bills Friday",
+     "style": "box",
+     "at": 0.4
+    }
+   ]
+  },
+  {
+   "line": 10,
+   "img": "wt0617",
+   "in": "fade",
+   "sfx": [
+    "hit"
+   ],
+   "ease": "inout",
+   "from": {
+    "find": "GUNMEN KILL 4 OFFICERS AND PRISONER",
+    "pad": 0.03
+   },
+   "to": "page"
+  }
+ ]
+}

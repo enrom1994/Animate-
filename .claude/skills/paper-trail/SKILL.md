@@ -1,0 +1,81 @@
+---
+name: paper-trail
+description: Makes a 30 to 60 s vertical (9:16) organized-crime history Short told through the original paper trail - real period front pages from the Library of Congress, slow push-ins and pans (a front page shown whole, then a push into the headline), red ink marks, typed date stamps, a dark low narration and burned-in captions. Use when the user runs /paper-trail or asks for a mob / organized-crime / true-crime history Short, a "One front page, one crime" episode, or a newspaper-archive documentary reel.
+---
+
+# /paper-trail
+
+```
+┌──────────────────────┐
+│ ONE FRONT PAGE, ONE CRIME   series label
+│  KANSAS CITY · JUNE 17, 1933   typed stamp
+│ ┌──────────────────┐ │
+│ │ GUNMEN KILL [4 OFFICERS] │  real scan, slow push, red ink box
+│ └──────────────────┘ │
+│     FOUR LAWMEN      │  1-3 word captions, red on key words
+└──────────────────────┘
+```
+
+A finished example lives in the repo at `reels/kc-massacre/` (reel.json is the whole spec).
+
+## Content rules (the channel's, not optional)
+- Historical or closed cases only. Nothing about active cases or real, named **living** people.
+- One story per Short. The hook is the first sentence.
+- Real material first. Never fabricate a front page, headline or quote. At most one or two AI images, only for atmosphere (an empty platform, rain), never depicting the event or real people; if used, tick YouTube's altered/synthetic content disclosure.
+- Copyright: US works published 1930 or earlier are public domain. 1931 to 1963 newspapers are usually public domain (copyright not renewed) and Chronicling America believes its pages are public domain, but wire photos inside them can still be protected. Post-1963 material needs licensing; avoid it.
+- Fact-check every claim (FBI history pages, Wikipedia and its sources, the period papers themselves). Hedge contested theories ("investigators said", "many historians").
+
+## First use
+```bash
+SKILL_DIR="<base directory of this skill>"
+KIT=$(python3 -c 'import os,sys;print(os.path.realpath(os.path.join(sys.argv[1],"..","..","kit")))' "$SKILL_DIR")
+[ -x "$KIT/.venv/bin/python" ] && [ -d "$KIT/models" ] || bash "$KIT/setup.sh" --voice   # ~1 GB voice models, once
+PY="$KIT/.venv/bin/python"
+```
+Needs ffmpeg, Node 18+, Python 3.9+. In a cloud container with a preinstalled Chromium, set `CHROME=/opt/pw-browsers/chromium` (render.mjs uses it instead of Playwright's own download).
+
+## Steps
+1. **Script.** 90 to 120 words, 35 to 50 s at the dark pace. Sentence 1 is the hook. Then place and date, the setup, the turn, the cost, the twist, the consequence. One idea per sentence. Show it to the user before building. Write numbers as digits in `script` and how to say them in `say` (`{"1933": "nineteen thirty-three"}`), so captions show `1933`.
+2. **Sources.** From the reel folder:
+   `python3 "$SKILL_DIR/tools/loc.py" search "nash kansas city" --from 1933-06-17 --to 1933-06-19 --front`
+   then `python3 "$SKILL_DIR/tools/loc.py" fetch <loc.gov resource url> <name>` (saves `assets/<name>.jpg`, its OCR `.xml`, and source/rights `.json`). Look at the pages (downscale with ffmpeg and view) and pick the strongest headline for the hook. Record every page in `reel.json` `assets` so the reel can be refetched.
+3. **Frame.** `python3 "$SKILL_DIR/tools/loc.py" find <name> "GUNMEN KILL 4 OFFICERS"` prints the phrase's box. Shots can use `{"find": "..."}` directly; the planner resolves them.
+4. **Spec.** Write `reel.json` (format below), one shot per sentence or half-sentence, 2.5 to 5 s each. Open with a headline already moving; use the signature move (`"from": "page"` to a headline) at least once; end by pulling back to the hook page.
+5. **Stills.** `bash "$SKILL_DIR/make.sh" <reel> stills 0.5,4.5,9,15` makes the voice, word timings and plan, then writes `build/stills/`. Check: headlines readable, ink marks on the right words, captions (y about 1330) clear of faces, the series label not covering text.
+6. **Build.** `bash "$SKILL_DIR/make.sh" <reel>` (about 3 minutes on 4 cores for 45 s; `WORKERS=8` on bigger machines). Writes `<reel>/<folder name>.mp4`. Remake the voice with `VOICE=1`; use your own narration by putting it at `audio/vo.wav` (44.1 kHz mono).
+7. **Hand over** the mp4, plus the list of sources (titles and loc.gov links from `assets/*.json`) for the video description.
+
+## reel.json
+```json
+{
+  "series": "One front page, one crime",
+  "voice": {"name": "am_onyx", "speed": 0.9, "pitch": -1.0, "gap": 0.32},
+  "script": ["Four lawmen died at a train station, trying to move one prisoner.", "..."],
+  "say": {"1933": "nineteen thirty-three"},
+  "emph": ["four", "dead"],                 // caption words drawn in red
+  "bed_db": -14,                            // music + SFX level under the voice
+  "assets": {"wt0617": "https://www.loc.gov/resource/sn84026749/1933-06-17/ed-1/?sp=1"},
+  "shots": [
+    {"line": 0, "img": "wt0617", "in": "cut", "sfx": ["hit"],
+     "from": {"find": "GUNMEN KILL 4", "pad": 0.04}, "to": {"find": "AND PRISONER", "pad": 0.06},
+     "marks": [{"find": "4 OFFICERS", "style": "box", "at": 1.6}]},
+    {"line": 1, "img": "es0617", "in": "flash", "stamp": "KANSAS CITY · JUNE 17, 1933", "sfx": ["flash", "type"],
+     "from": "page", "to": {"find": "GANG GUNS SLAY FOUR OFFICERS", "pad": 0.25}},
+    {"line": 2, "img": "es0617", "layout": "clip", "rot": -2, "clip": {"box": [0.148, 0.268, 0.262, 0.402]}}
+  ]
+}
+```
+- Shot timing: `line` (sentence index) and optional `word` (index inside it) and `offset`; a shot runs until the next one starts, so timing follows the voice automatically.
+- Views (`from`, `to`, `clip`): `"page"`, `{"find": "...", "pad", "nth", "grow": [l,t,r,b], "zoom"}` or `{"box": [x0,y0,x1,y1]}` (normalized). The camera fits the view into the frame; `zoom` > 1 pushes in.
+- `layout: "clip"` cuts the region out as a clipping on the dark blurred page (portraits, small items); it sits high so captions stay clear.
+- `in`: `cut`, `fade` (default), `flash`, `black`. `marks`: `box` or `underline` in red ink, `at` seconds into the shot. Newspaper lines are tight: prefer `box` over `underline`, and keep a mark to one line of text.
+- `sfx`: `hit` (low boom), `flash` (camera flash), `paper`, `type` (with a stamp), `burst` (distant muffled gunfire, use once), `drop` (the score cuts out for a beat; use on the deaths).
+
+## Style
+- Monochrome sepia grade, grain, flicker, vignette. Red (#c4161c) is the only colour: ink marks and emphasised caption words.
+- Captions: Inter Tight 800, uppercase, 1 to 3 words, never ending on "the/a/to/of"; safe area x 100 to 980, y 220 to 1500.
+- Narration: Kokoro `am_onyx` (the lowest free voice, ~87 Hz) slowed and pitched down 1 semitone with a little room. For release quality, swap in a human or ElevenLabs take at `audio/vo.wav`.
+- Score: low drone, a heartbeat pulse that quickens, a faint high tension tone that swells, all made in code and ducked under the voice.
+
+## Files
+`tools/loc.py` archive search/fetch/find · `tools/voice.py` Kokoro + darkening · `tools/align.py` word timings · `tools/plan.py` spec to timed plan · `tools/audio.py` score + SFX + mix · `tools/render.mjs` Playwright frames · `engine/` the canvas renderer · `make.sh` all of it.
