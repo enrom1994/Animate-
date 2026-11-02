@@ -1,0 +1,7 @@
+{
+  "series": "One front page, one crime",
+  "voice": { "name": "am_onyx", "speed": 0.9, "pitch": -1.0, "gap": 0.32 },
+  "bed_db": -14,
+  "outro": { "items": ["LIKE", "FOLLOW", "SUBSCRIBE"], "text": "Like, follow & subscribe for more", "say": null, "dur": 3.6 },
+  "cta_mid": null
+}

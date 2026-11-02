@@ -16,11 +16,12 @@ description: Makes a 30 to 60 s vertical (9:16) organized-crime history Short to
 └──────────────────────┘
 ```
 
-A finished example lives in the repo at `reels/kc-massacre/` (reel.json is the whole spec).
+A finished example lives in the repo at `reels/kc-massacre/` (reel.json is the whole spec). Channel-wide defaults (series label, voice, end card, mid-video prompt) live in `reels/channel.json`; a reel's own keys override them.
 
 ## Content rules (the channel's, not optional)
 - Historical or closed cases only. Nothing about active cases or real, named **living** people.
 - One story per Short. The hook is the first sentence.
+- Mix media, but the paper trail leads: newspaper pages for the spine, plus period photos (`loc.py search ... --photos`), typed cards, ink-drawn maps/diagrams and archive film where it helps. Keep everything in the same monochrome-and-red look; bright cartoon or stick-figure art breaks the tone and the trust.
 - Real material first. Never fabricate a front page, headline or quote. At most one or two AI images, only for atmosphere (an empty platform, rain), never depicting the event or real people; if used, tick YouTube's altered/synthetic content disclosure.
 - Copyright: US works published 1930 or earlier are public domain. 1931 to 1963 newspapers are usually public domain (copyright not renewed) and Chronicling America believes its pages are public domain, but wire photos inside them can still be protected. Post-1963 material needs licensing; avoid it.
 - Fact-check every claim (FBI history pages, Wikipedia and its sources, the period papers themselves). Hedge contested theories ("investigators said", "many historians").
@@ -38,12 +39,12 @@ Needs ffmpeg, Node 18+, Python 3.9+. In a cloud container with a preinstalled Ch
 1. **Script.** 90 to 120 words, 35 to 50 s at the dark pace. Sentence 1 is the hook. Then place and date, the setup, the turn, the cost, the twist, the consequence. One idea per sentence. Show it to the user before building. Write numbers as digits in `script` and how to say them in `say` (`{"1933": "nineteen thirty-three"}`), so captions show `1933`.
 2. **Sources.** From the reel folder:
    `python3 "$SKILL_DIR/tools/loc.py" search "nash kansas city" --from 1933-06-17 --to 1933-06-19 --front`
-   then `python3 "$SKILL_DIR/tools/loc.py" fetch <loc.gov resource url> <name>` (saves `assets/<name>.jpg`, its OCR `.xml`, and source/rights `.json`). Look at the pages (downscale with ffmpeg and view) and pick the strongest headline for the hook. Record every page in `reel.json` `assets` so the reel can be refetched.
+   then `python3 "$SKILL_DIR/tools/loc.py" fetch <loc.gov resource or item url> <name>` (newspaper page, or a Prints & Photographs item) (saves `assets/<name>.jpg`, its OCR `.xml`, and source/rights `.json`). Look at the pages (downscale with ffmpeg and view) and pick the strongest headline for the hook. Record every page in `reel.json` `assets` so the reel can be refetched.
 3. **Frame.** `python3 "$SKILL_DIR/tools/loc.py" find <name> "GUNMEN KILL 4 OFFICERS"` prints the phrase's box. Shots can use `{"find": "..."}` directly; the planner resolves them.
 4. **Spec.** Write `reel.json` (format below), one shot per sentence or half-sentence, 2.5 to 5 s each. Open with a headline already moving; use the signature move (`"from": "page"` to a headline) at least once; end by pulling back to the hook page.
 5. **Stills.** `bash "$SKILL_DIR/make.sh" <reel> stills 0.5,4.5,9,15` makes the voice, word timings and plan, then writes `build/stills/`. Check: headlines readable, ink marks on the right words, captions (y about 1330) clear of faces, the series label not covering text.
 6. **Build.** `bash "$SKILL_DIR/make.sh" <reel>` (about 3 minutes on 4 cores for 45 s; `WORKERS=8` on bigger machines). Writes `<reel>/<folder name>.mp4`. Remake the voice with `VOICE=1`; use your own narration by putting it at `audio/vo.wav` (44.1 kHz mono).
-7. **Hand over** the mp4, plus the list of sources (titles and loc.gov links from `assets/*.json`) for the video description.
+7. **Hand over** the mp4, plus `build/description.txt` (sources with loc.gov links, and an AI disclosure note if any shot used `"ai": true`) for the video description.
 
 ## reel.json
 ```json
@@ -69,7 +70,15 @@ Needs ffmpeg, Node 18+, Python 3.9+. In a cloud container with a preinstalled Ch
 - Views (`from`, `to`, `clip`): `"page"`, `{"find": "...", "pad", "nth", "grow": [l,t,r,b], "zoom"}` or `{"box": [x0,y0,x1,y1]}` (normalized). The camera fits the view into the frame; `zoom` > 1 pushes in.
 - `layout: "clip"` cuts the region out as a clipping on the dark blurred page (portraits, small items); it sits high so captions stay clear.
 - `in`: `cut`, `fade` (default), `flash`, `black`. `marks`: `box` or `underline` in red ink, `at` seconds into the shot. Newspaper lines are tight: prefer `box` over `underline`, and keep a mark to one line of text.
-- `sfx`: `hit` (low boom), `flash` (camera flash), `paper`, `type` (with a stamp), `burst` (distant muffled gunfire, use once), `drop` (the score cuts out for a beat; use on the deaths).
+- Other shot kinds (`"kind"`):
+  - `photo`: any still that fills the frame (`img` in assets/, `from`/`to` boxes). Small or landscape photos look better as `"layout": "clip"` (a print on the dark page) than stretched to fill. Add `"label": "UNION STATION · c. 1910-30"` when the picture isn't of the event itself.
+  - `card`: `{"kind": "card", "text": "30 seconds", "style": "number|quote|title", "sub": "..."}` stamped on aged paper.
+  - `map`: an ink diagram drawn in code, auto-labelled ILLUSTRATION. `blocks` `[x0,y0,x1,y1,"LABEL"]`, `points` `{x,y,label,align,dy}`, `route` `[[x,y],...]` (red, draws itself), `xs` `{x,y,label,at}` (red X), `title`. Coordinates 0..1 inside the map area. Keep it schematic; don't invent precise positions.
+  - `footage`: an archive film clip at `assets/<img>.mp4` (`from_s` = start second in the clip); frames are pre-extracted and graded like the pages. Public-domain sources only (e.g. US government newsreels, Prelinger, LoC); most newsreels after 1930 are not.
+  - AI images: `"ai": true` on the shot adds an "AI ILLUSTRATION" tag and a disclosure note in `build/description.txt`.
+- End card (every reel, from channel.json `outro`): a case-file checklist, LIKE / FOLLOW / SUBSCRIBE ticked in red, "FOR MORE" and the series name, about 3.6 s after the last line. Set `"say": "Like, follow and subscribe for more."` to have the narrator speak it, `"outro": false` in a reel to drop it.
+- Mid-video prompt (off by default): `"cta_mid": {"line": 6, "text": "Follow for part 2", "dur": 2.6}` shows a small pill under the captions.
+- `sfx`: `stamp`, `hit` (low boom), `flash` (camera flash), `paper`, `type` (with a stamp), `burst` (distant muffled gunfire, use once), `drop` (the score cuts out for a beat; use on the deaths).
 
 ## Style
 - Monochrome sepia grade, grain, flicker, vignette. Red (#c4161c) is the only colour: ink marks and emphasised caption words.

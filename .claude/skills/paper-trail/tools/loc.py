@@ -1,6 +1,8 @@
 """Library of Congress newspaper archive (Chronicling America) helper.
   loc.py search "nash kansas city" --from 1933-06-17 --to 1933-06-19 [--front]
   loc.py fetch <loc.gov resource url> <name> [--width 3000]   -> assets/<name>.jpg + .xml (OCR word boxes) + .json (source, rights)
+  loc.py search "union station kansas city" --photos           -> Prints & Photographs results instead of newspapers
+  loc.py fetch https://www.loc.gov/item/2016818238/ <name>     -> a photo item (largest JPEG, rights note kept)
   loc.py find <name> "gang guns slay"                          -> normalized box [x0,y0,x1,y1] of that phrase on the page
 Run fetch/find from the reel folder."""
 import json, os, re, sys, difflib, urllib.parse, urllib.request
@@ -22,13 +24,27 @@ def arg(flag, default=None):
 def search(q):
     p = {"q": q, "fo": "json", "c": arg("--count", "40")}
     if arg("--from"): p["dates"] = f"{arg('--from')}/{arg('--to', arg('--from'))}"
-    d = get("https://www.loc.gov/collections/chronicling-america/?" + urllib.parse.urlencode(p))
+    base = "https://www.loc.gov/photos/?" if "--photos" in sys.argv else "https://www.loc.gov/collections/chronicling-america/?"
+    d = get(base + urllib.parse.urlencode(p))
     print(d["pagination"]["of"], "pages")
     for r in d["results"]:
         if "--front" in sys.argv and not r["id"].endswith("sp=1"): continue
-        print(r.get("date"), r["id"], "|", r.get("title", "")[:90])
+        adv = r.get("rights_advisory"); adv = adv[0] if isinstance(adv, list) and adv else (adv or "")
+        print(r.get("date"), r["id"], "|", (r.get("title") or "")[:90], ("| " + adv[:50]) if "--photos" in sys.argv else "")
+
+def fetch_photo(url, name):
+    d = get(url + ("&" if "?" in url else "?") + "fo=json"); it = d["item"]
+    fs = [f for grp in d["resources"][0].get("files", []) for f in grp if f.get("mimetype") == "image/jpeg"]
+    best = max(fs, key=lambda f: f.get("width") or 0)
+    os.makedirs("assets", exist_ok=True); open(f"assets/{name}.jpg", "wb").write(get(best["url"], raw=True))
+    adv = it.get("rights_advisory"); adv = adv[0] if isinstance(adv, list) and adv else adv
+    meta = {"source": url, "title": it.get("title"), "date": it.get("date"), "image": best["url"], "kind": "photo",
+            "rights": f"Library of Congress Prints & Photographs: {adv or 'see the item page'}"}
+    json.dump(meta, open(f"assets/{name}.json", "w"), indent=1)
+    print("saved", name, meta["title"], best.get("width"), "px |", meta["rights"])
 
 def fetch(url, name):
+    if "/item/" in url: return fetch_photo(url, name)
     d = get(url + ("&" if "?" in url else "?") + "fo=json")
     jp2 = next(p for p in d["page"] if p.get("mimetype") == "image/jp2")
     xml = next(p for p in d["page"] if p.get("mimetype") == "text/xml")

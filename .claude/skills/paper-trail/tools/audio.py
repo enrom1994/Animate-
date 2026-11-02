@@ -1,9 +1,10 @@
 """Score + SFX for a paper-trail reel, made in code, placed by build/plan.json. Run from the reel folder after plan.py.
 Shot "sfx": paper | flash | hit | burst | type | drop   (drop = the score cuts out for a beat). Writes audio/mix.wav."""
-import json, numpy as np, soundfile as sf
+import json, os, sys, numpy as np, soundfile as sf
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__))); import config
 from scipy import signal
 SR = 44100; rng = np.random.default_rng(7)
-P = json.load(open("build/plan.json")); R = json.load(open("reel.json"))
+P = json.load(open("build/plan.json")); R = config.load()
 vo, vsr = sf.read("audio/vo.wav", dtype="float32")
 if vo.ndim > 1: vo = vo.mean(1)
 assert vsr == SR, "audio/vo.wav must be 44.1 kHz (voice.py writes it so)"
@@ -68,7 +69,14 @@ def typing(d=.9):
         n = int(.03 * SR); t = np.arange(n) / SR
         place(out, hp(rng.standard_normal(n), 2500) * np.exp(-t * 260) * .7 + np.sin(2 * np.pi * 1800 * t) * np.exp(-t * 200) * .2, t0); t0 += .055 + .05 * rng.random()
     return out
-FX = {"paper": (paper, .55), "flash": (flash, .7), "hit": (hit, .9), "burst": (burst, .55), "type": (typing, .35)}
+def stamp():
+    n = int(.5 * SR); t = np.arange(n) / SR
+    return verb(thud(95, .5)[:n] * .9 + bp(rng.standard_normal(n), 200, 2500) * np.exp(-t * 45) * .7, .8, .25)
+def stamp3():
+    out = np.zeros(int(2.4 * SR))
+    for i in range(3): place(out, stamp(), .5 + i * .3)
+    return out
+FX = {"stamp": (stamp, .7), "stamp3": (stamp3, .7), "paper": (paper, .55), "flash": (flash, .7), "hit": (hit, .9), "burst": (burst, .55), "type": (typing, .35)}
 sfx = np.zeros(N + 4 * SR)
 for s in P["shots"]:
     for name in s["sfx"]:

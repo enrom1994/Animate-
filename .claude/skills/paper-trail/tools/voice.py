@@ -6,13 +6,14 @@ HERE = os.path.dirname(os.path.realpath(__file__))
 KIT = os.path.realpath(os.path.join(HERE, "..", "..", "..", "kit"))
 from kokoro_onnx import Kokoro, EspeakConfig
 import espeakng_loader
+sys.path.insert(0, HERE); import config
 
 def spoken(line, say):
     for k in sorted(say, key=len, reverse=True): line = re.sub(rf"(?<![\w]){re.escape(k)}(?![\w])", say[k], line)
     return line
 
 if __name__ == "__main__":
-    R = json.load(open("reel.json")); V = {"name": "am_onyx", "speed": .9, "pitch": -1.0, "gap": .32, **R.get("voice", {})}
+    R = config.load(); V = {"name": "am_onyx", "speed": .9, "pitch": -1.0, "gap": .32, **R.get("voice", {})}
     data = espeakng_loader.get_data_path()
     if len(data) > 100:  # espeak-ng breaks on long data paths
         short = os.path.join(tempfile.gettempdir(), "kokoro-espeak-ng-data")

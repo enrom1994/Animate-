@@ -3,6 +3,7 @@ Writes audio/words.json: one entry per DISPLAY word of the script (so "1933" get
 import json, re, os, glob, sys, difflib, numpy as np, soundfile as sf, sherpa_onnx
 HERE = os.path.dirname(os.path.realpath(__file__)); sys.path.insert(0, HERE)
 from voice import spoken
+import config
 KIT = os.path.realpath(os.path.join(HERE, "..", "..", "..", "kit"))
 d = glob.glob(os.path.join(KIT, "models", "sherpa-onnx-nemo-parakeet*"))
 if not d: sys.exit(f"word-timing model missing: run  bash {KIT}/setup.sh --voice")
@@ -19,7 +20,7 @@ for tok, ts in zip(r.tokens, r.timestamps):
     if tok.startswith((" ", "▁")) or not asr: asr.append([tok.strip(" ▁"), ts])
     else: asr[-1][0] += tok
 norm = lambda w: re.sub(r"[^a-z0-9]", "", w.lower())
-R = json.load(open("reel.json")); say = R.get("say", {})
+R = config.load(); say = R.get("say", {})
 disp, toks = [], []   # display words, and the spoken tokens each one owns
 for li, line in enumerate(R["script"]):
     for w in line.split():

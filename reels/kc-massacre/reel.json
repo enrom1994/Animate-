@@ -1,12 +1,5 @@
 {
  "title": "The Kansas City Massacre",
- "series": "One front page, one crime",
- "voice": {
-  "name": "am_onyx",
-  "speed": 0.9,
-  "pitch": -1.0,
-  "gap": 0.32
- },
  "script": [
   "Four lawmen died at a train station, trying to move one prisoner.",
   "Kansas City. Union Station. June 17, 1933.",
@@ -36,7 +29,8 @@
  "assets": {
   "wt0617": "https://www.loc.gov/resource/sn84026749/1933-06-17/ed-1/?sp=1",
   "es0617": "https://www.loc.gov/resource/sn83045462/1933-06-17/ed-1/?sp=1",
-  "bt340519": "https://www.loc.gov/resource/sn85042243/1934-05-19/ed-1/?sp=1"
+  "bt340519": "https://www.loc.gov/resource/sn85042243/1934-05-19/ed-1/?sp=1",
+  "station": "https://www.loc.gov/item/2016818238/"
  },
  "shots": [
   {
@@ -103,24 +97,85 @@
   },
   {
    "line": 3,
-   "img": "es0617",
+   "img": "station",
+   "layout": "clip",
+   "rot": -1.5,
    "sfx": [
     "paper"
    ],
+   "label": "UNION STATION \u00b7 c. 1910-30",
+   "clip": {
+    "box": [
+     0.07,
+     0.06,
+     0.88,
+     0.94
+    ]
+   },
    "from": {
-    "find": "BAND SOUGHT TO FREE",
-    "pad": 0.2
+    "box": [
+     0.05,
+     0.04,
+     0.9,
+     0.96
+    ]
    },
    "to": {
-    "find": "Machine Gun Fours Hail of Bullets",
-    "pad": 0.12,
-    "grow": [
-     0,
-     0,
-     0,
-     0.012
+    "box": [
+     0.3,
+     0.45,
+     0.85,
+     0.96
     ]
    }
+  },
+  {
+   "line": 3,
+   "word": 8,
+   "kind": "map",
+   "title": "UNION STATION \u00b7 EAST DOOR",
+   "sfx": [
+    "paper"
+   ],
+   "blocks": [
+    [
+     0.0,
+     0.0,
+     1.0,
+     0.3,
+     "UNION STATION"
+    ],
+    [
+     0.5,
+     0.66,
+     0.78,
+     0.78,
+     "CAR"
+    ]
+   ],
+   "points": [
+    {
+     "x": 0.72,
+     "y": 0.3,
+     "label": "East door",
+     "align": "left",
+     "dy": 48
+    }
+   ],
+   "route": [
+    [
+     0.72,
+     0.3
+    ],
+    [
+     0.72,
+     0.5
+    ],
+    [
+     0.64,
+     0.66
+    ]
+   ]
   },
   {
    "line": 4,
@@ -164,10 +219,20 @@
   },
   {
    "line": 6,
-   "img": "es0617",
+   "kind": "card",
+   "style": "number",
+   "text": "30 seconds",
    "in": "cut",
    "sfx": [
     "drop",
+    "stamp"
+   ]
+  },
+  {
+   "line": 6,
+   "img": "es0617",
+   "in": "flash",
+   "sfx": [
     "hit"
    ],
    "from": {
@@ -185,7 +250,8 @@
      "style": "box",
      "at": 1.0
     }
-   ]
+   ],
+   "word": 4
   },
   {
    "line": 7,

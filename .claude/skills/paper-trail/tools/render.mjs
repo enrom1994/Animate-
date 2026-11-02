@@ -8,8 +8,8 @@ const HERE = path.dirname(fileURLToPath(import.meta.url)), ENGINE = path.join(HE
 const KIT = fs.realpathSync(path.join(HERE, '..', '..', '..', 'kit'));
 const { chromium } = createRequire(path.join(KIT, 'package.json'))('playwright');
 const REEL = process.cwd(), FONTS = path.join(KIT, 'fonts');
-const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.jpg': 'image/jpeg', '.png': 'image/png', '.woff2': 'font/woff2' };
-const roots = { '/engine/': ENGINE, '/reel/': REEL, '/fonts/': FONTS };
+const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.jpg': 'image/jpeg', '.png': 'image/png', '.woff2': 'font/woff2', '.ttf': 'font/ttf' };
+const roots = { '/engine/': ENGINE, '/reel/': REEL, '/fonts/': FONTS, '/fonts2/': path.join(HERE, '..', '..', 'stick-figure', 'engine', 'template', 'web', 'fonts') };
 const srv = http.createServer((q, r) => {
   const u = decodeURIComponent(q.url.split('?')[0]); const k = Object.keys(roots).find(p => u.startsWith(p));
   const f = k && path.join(roots[k], u.slice(k.length));
@@ -24,7 +24,7 @@ async function openPage() {
   p.on('pageerror', e => console.log('[err]', e.message)); p.on('console', m => m.type() === 'error' && console.log('[page]', m.text()));
   await p.goto(URL_); await p.evaluate(() => window.READY); return p;
 }
-const frame = async (p, f, q) => Buffer.from((await p.evaluate(([f, q]) => { renderFrame(f); return grab(q); }, [f, q])).split(',')[1], 'base64');
+const frame = async (p, f, q) => Buffer.from((await p.evaluate(async ([f, q]) => { await renderFrame(f); return grab(q); }, [f, q])).split(',')[1], 'base64');
 const mode = process.argv[2];
 fs.mkdirSync('build', { recursive: true });
 if (mode === 'stills') {
