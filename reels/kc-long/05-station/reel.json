@@ -1,6 +1,12 @@
 {
  "title": "Union Station",
- "intro": { "part": "Part four", "title": "Union Station", "sub": "Kansas City · 7:15 a.m.", "dur": 6, "img": "es0617" },
+ "intro": {
+  "part": "Part four",
+  "title": "Union Station",
+  "sub": "Kansas City \u00b7 7:15 a.m.",
+  "dur": 6,
+  "img": "es0617"
+ },
  "script": [
   "The train arrived at about seven fifteen.",
   "Waiting on the platform were two more federal agents, Reed Vetterli and Raymond Caffrey, and two Kansas City detectives, W. J. Grooms and Frank Hermanson.",
@@ -13,38 +19,221 @@
   "One shouted, \"Up, up!\"",
   "Then someone yelled, \"Let 'em have it.\""
  ],
- "emph": ["Caffrey", "never"],
+ "emph": [
+  "Caffrey",
+  "never"
+ ],
  "assets": {
   "station": "https://www.loc.gov/item/2016818238/",
   "es0617": "https://www.loc.gov/resource/sn83045462/1933-06-17/ed-1/?sp=1",
   "wt0617": "https://www.loc.gov/resource/sn84026749/1933-06-17/ed-1/?sp=1"
  },
  "shots": [
-  { "line": 0, "img": "station", "layout": "clip", "rot": -1, "sfx": ["paper"], "stamp": "KANSAS CITY · JUNE 17, 1933 · 7:15 A.M.",
-    "label": "UNION STATION · c. 1910-30", "clip": { "box": [0.07, 0.06, 0.88, 0.94] },
-    "from": { "box": [0.05, 0.04, 0.9, 0.96] }, "to": { "box": [0.2, 0.25, 0.8, 0.8] } },
-
-  { "line": 1, "kind": "card", "style": "title", "text": "Vetterli · Caffrey · Grooms · Hermanson", "sub": "two federal agents · two Kansas City detectives", "sfx": ["stamp"] },
-
-  { "line": 2, "kind": "map", "title": "Union Station · east entrance", "sfx": ["paper"],
-    "blocks": [[0.0, 0.0, 1.0, 0.42, "UNION STATION"], [0.62, 0.7, 0.82, 0.86, "CAFFREY'S CHEVROLET"]],
-    "points": [{ "x": 0.15, "y": 0.21, "label": "Platform" }, { "x": 0.72, "y": 0.42, "label": "East entrance", "dy": 44 }],
-    "route": [[0.15, 0.21], [0.72, 0.21], [0.72, 0.42], [0.72, 0.62]] },
-
-  { "line": 3, "kind": "map", "title": "Caffrey's Chevrolet", "sfx": ["paper"],
-    "blocks": [[0.3, 0.12, 0.7, 0.92, ""],
-               [0.34, 0.22, 0.66, 0.44, "FRONT · NASH", { "line": 3, "word": 4 }],
-               [0.34, 0.56, 0.66, 0.82, "BACK · LACKEY · SMITH · REED", { "line": 4 }]],
-    "points": [{ "x": 0.3, "y": 0.33, "label": "Caffrey", "align": "right", "line": 5 }],
-    "route": [],
-    "xs": [{ "x": 0.24, "y": 0.33, "line": 6, "word": 2 }] },
-
-  { "line": 7, "img": "wt0617", "in": "flash", "sfx": ["flash"],
-    "from": { "find": "RAIL DEPOT GANGSTER BATTLE SCENE", "pad": 0.4 },
-    "to": { "find": "RAIL DEPOT GANGSTER BATTLE SCENE", "pad": 0.15 } },
-
-  { "line": 8, "kind": "card", "style": "quote", "text": "Up, up!", "in": "cut", "sfx": ["stamp"] },
-
-  { "line": 9, "kind": "card", "style": "quote", "text": "Let 'em have it.", "in": "cut", "sfx": ["hit"] }
+  {
+   "line": 0,
+   "img": "station",
+   "layout": "clip",
+   "rot": -1,
+   "sfx": [
+    "paper"
+   ],
+   "stamp": "KANSAS CITY \u00b7 JUNE 17, 1933 \u00b7 7:15 A.M.",
+   "label": "UNION STATION \u00b7 c. 1910-30",
+   "clip": {
+    "box": [
+     0.07,
+     0.06,
+     0.88,
+     0.94
+    ]
+   },
+   "from": {
+    "box": [
+     0.05,
+     0.04,
+     0.9,
+     0.96
+    ]
+   },
+   "to": {
+    "box": [
+     0.2,
+     0.25,
+     0.8,
+     0.8
+    ]
+   }
+  },
+  {
+   "line": 1,
+   "kind": "card",
+   "style": "title",
+   "text": "Vetterli \u00b7 Caffrey",
+   "sub": "federal agents",
+   "sfx": [
+    "stamp"
+   ]
+  },
+  {
+   "line": 1,
+   "word": 14,
+   "kind": "card",
+   "style": "title",
+   "text": "Grooms \u00b7 Hermanson",
+   "sub": "Kansas City detectives",
+   "in": "cut",
+   "sfx": [
+    "stamp"
+   ]
+  },
+  {
+   "line": 2,
+   "kind": "map",
+   "title": "Union Station \u00b7 east entrance",
+   "sfx": [
+    "paper"
+   ],
+   "blocks": [
+    [
+     0.0,
+     0.0,
+     1.0,
+     0.42,
+     "UNION STATION"
+    ],
+    [
+     0.6,
+     0.7,
+     0.84,
+     0.86,
+     "CHEVROLET"
+    ]
+   ],
+   "points": [
+    {
+     "x": 0.12,
+     "y": 0.33,
+     "label": "Platform",
+     "dy": -40
+    },
+    {
+     "x": 0.72,
+     "y": 0.42,
+     "label": "East entrance",
+     "dy": 44
+    }
+   ],
+   "route": [
+    [
+     0.12,
+     0.33
+    ],
+    [
+     0.72,
+     0.33
+    ],
+    [
+     0.72,
+     0.42
+    ],
+    [
+     0.72,
+     0.68
+    ]
+   ]
+  },
+  {
+   "line": 3,
+   "kind": "map",
+   "title": "Caffrey's Chevrolet",
+   "sfx": [
+    "paper"
+   ],
+   "blocks": [
+    [
+     0.22,
+     0.08,
+     0.78,
+     0.94,
+     ""
+    ],
+    [
+     0.26,
+     0.16,
+     0.74,
+     0.44,
+     "FRONT: NASH",
+     {
+      "line": 3,
+      "word": 4
+     }
+    ],
+    [
+     0.26,
+     0.56,
+     0.74,
+     0.86,
+     "BACK: LACKEY, SMITH, REED",
+     {
+      "line": 4
+     }
+    ]
+   ],
+   "points": [
+    {
+     "x": 0.22,
+     "y": 0.3,
+     "label": "Caffrey",
+     "align": "right",
+     "line": 5,
+     "dy": 0
+    }
+   ],
+   "route": [],
+   "xs": [
+    {
+     "x": 0.22,
+     "y": 0.3,
+     "line": 6,
+     "word": 2
+    }
+   ]
+  },
+  {
+   "line": 7,
+   "img": "wt0617",
+   "in": "flash",
+   "sfx": [
+    "flash"
+   ],
+   "from": {
+    "find": "RAIL DEPOT GANGSTER BATTLE SCENE",
+    "pad": 0.4
+   },
+   "to": {
+    "find": "RAIL DEPOT GANGSTER BATTLE SCENE",
+    "pad": 0.15
+   }
+  },
+  {
+   "line": 8,
+   "kind": "card",
+   "style": "quote",
+   "text": "Up, up!",
+   "in": "cut",
+   "sfx": [
+    "stamp"
+   ]
+  },
+  {
+   "line": 9,
+   "kind": "card",
+   "style": "quote",
+   "text": "Let 'em have it.",
+   "in": "cut",
+   "sfx": [
+    "hit"
+   ]
+  }
  ]
 }

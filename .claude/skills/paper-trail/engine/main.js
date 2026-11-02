@@ -2,9 +2,9 @@
 // Deterministic: renderFrame(f) draws frame f from window.PLAN; window.READY resolves when images and fonts are loaded.
 const P = window.PLAN, W = P.W || 1080, H = P.H || 1920, FPS = P.fps, WIDE = W > H;
 // layout per format: portrait (Shorts, 1080x1920) or wide (long form, 1920x1080)
-const L = WIDE ? { capY: 968, capW: 1500, capPx: 64, capLH: 76, stampY: 96, labelX: 1860, labelY: 1036, cardY: 470, cardPx: 150, cardW: 1500,
+const L = WIDE ? { capY: 968, capW: 1500, capPx: 64, capLH: 76, stampY: 96, labelX: 1860, labelY: 1036, cardY: 470, cardPx: 120, cardW: 1500, quotePx: 112, mapFont: 36,
                    map: { x: 360, y: 150, w: 1200, h: 760 }, outroY: 400, ctaY: 860, clip: [.5, .46, .62, .8], series: 60 }
-               : { capY: 1330, capW: 880, capPx: 84, capLH: 96, stampY: 345, labelX: 980, labelY: 1499, cardY: H * .45, cardPx: 150, cardW: 900,
+               : { capY: 1330, capW: 880, capPx: 84, capLH: 96, stampY: 345, labelX: 980, labelY: 1499, cardY: H * .45, cardPx: 150, cardW: 900, quotePx: 76, mapFont: 30,
                    map: { x: 90, y: 420, w: 900, h: 900 }, outroY: H * .44, ctaY: 1452, clip: [.5, .43, .8, .5], series: 238 };
 const cv = Object.assign(document.getElementById('c'), { width: W, height: H }), ctx = cv.getContext('2d');
 const G = Object.assign({ sepia: .38, contrast: 1.3, bright: .9, grain: .09, vignette: .75 }, P.grade || {});
@@ -170,10 +170,12 @@ function wrap(text, maxW) {
 KINDS.card = (sh, t) => {  // {text, sub, style: number|quote|title}
   paper(t, sh);
   const st = sh.style || 'number';
-  if (st === 'quote') { ctx.font = '600 76px Lora'; stampText('“' + sh.text + '”', W / 2, L.cardY, t - .15, '600 76px Lora', INKC, L.cardW - 40); }
-  else { ctx.font = '800 150px "Inter Tight"'; stampText(sh.text.toUpperCase(), W / 2, L.cardY, t - .15, `800 ${L.cardPx}px "Inter Tight"`, st === 'number' ? INK : INKC, L.cardW); }
-  if (sh.sub) typed(sh.sub.toUpperCase(), W / 2, L.cardY + 230, t - .6, 28, '500 36px "JB Mono"', INKC);
-  const k = clamp((t - .35) / .4); ctx.fillStyle = INK; ctx.fillRect(W / 2 - 160 * k, L.cardY - 190, 320 * k, 6);
+  const quote = st === 'quote', px = quote ? L.quotePx : L.cardPx, font = quote ? `600 ${px}px Lora` : `800 ${px}px "Inter Tight"`;
+  const text = quote ? '“' + sh.text + '”' : sh.text.toUpperCase(), maxW = quote ? L.cardW - 40 : L.cardW; ctx.font = font;
+  const half = wrap(text, maxW).length * px * 1.05 / 2;  // measure the block so the rule and sub sit outside it
+  stampText(text, W / 2, L.cardY, t - .15, font, st === 'number' ? INK : INKC, maxW);
+  if (sh.sub) typed(sh.sub.toUpperCase(), W / 2, L.cardY + half + 70, t - .6, 28, '500 36px "JB Mono"', INKC);
+  const k = clamp((t - .35) / .4); ctx.fillStyle = INK; ctx.fillRect(W / 2 - 160 * k, L.cardY - half - 60, 320 * k, 6);
 };
 KINDS.map = (sh, t) => {  // ink diagram: blocks [x0,y0,x1,y1,label], points [{x,y,label}], route [[x,y]...], xs [{x,y,at}]
   paper(t, sh);
@@ -186,8 +188,8 @@ KINDS.map = (sh, t) => {  // ink diagram: blocks [x0,y0,x1,y1,label], points [{x
     ctx.save(); ctx.beginPath(); ctx.rect(X(b[0]), Y(b[1]), (b[2] - b[0]) * M.w, (b[3] - b[1]) * M.h); ctx.clip(); ctx.lineWidth = 1.5; ctx.globalAlpha = .35 * k;
     for (let h = -M.h; h < M.w; h += 18) { ctx.beginPath(); ctx.moveTo(X(b[0]) + h, Y(b[1])); ctx.lineTo(X(b[0]) + h + 600, Y(b[1]) + 600); ctx.stroke(); }
     ctx.restore();
-    if (b[4]) { ctx.globalAlpha = k; ctx.font = '500 30px "JB Mono"'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = INKC;
-      const tw = ctx.measureText(b[4]).width; ctx.fillStyle = '#e6dcc4'; ctx.fillRect((X(b[0]) + X(b[2])) / 2 - tw / 2 - 10, (Y(b[1]) + Y(b[3])) / 2 - 22, tw + 20, 44);
+    if (b[4]) { ctx.globalAlpha = k; ctx.font = `500 ${L.mapFont}px "JB Mono"`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = INKC;
+      const tw = ctx.measureText(b[4]).width; ctx.fillStyle = '#e6dcc4'; ctx.fillRect((X(b[0]) + X(b[2])) / 2 - tw / 2 - 10, (Y(b[1]) + Y(b[3])) / 2 - L.mapFont * .75, tw + 20, L.mapFont * 1.5);
       ctx.fillStyle = INKC; ctx.fillText(b[4], (X(b[0]) + X(b[2])) / 2, (Y(b[1]) + Y(b[3])) / 2); }
   }
   ctx.globalAlpha = 1;
