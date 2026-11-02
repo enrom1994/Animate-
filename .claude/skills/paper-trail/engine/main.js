@@ -104,7 +104,7 @@ function drawStamp(text, t) {  // typed on, top of frame, inside the safe area
 }
 
 function drawSeries(T) {
-  if (!P.series) return;
+  if (!P.series || !P.series_label) return;
   ctx.save(); const g = ctx.createLinearGradient(0, 0, 0, 400); g.addColorStop(0, 'rgba(6,5,4,.92)'); g.addColorStop(.55, 'rgba(6,5,4,.7)'); g.addColorStop(1, 'rgba(6,5,4,0)');
   ctx.fillStyle = g; ctx.fillRect(0, 0, W, 400); ctx.font = '500 26px "JB Mono"'; ctx.letterSpacing = '4px'; ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
   ctx.globalAlpha = .85; ctx.fillStyle = PAPER; ctx.fillText(P.series.toUpperCase(), W / 2, 238);
@@ -230,7 +230,7 @@ KINDS.outro = (sh, t) => {  // case-file checklist: each box gets a red tick
     const y = y0 + i * 170, k = clamp((t - .15 - i * .12) / .25); if (k <= 0) return; ctx.globalAlpha = k;
     ctx.strokeStyle = PAPER; ctx.lineWidth = 6; ctx.strokeRect(x0, y - bw / 2, bw, bw);
     ctx.fillStyle = PAPER; ctx.fillText(it, x0 + bw + gap, y + 4);
-    const tk = clamp((t - .5 - i * .3) / .16); if (tk > 0) {  // the tick
+    const tk = clamp((t - sh.ticks[i]) / .16); if (tk > 0) {  // the tick
       ctx.strokeStyle = INK; ctx.lineWidth = 13; ctx.lineCap = ctx.lineJoin = 'round'; ctx.beginPath();
       const a = [x0 + 12, y + 2], b = [x0 + 30, y + 24], c2 = [x0 + bw + 14, y - bw / 2 - 18];
       ctx.moveTo(...a); if (tk < .4) ctx.lineTo(a[0] + (b[0] - a[0]) * tk / .4, a[1] + (b[1] - a[1]) * tk / .4);
@@ -238,8 +238,8 @@ KINDS.outro = (sh, t) => {  // case-file checklist: each box gets a red tick
     }
   });
   ctx.restore(); ctx.globalAlpha = 1;
-  typed('FOR MORE', W / 2, y0 + items.length * 170 + 10, t - 1.3, 16, '500 50px "JB Mono"', PAPER);
-  if (P.series) { typed(P.series.toUpperCase(), W / 2, y0 + items.length * 170 + 100, t - 1.75, 45, '500 32px "JB Mono"', INK); }
+  typed('FOR MORE', W / 2, y0 + items.length * 170 + 10, t - sh.more_t, 16, '500 50px "JB Mono"', PAPER);
+  if (P.series && P.series_label) { typed(P.series.toUpperCase(), W / 2, y0 + items.length * 170 + 100, t - sh.more_t - .45, 45, '500 32px "JB Mono"', INK); }
 };
 function drawLabel(text) {  // small honest tag: ILLUSTRATION / AI ILLUSTRATION
   ctx.save(); ctx.font = '500 24px "JB Mono"'; ctx.letterSpacing = '3px'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';

@@ -7,7 +7,6 @@ description: Makes a 30 to 60 s vertical (9:16) organized-crime history Short to
 
 ```
 ┌──────────────────────┐
-│ ONE FRONT PAGE, ONE CRIME   series label
 │  KANSAS CITY · JUNE 17, 1933   typed stamp
 │ ┌──────────────────┐ │
 │ │ GUNMEN KILL [4 OFFICERS] │  real scan, slow push, red ink box
@@ -76,11 +75,12 @@ Needs ffmpeg, Node 18+, Python 3.9+. In a cloud container with a preinstalled Ch
   - `map`: an ink diagram drawn in code, auto-labelled ILLUSTRATION. `blocks` `[x0,y0,x1,y1,"LABEL"]`, `points` `{x,y,label,align,dy}`, `route` `[[x,y],...]` (red, draws itself), `xs` `{x,y,label,at}` (red X), `title`. Coordinates 0..1 inside the map area. Keep it schematic; don't invent precise positions.
   - `footage`: an archive film clip at `assets/<img>.mp4` (`from_s` = start second in the clip); frames are pre-extracted and graded like the pages. Public-domain sources only (e.g. US government newsreels, Prelinger, LoC); most newsreels after 1930 are not.
   - AI images: `"ai": true` on the shot adds an "AI ILLUSTRATION" tag and a disclosure note in `build/description.txt`.
-- End card (every reel, from channel.json `outro`): a case-file checklist, LIKE / FOLLOW / SUBSCRIBE ticked in red, "FOR MORE" and the series name, about 3.6 s after the last line. Set `"say": "Like, follow and subscribe for more."` to have the narrator speak it, `"outro": false` in a reel to drop it.
+- End card (every reel, from channel.json `outro`): a case-file checklist, LIKE / FOLLOW / SUBSCRIBE, each box ticked in red as the narrator says the word, then FOR MORE. The narrator says `outro.say` (default "Like, follow, and subscribe for more.") after a `pause` of 1.3 s; the card appears `lead` 0.7 s before the voice and holds `hold` 1.4 s after. `"outro": false` in a reel drops it.
 - Mid-video prompt (off by default): `"cta_mid": {"line": 6, "text": "Follow for part 2", "dur": 2.6}` shows a small pill under the captions.
 - `sfx`: `stamp`, `hit` (low boom), `flash` (camera flash), `paper`, `type` (with a stamp), `burst` (distant muffled gunfire, use once), `drop` (the score cuts out for a beat; use on the deaths).
 
 ## Style
+- No series label on screen (`series_label` stays false unless the user asks for it).
 - Monochrome sepia grade, grain, flicker, vignette. Red (#c4161c) is the only colour: ink marks and emphasised caption words.
 - Captions: Inter Tight 800, uppercase, 1 to 3 words, never ending on "the/a/to/of"; safe area x 100 to 980, y 220 to 1500.
 - Narration: Kokoro `am_onyx` (the lowest free voice, ~87 Hz) slowed and pitched down 1 semitone with a little room. For release quality, swap in a human or ElevenLabs take at `audio/vo.wav`.

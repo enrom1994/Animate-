@@ -1,7 +1,25 @@
 {
-  "series": "One front page, one crime",
-  "voice": { "name": "am_onyx", "speed": 0.9, "pitch": -1.0, "gap": 0.32 },
-  "bed_db": -14,
-  "outro": { "items": ["LIKE", "FOLLOW", "SUBSCRIBE"], "text": "Like, follow & subscribe for more", "say": null, "dur": 3.6 },
-  "cta_mid": null
+ "series": "One front page, one crime",
+ "voice": {
+  "name": "am_onyx",
+  "speed": 0.9,
+  "pitch": -1.0,
+  "gap": 0.32
+ },
+ "bed_db": -14,
+ "outro": {
+  "items": [
+   "LIKE",
+   "FOLLOW",
+   "SUBSCRIBE"
+  ],
+  "text": "Like, follow & subscribe for more",
+  "say": "Like, follow, and subscribe for more.",
+  "dur": 3.6,
+  "pause": 1.3,
+  "lead": 0.7,
+  "hold": 1.4
+ },
+ "cta_mid": null,
+ "series_label": false
 }

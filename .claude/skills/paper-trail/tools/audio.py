@@ -86,6 +86,10 @@ for s in P["shots"]:
         elif name in FX:
             f, gain = FX[name]; place(sfx, f(), s["start"] + (.15 if name == "type" else 0), gain)
         else: print("unknown sfx", name)
+for s in P["shots"]:
+    if s["kind"] == "outro":
+        for t in s["ticks"]: place(sfx, stamp(), s["start"] + t - .02, .7)
+        place(sfx, typing(.5), s["start"] + s["more_t"], .35)
 sfx = sfx[:N]
 
 # ---- mix: duck the score under the voice ----

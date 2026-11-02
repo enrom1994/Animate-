@@ -1,7 +1,8 @@
 """One place that reads a reel's settings: reels/channel.json (channel-wide defaults, e.g. the outro) merged with <reel>/reel.json.
 The outro's spoken line (if any) is appended to the script, so voice, timings and plan all see it."""
 import json, os
-DEFAULT_OUTRO = {"text": "Like, follow & subscribe for more", "items": ["LIKE", "FOLLOW", "SUBSCRIBE"], "say": None, "dur": 3.6}
+DEFAULT_OUTRO = {"text": "Like, follow & subscribe for more", "items": ["LIKE", "FOLLOW", "SUBSCRIBE"],
+                 "say": "Like, follow, and subscribe for more.", "dur": 3.6, "pause": 1.3, "lead": .7, "hold": 1.4}
 
 def load(path="reel.json"):
     R = json.load(open(path))

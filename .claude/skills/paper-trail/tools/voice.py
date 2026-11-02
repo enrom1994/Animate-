@@ -28,6 +28,7 @@ if __name__ == "__main__":
         idx = np.where(np.abs(a) > .01)[0]; a = a[max(0, idx[0] - int(.02 * sr)): idx[-1] + int(.08 * sr)]
         meta.append({"i": i, "text": line, "start": round(t, 3), "dur": round(len(a) / sr, 3)})
         gap = V["gap"] * (1.8 if i == 0 else 1.0)  # a held beat after the hook
+        if i == R["story_lines"] - 1 and len(R["script"]) > R["story_lines"]: gap = R["outro"].get("pause", 1.3)  # breathe before the end card
         out += [a, np.zeros(int(gap * sr), dtype=a.dtype)]; t += len(a) / sr + gap
     sf.write("audio/vo_raw.wav", np.concatenate(out), sr)
     json.dump(meta, open("audio/lines.json", "w"), indent=1)

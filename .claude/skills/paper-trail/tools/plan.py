@@ -50,8 +50,16 @@ if __name__ == "__main__":
         return round(max(0, words[i]["s"] + s.get("offset", 0) - (0 if i == 0 else .12)), 3)
     o_start = None
     # outro: starts on its spoken line, or a beat after the story
-    if O: o_start = round(words[first[story_n]]["s"] - .15, 3) if O.get("say") and story_n in first else round(story_end + .5, 3)
-    dur = round((max(o_start + O["dur"], W["dur"] + .4) if O else W["dur"] + R.get("tail", 1.2)), 3)
+    ticks, more_t = None, None
+    if O:
+        spoken = O.get("say") and story_n in first
+        o_start = round(words[first[story_n]]["s"] - O.get("lead", .7), 3) if spoken else round(story_end + .5, 3)
+        if spoken:  # tick each box as its word is said, type FOR MORE on "more"
+            ow = [w for w in words if w["line"] == story_n]
+            at = lambda word: next((round(w["s"] - o_start, 3) for w in ow if norm(w["w"]) == norm(word)), None)
+            ticks = [at(it) for it in O["items"]]; ticks = [t if t is not None else .5 + i * .3 for i, t in enumerate(ticks)]
+            more_t = at("more") or ticks[-1] + .6
+    dur = round((max(o_start + O["dur"], W["dur"] + O.get("hold", 1.3)) if O else W["dur"] + R.get("tail", 1.2)), 3)
     shots, images, ai_used = [], {}, []
     for k, s in enumerate(R["shots"]):
         kind = s.get("kind", "page"); sh = {"kind": kind, "start": 0 if k == 0 else t_of(s), "in": s.get("in", "fade" if k else "cut"),
@@ -87,7 +95,8 @@ if __name__ == "__main__":
         if sh["kind"] == "footage":
             src = next(iter(glob.glob(f"assets/{sh['img']}.*")))
             sh["frames"] = footage_frames(sh["img"], src, sh["src0"], sh["end"] - sh["start"])
-    if O: shots.append({"kind": "outro", "start": o_start, "end": dur, "in": "black", "sfx": ["type", "stamp3"], "marks": [], "text": O["text"], "items": O["items"]})
+    if O: shots.append({"kind": "outro", "start": o_start, "end": dur, "in": "black", "sfx": [], "marks": [], "text": O["text"], "items": O["items"],
+                        "ticks": ticks or [.5 + i * .3 for i in range(len(O["items"]))], "more_t": more_t or 1.3})
     # captions (story lines only): 1-3 words, break on punctuation, never end on a little word
     emph = {norm(e) for e in R.get("emph", [])}
     sw = [w for w in words if w["line"] < story_n]; caps, cur = [], []
@@ -108,7 +117,7 @@ if __name__ == "__main__":
     caps[-1]["e"] = round(min(caps[-1]["last"] + .6, o_start if O else dur), 3)
     mid = R.get("cta_mid")
     if mid: mid = {"text": mid.get("text", "Follow for more"), "s": t_of(mid), "e": t_of(mid) + mid.get("dur", 2.6)}
-    plan = {"fps": 30, "dur": dur, "images": images, "shots": shots, "captions": caps, "series": R.get("series"),
+    plan = {"fps": 30, "dur": dur, "images": images, "shots": shots, "captions": caps, "series": R.get("series"), "series_label": R.get("series_label", False),
             "grade": R.get("grade", {}), "cta_mid": mid, "ai": ai_used}
     os.makedirs("build", exist_ok=True)
     json.dump(plan, open("build/plan.json", "w"), indent=1)
