@@ -181,7 +181,7 @@ KINDS.map = (sh, t) => {  // ink diagram: blocks [x0,y0,x1,y1,label], points [{x
   ctx.save(); ctx.strokeStyle = INKC; ctx.fillStyle = INKC; ctx.lineWidth = 4;
   const draw = clamp(t / .9);
   for (const [i, b] of (sh.blocks || []).entries()) {
-    const k = clamp(draw * 1.6 - i * .15); if (k <= 0) continue; ctx.globalAlpha = k;
+    const at = b[5] && b[5].at; const k = at != null ? clamp((t - at) / .35) : clamp(draw * 1.6 - i * .15); if (k <= 0) continue; ctx.globalAlpha = k;
     ctx.strokeRect(X(b[0]), Y(b[1]), (b[2] - b[0]) * M.w, (b[3] - b[1]) * M.h);
     ctx.save(); ctx.beginPath(); ctx.rect(X(b[0]), Y(b[1]), (b[2] - b[0]) * M.w, (b[3] - b[1]) * M.h); ctx.clip(); ctx.lineWidth = 1.5; ctx.globalAlpha = .35 * k;
     for (let h = -M.h; h < M.w; h += 18) { ctx.beginPath(); ctx.moveTo(X(b[0]) + h, Y(b[1])); ctx.lineTo(X(b[0]) + h + 600, Y(b[1]) + 600); ctx.stroke(); }
@@ -199,7 +199,7 @@ KINDS.map = (sh, t) => {  // ink diagram: blocks [x0,y0,x1,y1,label], points [{x
     ctx.stroke(); ctx.setLineDash([]);
   }
   for (const [i, p] of (sh.points || []).entries()) {
-    const k = clamp((t - .3 - i * .25) / .3); if (k <= 0) continue; ctx.globalAlpha = k;
+    const k = clamp((t - (p.at ?? .3 + i * .25)) / .3); if (k <= 0) continue; ctx.globalAlpha = k;
     ctx.fillStyle = INKC; ctx.beginPath(); ctx.arc(X(p.x), Y(p.y), 12, 0, 7); ctx.fill();
     ctx.font = '800 40px "Inter Tight"'; ctx.textAlign = p.align || 'left'; ctx.textBaseline = 'middle';
     ctx.fillText(p.label.toUpperCase(), X(p.x) + (p.align === 'right' ? -28 : 28), Y(p.y) + (p.dy || 0));

@@ -94,6 +94,12 @@ if __name__ == "__main__":
         shots.insert(0, {"kind": "chapter", "start": 0, "in": "black", "sfx": [], "marks": [], "part": I.get("part"), "text": I.get("title"),
                          "sub": I.get("sub"), "img": I.get("img", next((x["img"] for x in shots if x.get("img")), None)), "label": None})
         shots[1]["in"] = "fade"
+    for sh in shots:  # map elements can be timed to the narration: {"line": n, "word": k}
+        if sh["kind"] == "map":
+            for key in ("blocks", "points", "xs"):
+                for el in sh.get(key, []) or []:
+                    if isinstance(el, dict) and "line" in el: el["at"] = round(t_of(el) - sh["start"], 3)
+                    elif isinstance(el, list) and len(el) > 5 and isinstance(el[5], dict): el[5]["at"] = round(t_of(el[5]) - sh["start"], 3)
     for a, b in zip(shots, shots[1:]): a["end"] = b["start"]
     shots[-1]["end"] = o_start if O else dur
     for sh in shots:
