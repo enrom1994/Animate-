@@ -93,52 +93,52 @@
    "sfx": [
     "paper"
    ],
-   "blocks": [
-    [
-     0.0,
-     0.0,
-     1.0,
-     0.42,
-     "UNION STATION"
-    ],
-    [
-     0.6,
-     0.7,
-     0.84,
-     0.86,
-     "CHEVROLET"
-    ]
+   "drawings": [
+    {
+     "type": "station",
+     "x": 0.5,
+     "y": 0.46,
+     "w": 0.92
+    },
+    {
+     "type": "car",
+     "x": 0.8,
+     "y": 0.8,
+     "w": 0.2,
+     "face": "left",
+     "at": 1.2
+    }
    ],
    "points": [
     {
-     "x": 0.12,
-     "y": 0.33,
-     "label": "Platform",
-     "dy": -40
+     "x": 0.5,
+     "y": 0.42,
+     "label": ""
     },
     {
-     "x": 0.72,
-     "y": 0.42,
+     "x": 0.93,
+     "y": 0.46,
      "label": "East entrance",
-     "dy": 44
+     "align": "right",
+     "dy": 40
     }
    ],
    "route": [
     [
-     0.12,
-     0.33
-    ],
-    [
-     0.72,
-     0.33
-    ],
-    [
-     0.72,
+     0.5,
      0.42
     ],
     [
-     0.72,
-     0.68
+     0.93,
+     0.42
+    ],
+    [
+     0.93,
+     0.6
+    ],
+    [
+     0.86,
+     0.72
     ]
    ]
   },
@@ -149,53 +149,50 @@
    "sfx": [
     "paper"
    ],
-   "blocks": [
-    [
-     0.22,
-     0.08,
-     0.78,
-     0.94,
-     ""
-    ],
-    [
-     0.26,
-     0.16,
-     0.74,
-     0.44,
-     "FRONT: NASH",
-     {
-      "line": 3,
-      "word": 4
-     }
-    ],
-    [
-     0.26,
-     0.56,
-     0.74,
-     0.86,
-     "BACK: LACKEY, SMITH, REED",
-     {
-      "line": 4
-     }
-    ]
-   ],
-   "points": [
+   "drawings": [
     {
-     "x": 0.22,
-     "y": 0.3,
-     "label": "Caffrey",
-     "align": "right",
-     "line": 5,
-     "dy": 0
-    }
-   ],
-   "route": [],
-   "xs": [
-    {
-     "x": 0.22,
-     "y": 0.3,
-     "line": 6,
-     "word": 2
+     "type": "car",
+     "x": 0.5,
+     "y": 0.52,
+     "w": 0.62,
+     "face": "right",
+     "at": 0.1,
+     "occupants": [
+      {
+       "seat": "front-right",
+       "label": "Nash",
+       "line": 3,
+       "word": 4,
+       "dx": 150
+      },
+      {
+       "seat": "rear-left",
+       "label": "Lackey",
+       "line": 4,
+       "word": 0,
+       "dx": -60
+      },
+      {
+       "seat": "rear-mid",
+       "label": "Smith",
+       "line": 4,
+       "word": 1,
+       "side": 1,
+       "dx": -170
+      },
+      {
+       "seat": "rear-right",
+       "label": "Reed",
+       "line": 4,
+       "word": 4
+      }
+     ],
+     "driver": {
+      "label": "Caffrey",
+      "line": 5,
+      "x_line": 6,
+      "x_word": 2
+     }
     }
    ]
   },

@@ -177,6 +177,91 @@ KINDS.card = (sh, t) => {  // {text, sub, style: number|quote|title}
   if (sh.sub) typed(sh.sub.toUpperCase(), W / 2, L.cardY + half + 70, t - .6, 28, '500 36px "JB Mono"', INKC);
   const k = clamp((t - .35) / .4); ctx.fillStyle = INK; ctx.fillRect(W / 2 - 160 * k, L.cardY - half - 60, 320 * k, 6);
 };
+
+// ---------- ink drawings for maps: a 1930s sedan (top view) and Union Station (front elevation) ----------
+function inkLine(pts, close) { ctx.beginPath(); ctx.moveTo(...pts[0]); for (const q of pts.slice(1)) ctx.lineTo(...q); if (close) ctx.closePath(); ctx.stroke(); }
+function rrect(x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); }
+function drawCar(d, t, X, Y, M) {
+  // d: {x, y, w (length as a fraction of map width), face: 'right'|'left', at, occupants: [{seat, label, side, at}], driver: {label, at, x: true}}
+  const Lp = d.w * M.w, Wp = Lp * .4, k = clamp((t - (d.at ?? .2)) / .6); if (k <= 0) return;
+  ctx.save(); ctx.translate(X(d.x), Y(d.y)); if (d.face === 'left') ctx.scale(-1, 1);
+  ctx.globalAlpha = k; ctx.strokeStyle = INKC; ctx.lineJoin = ctx.lineCap = 'round';
+  const fx = Lp * .5, rx = -Lp * .5, hw = Wp / 2;
+  // fenders: four rounded wheel arches that stick out past the body
+  ctx.lineWidth = 4; ctx.fillStyle = '#d9cdb2';
+  for (const [cx, sy] of [[Lp * .33, -1], [Lp * .33, 1], [-Lp * .3, -1], [-Lp * .3, 1]]) {
+    ctx.beginPath(); ctx.ellipse(cx, sy * (hw - Wp * .04), Lp * .085, Wp * .15, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); }
+  // running boards
+  ctx.lineWidth = 3; for (const sy of [-1, 1]) inkLine([[-Lp * .19, sy * (hw + Wp * .1)], [Lp * .22, sy * (hw + Wp * .1)]]);
+  // body: long hood in front, cabin, short trunk
+  ctx.lineWidth = 5; ctx.fillStyle = '#e8dfc9';
+  ctx.beginPath(); ctx.moveTo(rx + Lp * .05, -hw); ctx.lineTo(Lp * .12, -hw); ctx.quadraticCurveTo(Lp * .2, -hw * .78, Lp * .44, -hw * .62);
+  ctx.quadraticCurveTo(fx, -hw * .55, fx, 0); ctx.quadraticCurveTo(fx, hw * .55, Lp * .44, hw * .62); ctx.quadraticCurveTo(Lp * .2, hw * .78, Lp * .12, hw);
+  ctx.lineTo(rx + Lp * .05, hw); ctx.quadraticCurveTo(rx, hw, rx, 0); ctx.quadraticCurveTo(rx, -hw, rx + Lp * .05, -hw); ctx.closePath(); ctx.fill(); ctx.stroke();
+  // hood louvres + centre seam + grille
+  ctx.lineWidth = 2; inkLine([[Lp * .13, 0], [fx - Lp * .02, 0]]);
+  for (let i = 0; i < 5; i++) { const x = Lp * (.22 + i * .04); inkLine([[x, -hw * .5], [x + Lp * .02, -hw * .5]]); inkLine([[x, hw * .5], [x + Lp * .02, hw * .5]]); }
+  ctx.lineWidth = 4; inkLine([[fx - Lp * .012, -hw * .42], [fx - Lp * .012, hw * .42]]);
+  // headlamps
+  for (const sy of [-1, 1]) { ctx.beginPath(); ctx.arc(Lp * .43, sy * hw * .82, Wp * .07, 0, 7); ctx.stroke(); }
+  // cabin roof with windscreen and rear window
+  ctx.lineWidth = 3.5; rrect(-Lp * .3, -hw * .82, Lp * .42, hw * 1.64, Wp * .12); ctx.stroke();
+  ctx.lineWidth = 2; inkLine([[Lp * .1, -hw * .7], [Lp * .1, hw * .7]]); inkLine([[-Lp * .27, -hw * .6], [-Lp * .27, hw * .6]]);
+  // doors (seams) on each side
+  for (const sy of [-1, 1]) { inkLine([[Lp * .02, sy * hw], [Lp * .02, sy * hw * .82]]); inkLine([[-Lp * .12, sy * hw], [-Lp * .12, sy * hw * .82]]); }
+  // spare tyre on the back
+  ctx.lineWidth = 4; ctx.beginPath(); ctx.ellipse(rx - Lp * .025, 0, Lp * .035, Wp * .22, 0, 0, 7); ctx.fillStyle = '#cfc2a4'; ctx.fill(); ctx.stroke();
+  // bench seats: front (with a split back) and rear
+  ctx.lineWidth = 2.5; ctx.fillStyle = 'rgba(120,95,60,.18)';
+  rrect(-Lp * .04, -hw * .74, Lp * .1, hw * 1.48, 8); ctx.fill(); ctx.stroke(); inkLine([[-Lp * .02, -hw * .7], [-Lp * .02, hw * .7]]);
+  rrect(-Lp * .26, -hw * .74, Lp * .1, hw * 1.48, 8); ctx.fill(); ctx.stroke(); inkLine([[-Lp * .24, -hw * .7], [-Lp * .24, hw * .7]]);
+  // steering wheel on the driver's (left = top) side
+  ctx.lineWidth = 3; ctx.beginPath(); ctx.ellipse(Lp * .075, -hw * .42, Lp * .012, Wp * .12, 0, 0, 7); ctx.stroke();
+  ctx.restore();
+  // occupants: a head in the seat, a leader line, a name outside the car (drawn unflipped so text reads)
+  const flip = d.face === 'left' ? -1 : 1;
+  const SEAT = { 'front-left': [.02, -.42], 'front-right': [.02, .42], 'rear-left': [-.2, -.5], 'rear-mid': [-.2, 0], 'rear-right': [-.2, .5] };
+  for (const o of d.occupants || []) {
+    const kk = clamp((t - (o.at ?? 1)) / .3); if (kk <= 0) continue; const [sx, sy] = SEAT[o.seat];
+    const hx = X(d.x) + flip * sx * Lp, hy = Y(d.y) + sy * hw, side = o.side || (sy < 0 ? -1 : 1);
+    ctx.save(); ctx.globalAlpha = kk; ctx.fillStyle = INKC; ctx.beginPath(); ctx.arc(hx, hy, Wp * .085, 0, 7); ctx.fill();
+    const ly = Y(d.y) + side * (hw + Wp * .55) + (o.dy || 0), lx = hx + (o.dx || 0);
+    ctx.strokeStyle = INKC; ctx.lineWidth = 2; ctx.setLineDash([6, 6]); inkLine([[hx, hy + side * Wp * .1], [lx, ly - side * 22]]); ctx.setLineDash([]);
+    ctx.font = '800 38px "Inter Tight"'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(o.label.toUpperCase(), lx, ly);
+    if (o.note) { ctx.font = `500 ${Math.round(L.mapFont * .8)}px "JB Mono"`; ctx.fillText(o.note.toUpperCase(), lx, ly + side * 40); }
+    ctx.restore();
+  }
+  if (d.driver) {  // someone standing outside the driver's door
+    const o = d.driver, kk = clamp((t - (o.at ?? 1)) / .3);
+    if (kk > 0) { const hx = X(d.x) + flip * .02 * Lp, hy = Y(d.y) - hw - Wp * .32;
+      ctx.save(); ctx.globalAlpha = kk; ctx.fillStyle = INKC; ctx.beginPath(); ctx.arc(hx, hy, Wp * .085, 0, 7); ctx.fill();
+      ctx.font = '800 38px "Inter Tight"'; ctx.textAlign = flip > 0 ? 'left' : 'right'; ctx.textBaseline = 'middle'; ctx.fillText(o.label.toUpperCase(), hx + flip * Wp * .2, hy); ctx.restore();
+      const tx = t - (o.x_at ?? 1e9); if (tx > 0) { const kx = ease.out(clamp(tx / .15)), r = Wp * .16 * (1.4 - .4 * kx);
+        ctx.save(); ctx.strokeStyle = INK; ctx.lineWidth = 11; ctx.lineCap = 'round'; ctx.globalAlpha = kx;
+        inkLine([[hx - r, hy - r], [hx + r, hy + r]]); inkLine([[hx + r, hy - r], [hx - r, hy + r]]); ctx.restore(); } }
+  }
+}
+function drawStation(d, t, X, Y, M) {  // Union Station, Kansas City: central hall with three great arched windows, long wings
+  const w = d.w * M.w, h = w * .3, x0 = X(d.x) - w / 2, yb = Y(d.y), k = clamp((t - (d.at ?? .1)) / .8); if (k <= 0) return;
+  ctx.save(); ctx.globalAlpha = k; ctx.strokeStyle = INKC; ctx.fillStyle = '#e8dfc9'; ctx.lineJoin = 'round';
+  const cw = w * .36, cx0 = X(d.x) - cw / 2, ch = h, wh = h * .55;
+  ctx.lineWidth = 4;
+  ctx.fillRect(x0, yb - wh, w, wh); ctx.strokeRect(x0, yb - wh, w, wh);                    // wings
+  ctx.fillRect(cx0, yb - ch, cw, ch); ctx.strokeRect(cx0, yb - ch, cw, ch);                // central hall
+  ctx.lineWidth = 3; inkLine([[cx0 - 10, yb - ch], [cx0 + cw + 10, yb - ch]]); inkLine([[cx0 - 6, yb - ch + 12], [cx0 + cw + 6, yb - ch + 12]]);  // cornice
+  ctx.lineWidth = 3;
+  for (let i = 0; i < 3; i++) {                                                             // the three arches
+    const aw = cw * .2, ax = cx0 + cw * (.14 + i * .29), top = yb - ch * .78, r = aw / 2;
+    ctx.beginPath(); ctx.moveTo(ax, yb - 6); ctx.lineTo(ax, top + r); ctx.arc(ax + r, top + r, r, Math.PI, 0); ctx.lineTo(ax + aw, yb - 6); ctx.stroke();
+    ctx.lineWidth = 1.5; for (let g = 1; g < 4; g++) inkLine([[ax, top + r + (yb - top - r) * g / 4], [ax + aw, top + r + (yb - top - r) * g / 4]]); inkLine([[ax + r, top], [ax + r, yb - 6]]); ctx.lineWidth = 3;
+  }
+  ctx.lineWidth = 1.8;                                                                       // wing windows
+  for (const [a, b] of [[x0, cx0], [cx0 + cw, x0 + w]]) { const n = Math.floor((b - a) / 34);
+    for (let i = 0; i < n; i++) for (let r = 0; r < 2; r++) ctx.strokeRect(a + 12 + i * (b - a - 24) / n, yb - wh + 14 + r * wh * .42, (b - a - 24) / n - 12, wh * .26); }
+  ctx.lineWidth = 4; inkLine([[x0 - 40, yb], [x0 + w + 40, yb]]);                          // ground line
+  if (d.label) { ctx.font = `500 ${L.mapFont}px "JB Mono"`; ctx.fillStyle = INKC; ctx.textAlign = 'center'; ctx.letterSpacing = '4px'; ctx.fillText(d.label.toUpperCase(), X(d.x), yb - ch - 34); }
+  ctx.restore();
+}
 KINDS.map = (sh, t) => {  // ink diagram: blocks [x0,y0,x1,y1,label], points [{x,y,label}], route [[x,y]...], xs [{x,y,at}]
   paper(t, sh);
   const M = L.map, X = x => M.x + x * M.w, Y = y => M.y + y * M.h;  // map area inside the safe zone, above the captions
@@ -193,6 +278,7 @@ KINDS.map = (sh, t) => {  // ink diagram: blocks [x0,y0,x1,y1,label], points [{x
       ctx.fillStyle = INKC; ctx.fillText(b[4], (X(b[0]) + X(b[2])) / 2, (Y(b[1]) + Y(b[3])) / 2); }
   }
   ctx.globalAlpha = 1;
+  for (const d of sh.drawings || []) (d.type === 'car' ? drawCar : drawStation)(d, t, X, Y, M);
   const R = sh.route || []; if (R.length > 1) {  // red route draws itself
     const k = ease.inout(clamp((t - .6) / Math.max(.8, (sh.end - sh.start) * .55))); let L = 0; const seg = [];
     for (let i = 1; i < R.length; i++) { const d = Math.hypot(X(R[i][0]) - X(R[i - 1][0]), Y(R[i][1]) - Y(R[i - 1][1])); seg.push(d); L += d; }

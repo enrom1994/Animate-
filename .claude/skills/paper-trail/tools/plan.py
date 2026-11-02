@@ -86,7 +86,7 @@ if __name__ == "__main__":
         elif kind == "footage":
             n = s["img"]; sh.update({"img": n, "src0": s.get("from_s", 0)})
         elif kind in ("card", "map"):
-            sh.update({k2: s[k2] for k2 in ("text", "sub", "title", "blocks", "points", "route", "xs", "style") if k2 in s})
+            sh.update({k2: s[k2] for k2 in ("text", "sub", "title", "blocks", "points", "route", "xs", "style", "drawings") if k2 in s})
             if kind == "map" and not sh["label"]: sh["label"] = "ILLUSTRATION"
         else: sys.exit(f"unknown shot kind {kind}")
         shots.append(sh)
@@ -96,6 +96,10 @@ if __name__ == "__main__":
         shots[1]["in"] = "fade"
     for sh in shots:  # map elements can be timed to the narration: {"line": n, "word": k}
         if sh["kind"] == "map":
+            for d in sh.get("drawings", []) or []:  # drawing parts timed to words
+                for el in [d] + (d.get("occupants") or []) + ([d["driver"]] if d.get("driver") else []):
+                    if "line" in el: el["at"] = round(t_of(el) - sh["start"], 3)
+                    if "x_line" in el: el["x_at"] = round(t_of({"line": el["x_line"], "word": el.get("x_word", 0)}) - sh["start"], 3)
             for key in ("blocks", "points", "xs"):
                 for el in sh.get(key, []) or []:
                     if isinstance(el, dict) and "line" in el: el["at"] = round(t_of(el) - sh["start"], 3)
