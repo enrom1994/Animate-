@@ -87,6 +87,10 @@ for s in P["shots"]:
             f, gain = FX[name]; place(sfx, f(), s["start"] + (.15 if name == "type" else 0), gain)
         else: print("unknown sfx", name)
 for s in P["shots"]:
+    if s["kind"] == "chapter":
+        place(sfx, stamp(), s["start"] + .5, .6)
+        place(sfx, typing(max(.6, len(s.get("text") or "") * .07)), s["start"] + 1.0, .35)
+        place(sfx, typing(.9), s["start"] + 1.4 + len(s.get("text") or "") * .07, .25)
     if s["kind"] == "outro":
         for t in s["ticks"]: place(sfx, stamp(), s["start"] + t - .02, .7)
         place(sfx, typing(.5), s["start"] + s["more_t"], .35)
@@ -102,5 +106,7 @@ BED_DB = R.get("bed_db", -14)  # score + SFX sit this many dB under the narratio
 bed *= rms(v) * 10 ** (BED_DB / 20) / rms(bed)
 mix = v + bed
 mix = mix / max(1e-6, np.abs(mix).max()) * .89
+NF = round(P["dur"] * 30) * SR // 30  # exactly the video's length, so chapters stitch without drift
+mix = np.concatenate([mix, np.zeros(max(0, NF - len(mix)))])[:NF]
 sf.write("audio/mix.wav", mix.astype(np.float32), SR)
 print("audio/mix.wav", round(len(mix) / SR, 2), "s")

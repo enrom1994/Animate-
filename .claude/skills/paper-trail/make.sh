@@ -19,6 +19,7 @@ echo "== plan"; "$PY" "$SK/tools/plan.py"
 if [ "${2:-}" = stills ]; then node "$SK/tools/render.mjs" stills "$3"; exit 0; fi
 echo "== score + sfx"; "$PY" "$SK/tools/audio.py"
 echo "== frames"; node "$SK/tools/render.mjs" video "${WORKERS:-4}"
+[ "${NOMUX:-0}" = 1 ] && { echo "frames + mix ready (NOMUX)"; exit 0; }
 echo "== mux"
 ffmpeg -v error -y -i build/silent.mp4 -i audio/mix.wav -map 0:v -map 1:a -c:v copy \
   -af "loudnorm=I=-14:TP=-1.5:LRA=9" -c:a aac -b:a 192k -ar 48000 -shortest -movflags +faststart "$NAME.part.mp4"

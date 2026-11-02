@@ -45,6 +45,7 @@ if __name__ == "__main__":
     first = {}
     for i, w in enumerate(words): first.setdefault(w["line"], i)
     story_end = max(w["e"] for w in words if w["line"] < story_n)
+    WIDE = R["format"] == "16:9"; I = R.get("intro")
     def t_of(s):
         i = first[s["line"]] + s.get("word", 0)
         return round(max(0, words[i]["s"] + s.get("offset", 0) - (0 if i == 0 else .12)), 3)
@@ -62,7 +63,7 @@ if __name__ == "__main__":
     dur = round((max(o_start + O["dur"], W["dur"] + O.get("hold", 1.3)) if O else W["dur"] + R.get("tail", 1.2)), 3)
     shots, images, ai_used = [], {}, []
     for k, s in enumerate(R["shots"]):
-        kind = s.get("kind", "page"); sh = {"kind": kind, "start": 0 if k == 0 else t_of(s), "in": s.get("in", "fade" if k else "cut"),
+        kind = s.get("kind", "page"); sh = {"kind": kind, "start": (t_of(s) - .3 if I else 0) if k == 0 else t_of(s), "in": s.get("in", "fade" if k else "cut"),
               "sfx": s.get("sfx", []), "ease": s.get("ease", "inout"), "stamp": s.get("stamp"), "frame": s.get("frame"),
               "label": s.get("label") or ("AI ILLUSTRATION" if s.get("ai") else None), "marks": [], "rot": s.get("rot", 0)}
         if s.get("ai"): ai_used.append(s.get("img"))
@@ -89,8 +90,15 @@ if __name__ == "__main__":
             if kind == "map" and not sh["label"]: sh["label"] = "ILLUSTRATION"
         else: sys.exit(f"unknown shot kind {kind}")
         shots.append(sh)
+    if I:  # chapter title card fills the silent lead-in
+        shots.insert(0, {"kind": "chapter", "start": 0, "in": "black", "sfx": [], "marks": [], "part": I.get("part"), "text": I.get("title"),
+                         "sub": I.get("sub"), "img": I.get("img", next((x["img"] for x in shots if x.get("img")), None)), "label": None})
+        shots[1]["in"] = "fade"
     for a, b in zip(shots, shots[1:]): a["end"] = b["start"]
     shots[-1]["end"] = o_start if O else dur
+    for sh in shots:
+        if sh["kind"] == "chapter" and sh.get("img") and sh["img"] not in images:
+            iw, ih = img_size(f"assets/{sh['img']}.jpg"); images[sh["img"]] = {"src": f"assets/{sh['img']}.jpg", "w": iw, "h": ih}
     for i, sh in enumerate(shots):
         if sh["kind"] == "footage":
             src = next(iter(glob.glob(f"assets/{sh['img']}.*")))
@@ -104,9 +112,10 @@ if __name__ == "__main__":
         cur.append(i); nxt = sw[i + 1] if i + 1 < len(sw) else None
         txt = " ".join(cap_word(sw[j]["w"]) for j in cur)
         punct = re.search(r"[.,?!;:]$", w["w"])
-        brk = punct or len(cur) == 3 or nxt is None or nxt["line"] != w["line"] or len(txt) + 1 + len(cap_word(nxt["w"])) > 15
+        maxw, maxc = (6, 34) if WIDE else (3, 15)  # long form reads as subtitles, Shorts as punchy 1-3 word captions
+        brk = punct or len(cur) == maxw or nxt is None or nxt["line"] != w["line"] or len(txt) + 1 + len(cap_word(nxt["w"])) > maxc
         if brk and not punct and nxt is not None and nxt["line"] == w["line"] and norm(w["w"]) in SMALL:
-            if len(cur) < 3: brk = False
+            if len(cur) < maxw: brk = False
             elif len(cur) > 1:  # push the little word(s) to the next caption instead
                 carry = []
                 while len(cur) > 1 and norm(sw[cur[-1]]["w"]) in SMALL: carry.insert(0, cur.pop())
@@ -117,7 +126,10 @@ if __name__ == "__main__":
     caps[-1]["e"] = round(min(caps[-1]["last"] + .6, o_start if O else dur), 3)
     mid = R.get("cta_mid")
     if mid: mid = {"text": mid.get("text", "Follow for more"), "s": t_of(mid), "e": t_of(mid) + mid.get("dur", 2.6)}
-    plan = {"fps": 30, "dur": dur, "images": images, "shots": shots, "captions": caps, "series": R.get("series"), "series_label": R.get("series_label", False),
+    dur = round(round(dur * 30) / 30, 4)  # whole frames, so chapters stitch without drift
+    shots[-1]["end"] = dur
+    WH = (1920, 1080) if WIDE else (1080, 1920)
+    plan = {"fps": 30, "W": WH[0], "H": WH[1], "format": R["format"], "dur": dur, "images": images, "shots": shots, "captions": caps, "series": R.get("series"), "series_label": R.get("series_label", False),
             "grade": R.get("grade", {}), "cta_mid": mid, "ai": ai_used}
     os.makedirs("build", exist_ok=True)
     json.dump(plan, open("build/plan.json", "w"), indent=1)

@@ -20,7 +20,8 @@ await new Promise(r => srv.listen(0, '127.0.0.1', r));
 const URL_ = `http://127.0.0.1:${srv.address().port}/engine/index.html`;
 const browser = await chromium.launch({ ...(process.env.CHROME ? { executablePath: process.env.CHROME } : {}) });
 async function openPage() {
-  const p = await browser.newPage({ viewport: { width: 1080, height: 1920 } });
+  const PL = JSON.parse(fs.readFileSync('build/plan.json', 'utf8'));
+  const p = await browser.newPage({ viewport: { width: PL.W || 1080, height: PL.H || 1920 } });
   p.on('pageerror', e => console.log('[err]', e.message)); p.on('console', m => m.type() === 'error' && console.log('[page]', m.text()));
   await p.goto(URL_); await p.evaluate(() => window.READY); return p;
 }

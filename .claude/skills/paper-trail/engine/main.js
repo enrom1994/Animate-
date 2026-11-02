@@ -1,7 +1,12 @@
 // paper-trail renderer: archive pages with slow camera moves, film grade, grain, red ink marks, typed stamps, captions.
 // Deterministic: renderFrame(f) draws frame f from window.PLAN; window.READY resolves when images and fonts are loaded.
-const P = window.PLAN, W = 1080, H = 1920, FPS = P.fps;
-const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const P = window.PLAN, W = P.W || 1080, H = P.H || 1920, FPS = P.fps, WIDE = W > H;
+// layout per format: portrait (Shorts, 1080x1920) or wide (long form, 1920x1080)
+const L = WIDE ? { capY: 968, capW: 1500, capPx: 64, capLH: 76, stampY: 96, labelX: 1860, labelY: 1036, cardY: 470, cardPx: 150, cardW: 1500,
+                   map: { x: 360, y: 150, w: 1200, h: 760 }, outroY: 400, ctaY: 860, clip: [.5, .46, .62, .8], series: 60 }
+               : { capY: 1330, capW: 880, capPx: 84, capLH: 96, stampY: 345, labelX: 980, labelY: 1499, cardY: H * .45, cardPx: 150, cardW: 900,
+                   map: { x: 90, y: 420, w: 900, h: 900 }, outroY: H * .44, ctaY: 1452, clip: [.5, .43, .8, .5], series: 238 };
+const cv = Object.assign(document.getElementById('c'), { width: W, height: H }), ctx = cv.getContext('2d');
 const G = Object.assign({ sepia: .38, contrast: 1.3, bright: .9, grain: .09, vignette: .75 }, P.grade || {});
 const INK = '#c4161c', PAPER = '#efe6d2', DARK = '#0b0907';
 const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
@@ -26,7 +31,7 @@ async function load() {
 }
 // grain frames + vignette, made once
 const GRAIN = [...Array(8)].map((_, k) => {
-  const c = mk(360, 640), g = c.getContext('2d'), d = g.createImageData(360, 640);
+  const c = mk(W / 3, H / 3), g = c.getContext('2d'), d = g.createImageData(W / 3, H / 3);
   for (let i = 0; i < d.data.length; i += 4) { const v = 128 + (rnd(i * .37 + k * 9973) - .5) * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; }
   g.putImageData(d, 0, 0); return c;
 });
@@ -35,7 +40,7 @@ const VIG = (() => { const c = mk(W, H), g = c.getContext('2d'); const r = g.cre
 
 // camera: a view box (normalized image coords) -> scale + centre that fits it in the frame
 // [cx, cy, w, h] of the screen area a view is fitted into
-function frameOf(sh) { return sh.frame || (sh.layout === 'clip' ? [.5, .43, .8, .5] : [.5, .5, 1, 1]); }
+function frameOf(sh) { return sh.frame || (sh.layout === 'clip' ? L.clip : [.5, .5, 1, 1]); }
 function cam(img, b, fr) {
   const bw = (b[2] - b[0]) * img.w, bh = (b[3] - b[1]) * img.h;
   return { s: (fr.cover ? Math.max : Math.min)(W * fr[2] / bw, H * fr[3] / bh), cx: (b[0] + b[2]) / 2 * img.w, cy: (b[1] + b[3]) / 2 * img.h, fx: fr[0] * W, fy: fr[1] * H };
@@ -96,7 +101,7 @@ function drawMark(m, c, t, img, sh) {  // hand-drawn red ink, drawn on over ~0.5
 function drawStamp(text, t) {  // typed on, top of frame, inside the safe area
   const n = Math.floor(clamp((t - .15) / .9) * text.length); if (n <= 0) return;
   ctx.save(); ctx.font = '500 40px "JB Mono"'; ctx.letterSpacing = '3px'; ctx.textBaseline = 'middle';
-  const full = ctx.measureText(text).width, x = (W - full) / 2, y = 345;
+  const full = ctx.measureText(text).width, x = (W - full) / 2, y = L.stampY;
   ctx.fillStyle = 'rgba(10,8,6,.78)'; ctx.fillRect(x - 28, y - 42, full + 56, 84);
   ctx.fillStyle = PAPER; ctx.fillText(text.slice(0, n), x, y + 2);
   if (n < text.length || Math.floor(t * 2) % 2 === 0) ctx.fillRect(x + ctx.measureText(text.slice(0, n)).width + 4, y - 20, 4, 40);
@@ -107,23 +112,23 @@ function drawSeries(T) {
   if (!P.series || !P.series_label) return;
   ctx.save(); const g = ctx.createLinearGradient(0, 0, 0, 400); g.addColorStop(0, 'rgba(6,5,4,.92)'); g.addColorStop(.55, 'rgba(6,5,4,.7)'); g.addColorStop(1, 'rgba(6,5,4,0)');
   ctx.fillStyle = g; ctx.fillRect(0, 0, W, 400); ctx.font = '500 26px "JB Mono"'; ctx.letterSpacing = '4px'; ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
-  ctx.globalAlpha = .85; ctx.fillStyle = PAPER; ctx.fillText(P.series.toUpperCase(), W / 2, 238);
-  ctx.fillStyle = INK; ctx.fillRect(W / 2 - 40, 262, 80, 4); ctx.restore();
+  ctx.globalAlpha = .85; ctx.fillStyle = PAPER; ctx.fillText(P.series.toUpperCase(), W / 2, L.series);
+  ctx.fillStyle = INK; ctx.fillRect(W / 2 - 40, L.series + 24, 80, 4); ctx.restore();
 }
 
 function drawCaption(T) {
   const c = P.captions.find(c => T >= c.s && T < c.e); if (!c) return;
   const age = T - c.s, pop = 1 + .07 * (1 - ease.out(clamp(age / .12)));
-  ctx.save(); ctx.font = '800 84px "Inter Tight"'; ctx.textBaseline = 'alphabetic'; ctx.letterSpacing = '1px';
+  ctx.save(); ctx.font = `800 ${L.capPx}px "Inter Tight"`; ctx.textBaseline = 'alphabetic'; ctx.letterSpacing = '1px';
   const sp = ctx.measureText(' ').width, ws = c.words.map(w => ({ ...w, wd: ctx.measureText(w.w).width }));
   const lines = [[]]; let lw = 0;
-  for (const w of ws) { if (lw && lw + sp + w.wd > 880) { lines.push([]); lw = 0; } lines[lines.length - 1].push(w); lw += (lw ? sp : 0) + w.wd; }
-  const y0 = 1330 - (lines.length - 1) * 48;
+  for (const w of ws) { if (lw && lw + sp + w.wd > L.capW) { lines.push([]); lw = 0; } lines[lines.length - 1].push(w); lw += (lw ? sp : 0) + w.wd; }
+  const y0 = L.capY - (lines.length - 1) * L.capLH / 2;
   ctx.translate(W / 2, y0); ctx.scale(pop, pop); ctx.globalAlpha = clamp(age / .06);
-  lines.forEach((L, li) => {
-    const tw = L.reduce((a, w) => a + w.wd, 0) + sp * (L.length - 1); let x = -tw / 2; const y = li * 96;
-    for (const w of L) {
-      ctx.lineJoin = 'round'; ctx.lineWidth = 14; ctx.strokeStyle = 'rgba(8,6,5,.95)'; ctx.strokeText(w.w, x, y);
+  lines.forEach((Ln, li) => {
+    const tw = Ln.reduce((a, w) => a + w.wd, 0) + sp * (Ln.length - 1); let x = -tw / 2; const y = li * L.capLH;
+    for (const w of Ln) {
+      ctx.lineJoin = 'round'; ctx.lineWidth = L.capPx / 6; ctx.strokeStyle = 'rgba(8,6,5,.95)'; ctx.strokeText(w.w, x, y);
       ctx.fillStyle = w.emph ? '#e2322a' : '#f4eee2'; ctx.fillText(w.w, x, y); x += w.wd + sp;
     }
   });
@@ -165,21 +170,21 @@ function wrap(text, maxW) {
 KINDS.card = (sh, t) => {  // {text, sub, style: number|quote|title}
   paper(t, sh);
   const st = sh.style || 'number';
-  if (st === 'quote') { ctx.font = '600 76px Lora'; stampText('“' + sh.text + '”', W / 2, H * .45, t - .15, '600 76px Lora', INKC, 860); }
-  else { ctx.font = '800 150px "Inter Tight"'; stampText(sh.text.toUpperCase(), W / 2, H * .45, t - .15, '800 150px "Inter Tight"', st === 'number' ? INK : INKC, 900); }
-  if (sh.sub) typed(sh.sub.toUpperCase(), W / 2, H * .45 + 230, t - .6, 28, '500 36px "JB Mono"', INKC);
-  const k = clamp((t - .35) / .4); ctx.fillStyle = INK; ctx.fillRect(W / 2 - 160 * k, H * .45 - 190, 320 * k, 6);
+  if (st === 'quote') { ctx.font = '600 76px Lora'; stampText('“' + sh.text + '”', W / 2, L.cardY, t - .15, '600 76px Lora', INKC, L.cardW - 40); }
+  else { ctx.font = '800 150px "Inter Tight"'; stampText(sh.text.toUpperCase(), W / 2, L.cardY, t - .15, `800 ${L.cardPx}px "Inter Tight"`, st === 'number' ? INK : INKC, L.cardW); }
+  if (sh.sub) typed(sh.sub.toUpperCase(), W / 2, L.cardY + 230, t - .6, 28, '500 36px "JB Mono"', INKC);
+  const k = clamp((t - .35) / .4); ctx.fillStyle = INK; ctx.fillRect(W / 2 - 160 * k, L.cardY - 190, 320 * k, 6);
 };
 KINDS.map = (sh, t) => {  // ink diagram: blocks [x0,y0,x1,y1,label], points [{x,y,label}], route [[x,y]...], xs [{x,y,at}]
   paper(t, sh);
-  const X = x => 90 + x * 900, Y = y => 420 + y * 900;  // map area inside the safe zone, above the captions
+  const M = L.map, X = x => M.x + x * M.w, Y = y => M.y + y * M.h;  // map area inside the safe zone, above the captions
   ctx.save(); ctx.strokeStyle = INKC; ctx.fillStyle = INKC; ctx.lineWidth = 4;
   const draw = clamp(t / .9);
   for (const [i, b] of (sh.blocks || []).entries()) {
     const k = clamp(draw * 1.6 - i * .15); if (k <= 0) continue; ctx.globalAlpha = k;
-    ctx.strokeRect(X(b[0]), Y(b[1]), (b[2] - b[0]) * 900, (b[3] - b[1]) * 900);
-    ctx.save(); ctx.beginPath(); ctx.rect(X(b[0]), Y(b[1]), (b[2] - b[0]) * 900, (b[3] - b[1]) * 900); ctx.clip(); ctx.lineWidth = 1.5; ctx.globalAlpha = .35 * k;
-    for (let h = -900; h < 900; h += 18) { ctx.beginPath(); ctx.moveTo(X(b[0]) + h, Y(b[1])); ctx.lineTo(X(b[0]) + h + 600, Y(b[1]) + 600); ctx.stroke(); }
+    ctx.strokeRect(X(b[0]), Y(b[1]), (b[2] - b[0]) * M.w, (b[3] - b[1]) * M.h);
+    ctx.save(); ctx.beginPath(); ctx.rect(X(b[0]), Y(b[1]), (b[2] - b[0]) * M.w, (b[3] - b[1]) * M.h); ctx.clip(); ctx.lineWidth = 1.5; ctx.globalAlpha = .35 * k;
+    for (let h = -M.h; h < M.w; h += 18) { ctx.beginPath(); ctx.moveTo(X(b[0]) + h, Y(b[1])); ctx.lineTo(X(b[0]) + h + 600, Y(b[1]) + 600); ctx.stroke(); }
     ctx.restore();
     if (b[4]) { ctx.globalAlpha = k; ctx.font = '500 30px "JB Mono"'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = INKC;
       const tw = ctx.measureText(b[4]).width; ctx.fillStyle = '#e6dcc4'; ctx.fillRect((X(b[0]) + X(b[2])) / 2 - tw / 2 - 10, (Y(b[1]) + Y(b[3])) / 2 - 22, tw + 20, 44);
@@ -207,7 +212,23 @@ KINDS.map = (sh, t) => {  // ink diagram: blocks [x0,y0,x1,y1,label], points [{x
     if (x.label) { ctx.fillStyle = INK; ctx.font = '800 34px "Inter Tight"'; ctx.textAlign = 'center'; ctx.fillText(x.label.toUpperCase(), X(x.x), Y(x.y) + 70); }
   }
   ctx.restore();
-  if (sh.title) typed(sh.title.toUpperCase(), W / 2, 345, t - .1, 30, '500 40px "JB Mono"', INKC);
+  if (sh.title) typed(sh.title.toUpperCase(), W / 2, L.stampY, t - .1, 30, '500 40px "JB Mono"', INKC);
+};
+
+KINDS.chapter = (sh, t) => {  // section title: a slow push on a dark blurred page, PART label stamped, headline typed, place/date typed
+  const span = sh.end - sh.start;
+  if (sh.img && IMG[sh.img]) { const z = 1.04 + .06 * clamp(t / span); ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.globalAlpha = .9; ctx.drawImage(IMG[sh.img].bg, -W / 2, -H / 2, W, H); ctx.restore(); }
+  else { ctx.fillStyle = DARK; ctx.fillRect(0, 0, W, H); }
+  const cy = H * .46;
+  if (sh.part) { ctx.save(); ctx.font = '500 44px "JB Mono"'; ctx.letterSpacing = '12px'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const k = ease.out(clamp((t - .5) / .2)); ctx.globalAlpha = k; ctx.fillStyle = '#e0473c'; ctx.fillText(sh.part.toUpperCase(), W / 2, cy - (WIDE ? 130 : 180)); ctx.restore(); }
+  const head = (sh.text || '').toUpperCase(), n = Math.floor(clamp((t - 1.0) / Math.max(.6, head.length * .07)) * head.length);
+  if (n > 0) { ctx.save(); ctx.font = `800 ${WIDE ? 120 : 112}px "Inter Tight"`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = PAPER;
+    const lines = wrap(head, WIDE ? 1600 : 920); let used = 0;
+    lines.forEach((ln, i) => { const m = Math.max(0, Math.min(ln.length, n - used)); used += ln.length + 1; if (m) ctx.fillText(ln.slice(0, m), W / 2, cy + (i - (lines.length - 1) / 2) * 128); });
+    ctx.restore(); }
+  const k = ease.inout(clamp((t - 1.0 - head.length * .07) / .5)); ctx.fillStyle = INK; ctx.fillRect(W / 2 - 220 * k, cy + (WIDE ? 95 : 150), 440 * k, 5);
+  if (sh.sub) typed(sh.sub.toUpperCase(), W / 2, cy + (WIDE ? 160 : 220), t - 1.4 - head.length * .07, 26, '500 40px "JB Mono"', PAPER);
 };
 const FOOT = {};  // footage frames, loaded on demand
 function footFrame(sh, i) {
@@ -225,7 +246,7 @@ KINDS.outro = (sh, t) => {  // case-file checklist: each box gets a red tick
   ctx.drawImage(VIG, 0, 0); ctx.fillStyle = DARK; ctx.fillRect(0, 0, W, H);
   const items = sh.items && sh.items.length ? sh.items : [sh.text];
   ctx.save(); ctx.font = '800 104px "Inter Tight"'; ctx.textBaseline = 'middle';
-  const bw = 78, gap = 38, colW = Math.max(...items.map(s => ctx.measureText(s).width)) + bw + gap, x0 = (W - colW) / 2, y0 = H * .44 - (items.length - 1) * 85;
+  const bw = 78, gap = 38, colW = Math.max(...items.map(s => ctx.measureText(s).width)) + bw + gap, x0 = (W - colW) / 2, y0 = L.outroY - (items.length - 1) * 85;
   items.forEach((it, i) => {
     const y = y0 + i * 170, k = clamp((t - .15 - i * .12) / .25); if (k <= 0) return; ctx.globalAlpha = k;
     ctx.strokeStyle = PAPER; ctx.lineWidth = 6; ctx.strokeRect(x0, y - bw / 2, bw, bw);
@@ -243,17 +264,17 @@ KINDS.outro = (sh, t) => {  // case-file checklist: each box gets a red tick
 };
 function drawLabel(text) {  // small honest tag: ILLUSTRATION / AI ILLUSTRATION
   ctx.save(); ctx.font = '500 24px "JB Mono"'; ctx.letterSpacing = '3px'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
-  const tw = ctx.measureText(text).width; ctx.fillStyle = 'rgba(10,8,6,.7)'; ctx.fillRect(980 - tw - 20, 1478, tw + 30, 40);
-  ctx.fillStyle = PAPER; ctx.fillText(text, 975, 1499); ctx.restore();
+  const tw = ctx.measureText(text).width; ctx.fillStyle = 'rgba(10,8,6,.7)'; ctx.fillRect(L.labelX - tw - 20, L.labelY - 21, tw + 30, 40);
+  ctx.fillStyle = PAPER; ctx.fillText(text, L.labelX - 5, L.labelY); ctx.restore();
 }
 function drawMidCTA(T) {
   const m = P.cta_mid; if (!m || T < m.s || T > m.e) return;
   const k = Math.min(ease.out(clamp((T - m.s) / .3)), ease.out(clamp((m.e - T) / .3)));
   ctx.save(); ctx.globalAlpha = k; ctx.translate(0, (1 - k) * 30); ctx.font = '500 32px "JB Mono"'; ctx.letterSpacing = '3px'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   const text = m.text.toUpperCase(), tw = ctx.measureText(text).width;
-  ctx.fillStyle = 'rgba(10,8,6,.82)'; ctx.fillRect(W / 2 - tw / 2 - 44, 1452, tw + 88, 62);
-  ctx.fillStyle = INK; ctx.beginPath(); ctx.arc(W / 2 - tw / 2 - 18, 1483, 8, 0, 7); ctx.fill();
-  ctx.fillStyle = PAPER; ctx.fillText(text, W / 2 + 10, 1484); ctx.restore();
+  ctx.fillStyle = 'rgba(10,8,6,.82)'; ctx.fillRect(W / 2 - tw / 2 - 44, L.ctaY, tw + 88, 62);
+  ctx.fillStyle = INK; ctx.beginPath(); ctx.arc(W / 2 - tw / 2 - 18, L.ctaY + 31, 8, 0, 7); ctx.fill();
+  ctx.fillStyle = PAPER; ctx.fillText(text, W / 2 + 10, L.ctaY + 32); ctx.restore();
 }
 
 async function renderFrame(f) {

@@ -88,3 +88,22 @@ Needs ffmpeg, Node 18+, Python 3.9+. In a cloud container with a preinstalled Ch
 
 ## Files
 `tools/loc.py` archive search/fetch/find · `tools/voice.py` Kokoro + darkening · `tools/align.py` word timings · `tools/plan.py` spec to timed plan · `tools/audio.py` score + SFX + mix · `tools/render.mjs` Playwright frames · `engine/` the canvas renderer · `make.sh` all of it.
+
+## Long form (16:9, 5 to 10 minutes)
+A film is a folder of chapter reels, built one by one and stitched frame-exact:
+```
+reels/<film>/film.json        {"title", "format": "16:9", "outro": false, "chapters": ["01-open", "02-trusty", ...]}
+reels/<film>/01-open/reel.json     cold open: no intro card, ends on a title card shot
+reels/<film>/02-trusty/reel.json   "intro": {"part": "Part one", "title": "The trusty", "sub": "Leavenworth · 1924-1930", "dur": 6}
+reels/<film>/08-after/reel.json    "outro": true  (the spoken end card, only once, at the very end)
+```
+- Write the whole script first (`SCRIPT.md`, 750 to 1,200 words, 6 to 8 chapters of 60 to 90 s, one beat each) and get it approved. Then build chapters.
+- `intro` makes the narration start after `dur` seconds of silence (5 to 10 s) while a title card plays: PART label stamped, headline typed, place/date typed, over the chapter's first page blurred. Chapters fade to black at the end and in from black at the start, so the seams read as deliberate pauses.
+- `bash "$SKILL_DIR/film.sh" reels/<film>` builds every chapter (`NOMUX`), concatenates video and audio (each chapter's audio is cut to its exact frame count), normalises loudness once, and writes `<film>.mp4` plus `build/description.txt` with YouTube chapter timestamps and all sources. `CHAPTERS="03 05" film.sh ...` rebuilds only those chapters.
+- 16:9 layout: subtitle-style captions (up to 6 words) at the bottom, wider map area, clippings framed in the centre. `"format": "9:16"` (or `FORMAT=9:16` in the environment) renders the same chapter vertically, which is how a Short is cut from a chapter.
+- Render time is about 3.5 minutes per minute of video on 4 cores; run long builds in the background.
+
+## Voices
+- `kokoro` (default): free, fast, robotic over long durations. `am_onyx` is the deepest.
+- `chatterbox`: Resemble AI's open model (MIT licence, free, commercial use OK). Much more natural; about 5x slower than real time on CPU (an 8 minute film takes about 40 minutes of voice generation; the per-line cache in `audio/cb_lines/` means a rerun only redoes changed lines). Set `"voice": {"engine": "chatterbox", "ref": "../../voices/ref_onyx.wav", "exaggeration": 0.35, "cfg": 0.35}`; `ref` is a 5 to 10 s sample whose voice it imitates (use only a voice you own or have permission for; `reels/voices/ref_onyx.wav` is the synthetic Kokoro onyx voice). Lower `cfg` means slower, more deliberate delivery. Outputs carry Resemble's inaudible watermark. Install once: `python3 -m venv kit/.venv-cb && kit/.venv-cb/bin/pip install torch==2.6.0 torchaudio==2.6.0 --index-url https://download.pytorch.org/whl/cpu && kit/.venv-cb/bin/pip install chatterbox-tts`.
+- Your own recording: put it at `audio/vo.wav` (44.1 kHz mono) and the pipeline times everything to it.

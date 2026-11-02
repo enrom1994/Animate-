@@ -23,8 +23,22 @@ if __name__ == "__main__":
                espeak_config=EspeakConfig(lib_path=espeakng_loader.get_library_path(), data_path=data))
     os.makedirs("audio", exist_ok=True)
     out, meta, t, sr = [], [], 0.0, 24000
+    lead = (R.get("intro") or {}).get("dur", 0)  # chapter title card: silent breathing room before the narration
+    if lead: out.append(np.zeros(int(lead * sr), dtype=np.float32)); t = lead
+    engine = V.get("engine", "kokoro")
+    if engine == "chatterbox":  # better, slower (~5x real time on CPU); runs in its own venv
+        import subprocess
+        texts = [spoken(l, R.get("say", {})) for l in R["script"]]
+        key = json.dumps([texts, V.get("ref"), V.get("exaggeration", .35), V.get("cfg", .35)])
+        cache = "audio/cb_lines"
+        if os.path.exists(f"{cache}/key.json") and open(f"{cache}/key.json").read() != key: shutil.rmtree(cache)
+        os.makedirs(cache, exist_ok=True); json.dump(texts, open(f"{cache}/lines.json", "w")); open(f"{cache}/key.json", "w").write(key)
+        ref = os.path.realpath(os.path.join(os.path.dirname(os.path.abspath("reel.json")), V["ref"])) if V.get("ref") else ""
+        subprocess.run([f"{KIT}/.venv-cb/bin/python", f"{HERE}/tts_chatterbox.py", f"{cache}/lines.json", cache, ref,
+                        str(V.get("exaggeration", .35)), str(V.get("cfg", .35))], check=True)
     for i, line in enumerate(R["script"]):
-        a, sr = k.create(spoken(line, R.get("say", {})), voice=V["name"], speed=V["speed"], lang="en-us" if V["name"][0] == "a" else "en-gb")
+        if engine == "chatterbox": a, sr = sf.read(f"audio/cb_lines/line_{i:02d}.wav", dtype="float32"); a = np.asarray(a, dtype=np.float32)
+        else: a, sr = k.create(spoken(line, R.get("say", {})), voice=V["name"], speed=V["speed"], lang="en-us" if V["name"][0] == "a" else "en-gb")
         idx = np.where(np.abs(a) > .01)[0]; a = a[max(0, idx[0] - int(.02 * sr)): idx[-1] + int(.08 * sr)]
         meta.append({"i": i, "text": line, "start": round(t, 3), "dur": round(len(a) / sr, 3)})
         gap = V["gap"] * (1.8 if i == 0 else 1.0)  # a held beat after the hook
@@ -33,9 +47,9 @@ if __name__ == "__main__":
     sf.write("audio/vo_raw.wav", np.concatenate(out), sr)
     json.dump(meta, open("audio/lines.json", "w"), indent=1)
     # darker: small pitch drop (tempo kept), warm low end, softened top, a little room, gentle compression
-    r = 2 ** (V["pitch"] / 12)
+    r = 2 ** ((V["pitch"] if engine == "kokoro" else V.get("cb_pitch", 0)) / 12)
     af = (f"asetrate={sr}*{r:.5f},aresample={sr},atempo={1 / r:.5f},"
           "equalizer=f=110:t=q:w=1:g=3,equalizer=f=3200:t=q:w=1.5:g=-2,lowpass=f=9500,"
           "aecho=0.8:0.6:38|71:0.10|0.06,acompressor=threshold=0.12:ratio=3:attack=8:release=120:makeup=1.6")
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", "audio/vo_raw.wav", "-af", af, "-ar", "44100", "-ac", "1", "audio/vo.wav"], check=True)
-    print(f"{V['name']} {t:.2f}s -> audio/vo.wav")
+    print(f"{engine}:{V.get("ref") or V["name"]} {t:.2f}s -> audio/vo.wav")

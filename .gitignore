@@ -12,7 +12,9 @@ __pycache__/
 .claude/skills/stick-figure/engine/template/stills/
 .claude/skills/stick-figure/engine/template/silent.mp4
 # paper-trail reels: keep the spec, refetch/regenerate the rest
-reels/*/assets/
-reels/*/audio/
-reels/*/build/
-reels/*/*.mp4
+reels/**/assets/
+reels/**/audio/
+reels/**/build/
+reels/**/*.mp4
+reels/**/*.m4a
+.claude/kit/.venv-cb/
