@@ -52,4 +52,4 @@ if __name__ == "__main__":
           "equalizer=f=110:t=q:w=1:g=3,equalizer=f=3200:t=q:w=1.5:g=-2,lowpass=f=9500,"
           "aecho=0.8:0.6:38|71:0.10|0.06,acompressor=threshold=0.12:ratio=3:attack=8:release=120:makeup=1.6")
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", "audio/vo_raw.wav", "-af", af, "-ar", "44100", "-ac", "1", "audio/vo.wav"], check=True)
-    print(f"{engine}:{V.get("ref") or V["name"]} {t:.2f}s -> audio/vo.wav")
+    print(f"{engine}:{V.get('ref') or V['name']} {t:.2f}s -> audio/vo.wav")
