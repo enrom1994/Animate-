@@ -320,7 +320,7 @@ function drawRoutes(sh, t, X, Y) {  // several routes: style car (dashed), rail 
       ctx.strokeStyle = INK; ctx.lineWidth = 5; ctx.beginPath(); pts.forEach((p, i) => i ? ctx.lineTo(...p) : ctx.moveTo(...p)); ctx.globalAlpha = .55; ctx.stroke();
     } else { ctx.strokeStyle = r.style === 'plan' ? 'rgba(29,23,18,.45)' : INK; ctx.lineWidth = r.style === 'plan' ? 4 : 8; ctx.setLineDash(r.style === 'plan' ? [4, 12] : [24, 14]);
       ctx.beginPath(); pts.forEach((p, i) => i ? ctx.lineTo(...p) : ctx.moveTo(...p)); ctx.stroke(); }
-    if (r.label && k > .6) { ctx.globalAlpha = clamp((k - .6) / .3); ctx.font = `500 ${Math.round(L.mapFont * .85)}px "JB Mono"`; ctx.fillStyle = INKC; ctx.textAlign = 'center'; const m = pts[Math.floor(pts.length / 2)]; ctx.fillText(r.label.toUpperCase(), m[0] + (r.lx || 0), m[1] + (r.ly || -24)); }
+    if (r.label && k > .6) { ctx.globalAlpha = clamp((k - .6) / .3); ctx.font = `500 ${Math.round(L.mapFont * .85)}px "JB Mono"`; ctx.fillStyle = INKC; ctx.textAlign = 'center'; const m = pts.length === 2 ? [(pts[0][0] + pts[1][0]) / 2, (pts[0][1] + pts[1][1]) / 2] : pts[Math.floor(pts.length / 2)]; ctx.fillText(r.label.toUpperCase(), m[0] + (r.lx || 0), m[1] + (r.ly || -24)); }
     ctx.restore();
   }
 }
