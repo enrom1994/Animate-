@@ -8,6 +8,11 @@ SK="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; KIT="$(cd "$SK/../../kit" &&
 [ -d "$KIT/node_modules/playwright" ] || (cd "$KIT" && npm install --silent --no-audit --no-fund)
 DIR="$(cd "${1:?usage: make.sh <reel-folder> [stills t1,t2]}" && pwd)"; NAME="$(basename "$DIR")"; cd "$DIR"
 [ -f reel.json ] || { echo "no reel.json in $DIR"; exit 1; }
+python3 - "$SK" <<'PY'   # fetch any page listed in reel.json "assets" that isn't on disk yet
+import json, os, subprocess, sys
+for n, url in json.load(open("reel.json")).get("assets", {}).items():
+    if not os.path.exists(f"assets/{n}.jpg"): subprocess.run([sys.executable, f"{sys.argv[1]}/tools/loc.py", "fetch", url, n], check=True)
+PY
 if [ ! -f audio/vo.wav ] || [ "${VOICE:-0}" = 1 ]; then echo "== voice"; "$PY" "$SK/tools/voice.py"; fi
 if [ ! -f audio/words.json ] || [ audio/vo.wav -nt audio/words.json ] || [ reel.json -nt audio/words.json ]; then echo "== word timings"; "$PY" "$SK/tools/align.py"; fi
 echo "== plan"; "$PY" "$SK/tools/plan.py"
