@@ -3,7 +3,7 @@
 #   voice (Kokoro, skipped if audio/vo.wav exists; VOICE=1 to remake) -> word timings -> plan -> score + SFX -> frames -> <name>.mp4
 #   Your own narration: put it at <reel>/audio/vo.wav (44.1 kHz mono) and run as usual.
 set -euo pipefail
-SK="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; KIT="$(cd "$SK/../../kit" && pwd)"; PY="$KIT/.venv/bin/python"
+SK="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; export SK; KIT="$(cd "$SK/../../kit" && pwd)"; PY="$KIT/.venv/bin/python"
 [ -x "$PY" ] || { echo "voice tools missing: run  bash $KIT/setup.sh --voice"; exit 1; }
 [ -d "$KIT/node_modules/playwright" ] || (cd "$KIT" && npm install --silent --no-audit --no-fund)
 DIR="$(cd "${1:?usage: make.sh <reel-folder> [stills t1,t2]}" && pwd)"; NAME="$(basename "$DIR")"; cd "$DIR"
@@ -13,7 +13,16 @@ import json, os, subprocess, sys
 for n, url in json.load(open("reel.json")).get("assets", {}).items():
     if not os.path.exists(f"assets/{n}.jpg"): subprocess.run([sys.executable, f"{sys.argv[1]}/tools/loc.py", "fetch", url, n], check=True)
 PY
-if [ ! -f audio/vo.wav ] || [ "${VOICE:-0}" = 1 ]; then echo "== voice"; "$PY" "$SK/tools/voice.py"; fi
+# remake the voice when there is none, when asked, or when the script/voice changed since the last generated take
+# (a take you recorded yourself has no audio/voiced.json and is never replaced)
+STALE=$("$PY" - <<'PY' 2>/dev/null || echo 0
+import json, os, sys; sys.path.insert(0, os.environ["SK"] + "/tools"); import config
+R = config.load(); v = json.load(open("audio/voiced.json")) if os.path.exists("audio/voiced.json") else None
+V = {"name": "am_onyx", "speed": .9, "pitch": -1.0, "gap": .32, **R.get("voice", {})}
+print(1 if v and (v["script"] != R["script"] or v["say"] != R.get("say", {}) or v["voice"] != V) else 0)
+PY
+)
+if [ ! -f audio/vo.wav ] || [ "${VOICE:-0}" = 1 ] || [ "$STALE" = 1 ]; then echo "== voice"; "$PY" "$SK/tools/voice.py"; fi
 if [ ! -f audio/words.json ] || [ audio/vo.wav -nt audio/words.json ] || [ reel.json -nt audio/words.json ]; then echo "== word timings"; "$PY" "$SK/tools/align.py"; fi
 echo "== plan"; "$PY" "$SK/tools/plan.py"
 if [ "${2:-}" = stills ]; then node "$SK/tools/render.mjs" stills "$3"; exit 0; fi
@@ -21,6 +30,7 @@ echo "== score + sfx"; "$PY" "$SK/tools/audio.py"
 echo "== frames"; node "$SK/tools/render.mjs" video "${WORKERS:-4}"
 [ "${NOMUX:-0}" = 1 ] && { echo "frames + mix ready (NOMUX)"; exit 0; }
 echo "== mux"
+LN=$(python3 "$SK/tools/loudnorm.py" audio/mix.wav -14 -1.5 9)   # two-pass: lands on -14 LUFS
 ffmpeg -v error -y -i build/silent.mp4 -i audio/mix.wav -map 0:v -map 1:a -c:v copy \
-  -af "loudnorm=I=-14:TP=-1.5:LRA=9" -c:a aac -b:a 192k -ar 48000 -shortest -movflags +faststart "$NAME.part.mp4"
+  -af "$LN" -c:a aac -b:a 192k -ar 48000 -shortest -movflags +faststart "$NAME.part.mp4"
 mv "$NAME.part.mp4" "$NAME.mp4"; echo "done: $DIR/$NAME.mp4"

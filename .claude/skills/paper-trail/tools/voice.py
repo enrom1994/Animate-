@@ -29,15 +29,20 @@ if __name__ == "__main__":
     if engine == "chatterbox":  # better, slower (~5x real time on CPU); runs in its own venv
         import subprocess
         texts = [spoken(l, R.get("say", {})) for l in R["script"]]
-        key = json.dumps([texts, V.get("ref"), V.get("exaggeration", .35), V.get("cfg", .35)])
-        cache = "audio/cb_lines"
-        if os.path.exists(f"{cache}/key.json") and open(f"{cache}/key.json").read() != key: shutil.rmtree(cache)
-        os.makedirs(cache, exist_ok=True); json.dump(texts, open(f"{cache}/lines.json", "w")); open(f"{cache}/key.json", "w").write(key)
+        import hashlib
+        cache = "audio/cb_lines"; os.makedirs(cache, exist_ok=True)
         ref = os.path.realpath(os.path.join(os.path.dirname(os.path.abspath("reel.json")), V["ref"])) if V.get("ref") else ""
-        subprocess.run([f"{KIT}/.venv-cb/bin/python", f"{HERE}/tts_chatterbox.py", f"{cache}/lines.json", cache, ref,
-                        str(V.get("exaggeration", .35)), str(V.get("cfg", .35))], check=True)
+        params = [os.path.basename(ref), V.get("exaggeration", .35), V.get("cfg", .35)]
+        # one file per line, named by its text + settings: editing one line re-records only that line
+        files = [f"{cache}/{hashlib.sha1(json.dumps([t] + params).encode()).hexdigest()[:12]}.wav" for t in texts]
+        todo = [[t, f] for t, f in zip(texts, files) if not os.path.exists(f)]
+        if todo:
+            json.dump(todo, open(f"{cache}/todo.json", "w"))
+            subprocess.run([f"{KIT}/.venv-cb/bin/python", f"{HERE}/tts_chatterbox.py", f"{cache}/todo.json", ref,
+                            str(V.get("exaggeration", .35)), str(V.get("cfg", .35))], check=True)
+        print(f"chatterbox: {len(texts) - len(todo)} lines reused, {len(todo)} recorded")
     for i, line in enumerate(R["script"]):
-        if engine == "chatterbox": a, sr = sf.read(f"audio/cb_lines/line_{i:02d}.wav", dtype="float32"); a = np.asarray(a, dtype=np.float32)
+        if engine == "chatterbox": a, sr = sf.read(files[i], dtype="float32"); a = np.asarray(a, dtype=np.float32)
         else: a, sr = k.create(spoken(line, R.get("say", {})), voice=V["name"], speed=V["speed"], lang="en-us" if V["name"][0] == "a" else "en-gb")
         idx = np.where(np.abs(a) > .01)[0]; a = a[max(0, idx[0] - int(.02 * sr)): idx[-1] + int(.08 * sr)]
         meta.append({"i": i, "text": line, "start": round(t, 3), "dur": round(len(a) / sr, 3)})
@@ -52,4 +57,5 @@ if __name__ == "__main__":
           "equalizer=f=110:t=q:w=1:g=3,equalizer=f=3200:t=q:w=1.5:g=-2,lowpass=f=9500,"
           "aecho=0.8:0.6:38|71:0.10|0.06,acompressor=threshold=0.12:ratio=3:attack=8:release=120:makeup=1.6")
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", "audio/vo_raw.wav", "-af", af, "-ar", "44100", "-ac", "1", "audio/vo.wav"], check=True)
+    json.dump({"script": R["script"], "say": R.get("say", {}), "voice": V}, open("audio/voiced.json", "w"), indent=1)  # what this take says
     print(f"{engine}:{V.get('ref') or V['name']} {t:.2f}s -> audio/vo.wav")

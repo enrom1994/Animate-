@@ -100,6 +100,7 @@ reels/<film>/08-after/reel.json    "outro": true  (the spoken end card, only onc
 ```
 - Write the whole script first (`SCRIPT.md`, 750 to 1,200 words, 6 to 8 chapters of 60 to 90 s, one beat each) and get it approved. Then build chapters.
 - `intro` makes the narration start after `dur` seconds of silence (5 to 10 s) while a title card plays: PART label stamped, headline typed, place/date typed, over the chapter's first page blurred. Chapters fade to black at the end and in from black at the start, so the seams read as deliberate pauses.
+- List the written sources for the narration in `film.json` `"references"` (they go into the description under the archive list).
 - `bash "$SKILL_DIR/film.sh" reels/<film>` builds every chapter (`NOMUX`), concatenates video and audio (each chapter's audio is cut to its exact frame count), normalises loudness once, and writes `<film>.mp4` plus `build/description.txt` with YouTube chapter timestamps and all sources. `CHAPTERS="03 05" film.sh ...` rebuilds only those chapters.
 - 16:9 layout: subtitle-style captions (up to 6 words) at the bottom, wider map area, clippings framed in the centre. `"format": "9:16"` (or `FORMAT=9:16` in the environment) renders the same chapter vertically, which is how a Short is cut from a chapter.
 - Render time is about 3.5 minutes per minute of video on 4 cores; run long builds in the background.

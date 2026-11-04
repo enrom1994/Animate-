@@ -16,8 +16,9 @@ mkdir -p build; : > build/v.txt; : > build/a.txt
 for c in "${CH[@]}"; do echo "file '$FILM/$c/build/silent.mp4'" >> build/v.txt; echo "file '$FILM/$c/audio/mix.wav'" >> build/a.txt; done
 ffmpeg -v error -y -f concat -safe 0 -i build/v.txt -c copy build/silent.mp4
 ffmpeg -v error -y -f concat -safe 0 -i build/a.txt -c copy build/mix.wav
+LN=$(python3 "$SK/tools/loudnorm.py" build/mix.wav -14 -1.5 11)   # two-pass: lands on -14 LUFS
 ffmpeg -v error -y -i build/silent.mp4 -i build/mix.wav -map 0:v -map 1:a -c:v copy \
-  -af "loudnorm=I=-14:TP=-1.5:LRA=11" -c:a aac -b:a 192k -ar 48000 -shortest -movflags +faststart "$NAME.part.mp4"
+  -af "$LN" -c:a aac -b:a 192k -ar 48000 -shortest -movflags +faststart "$NAME.part.mp4"
 mv "$NAME.part.mp4" "$NAME.mp4"
 # chapters for the YouTube description (timestamps of each title card)
 python3 - "${CH[@]}" <<'PY'
@@ -31,7 +32,9 @@ src = []
 for c in sys.argv[1:]:
     for line in open(f"{c}/build/description.txt").read().splitlines():
         if line.startswith("- ") and line not in src: src.append(line)
-open("build/description.txt", "w").write("Chapters:\n" + "\n".join(out) + "\n\nSources:\n" + "\n".join(src) + "\n")
+refs = json.load(open("film.json")).get("references", [])
+open("build/description.txt", "w").write("Chapters:\n" + "\n".join(out) + "\n\nArchive pages and photos (Library of Congress):\n" + "\n".join(src)
+    + ("\n\nFurther reading:\n" + "\n".join(f"- {r}" for r in refs) if refs else "") + "\n")
 print("\n".join(out))
 PY
 echo "done: $FILM/$NAME.mp4"

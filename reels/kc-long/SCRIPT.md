@@ -27,7 +27,7 @@ On October 19, 1930, he was sent outside the walls on an errand.
 He never came back.
 For almost three years, Frank Nash lived as a free man.
 He moved through Chicago and other big cities, and kept company with the underworld.
-In December 1931, he helped free seven prisoners from Fort Leavenworth.
+In December 1931, he helped free seven prisoners from Leavenworth.
 And he fell in love with a barmaid named Frances Luce.
 In May 1933, he married her, under a false name.
 
@@ -107,7 +107,7 @@ Four lawmen. One prisoner. Thirty seconds.
 ---
 
 ### Fact notes
-- Nash: 25-year sentence at Leavenworth on March 1, 1924; walked out on an errand on October 19, 1930; helped free seven prisoners from Fort Leavenworth in December 1931; married Frances Luce on May 26, 1933 under the name "Moore" (Wikipedia, Frank Nash).
+- Nash: 25-year sentence at Leavenworth on March 1, 1924; walked out on an errand on October 19, 1930; helped free seven prisoners in the December 11, 1931 break at the federal penitentiary in Leavenworth (Wikipedia says "Fort Leavenworth"; the period headlines, e.g. "Six Convicts Recaptured After Leavenworth Pen Break", show it was the penitentiary); married Frances Luce on May 26, 1933 under the name "Moore" (Wikipedia, Frank Nash).
 - Capture: agents Lackey and Smith with Chief Otto Reed, because agents were then barred from carrying weapons and making arrests; arrested June 16 and driven to Fort Smith; Missouri Pacific train that night (Wikipedia, Frank Nash).
 - Union Station: met by Vetterli, Caffrey, Grooms and Hermanson; Caffrey's Chevrolet by the east entrance; Nash in front, Lackey, Smith and Reed in the back; "Up, up!", "Let 'em have it!", about 30 seconds, "They're all dead. Let's get out of here." (Wikipedia, Kansas City massacre).
 - Fates: Miller found dead near Detroit on November 29, 1933; Floyd killed on October 22, 1934 near Clarkson, Ohio; Richetti convicted in 1935 and executed on October 7, 1938 (Wikipedia).
