@@ -2,13 +2,13 @@ Chapters:
 0:00 Cold open
 0:37 The trusty
 1:28 Hot Springs
-2:18 The word gets out
-3:03 Union Station
+2:17 The word gets out
+3:02 Union Station
 3:45 Thirty seconds
 4:28 The hunt
 5:27 What it changed
 
-Sources:
+Archive pages and photos (Library of Congress):
 - [Union Station, Kansas City, Mo.] - https://www.loc.gov/item/2016818238/
 - Evening star (Washington, D.C.), June 17, 1933 - https://www.loc.gov/resource/sn83045462/1933-06-17/ed-1/?sp=1
 - The Washington times (Washington [D.C.]), June 17, 1933 - https://www.loc.gov/resource/sn84026749/1933-06-17/ed-1/?sp=1
@@ -25,3 +25,10 @@ Sources:
 - The Key West citizen (Key West, Fla.), June 17, 1933 - https://www.loc.gov/resource/sn83016244/1933-06-17/ed-1/?sp=1
 - The Indianapolis times (Indianapolis [Ind.]), October 23, 1934, (Home Edition) - https://www.loc.gov/resource/sn82015313/1934-10-23/ed-1/?sp=1
 - Henderson daily dispatch (Henderson, N.C.), October 7, 1938 - https://www.loc.gov/resource/sn91068401/1938-10-07/ed-1/?sp=1
+
+Further reading:
+- Wikipedia, "Kansas City massacre": https://en.wikipedia.org/wiki/Kansas_City_massacre
+- Wikipedia, "Frank Nash": https://en.wikipedia.org/wiki/Frank_Nash
+- Wikipedia, "Vernon C. Miller": https://en.wikipedia.org/wiki/Vernon_C._Miller
+- FBI, "Kansas City Massacre / Pretty Boy Floyd" (archived): https://webarchive.library.unt.edu/web/20130220183753/http://www.fbi.gov/about-us/history/famous-cases/kansas-city-massacre-pretty-boy-floyd
+- Robert Unger, The Union Station Massacre: The Original Sin of J. Edgar Hoover's FBI (1997)
