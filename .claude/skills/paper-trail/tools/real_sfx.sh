@@ -19,3 +19,10 @@ python3 "$RS/scripts/mix.py" "$WORK/cues.json" --out "$WORK/sfx.mp4" --voice-saf
 python3 "$RS/scripts/critique.py" "$WORK/sfx_resolved_cues.json" "$WORK/sfx_sfx_track.wav" --listen-out "$WORK/listen.wav" > "$WORK/critique.md" 2>&1 || true
 grep -E "^\| (sync|variety|balance|audibility|speech) " "$WORK/critique.md" | cut -c1-110 || true
 mv "$WORK/sfx.mp4" "$OUT"; echo "real sfx -> $OUT  (critique: $WORK/critique.md, listen-list: $WORK/listen.wav)"
+# independent ears (earshot, if installed): does every cue frame really get a sound, and what does the film sound like?
+ES="$SK/../../kit/.venv-earshot/bin/earshot"
+if [ -x "$ES" ]; then
+  "$ES" timeline "$OUT" --cues "$CUES" --detail low --out "$WORK/earshot_timeline.json" > "$WORK/earshot_timeline.txt" 2>/dev/null || true
+  grep -oE "Sync to [0-9]+ cues: [^;]+; [^;]+;[^;]+" "$WORK/earshot_timeline.txt" | head -1 | sed 's/^/earshot: /' || true
+  grep -oE "[0-9]+ section\(s\): [^.]*" "$WORK/earshot_timeline.txt" | head -1 | cut -c1-300 | sed 's/^/earshot hears: /' || true
+fi

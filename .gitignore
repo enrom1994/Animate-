@@ -24,3 +24,4 @@ reels/**/_pool/
 .claude/skills/real-sfx/config.json
 .claude/skills/real-sfx/venv/
 .claude/skills/real-sfx/vendor/models/
+.claude/kit/.venv-earshot/

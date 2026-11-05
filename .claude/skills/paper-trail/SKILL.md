@@ -131,3 +131,22 @@ With `"sfx": "real"` (the channel default in `reels/channel.json`), the effects 
   other), fetch, rebuild the index.
 - Known limits: there is no real machine-gun recording in the library (the burst repeats one gunshot, so the critique's
   `variety` axis stays near 6); `"sfx": "synth"` in a reel brings back the old synthesized effects.
+
+## Ears: earshot
+earshot (github.com/Leonxlnx/earshot, MIT, pinned at 591fa3e) runs locally in `kit/.venv-earshot` with two open models
+(CLAP + an AudioSet tagger, ~1.1 GB in `~/.cache/earshot`, fetched once). It turns sound into evidence:
+- **Library audit** (`kit/.venv-earshot/bin/python kit/sfx/audit.py`): every file is matched against what its row in
+  `mixkit.csv` says it is, and checked for being a real recording; writes `kit/sfx/audit.json`. Run it after adding
+  sounds; drop or refile anything flagged. (It caught a synthesized "projector", a crowd filed as a shutter, a
+  "gunshot" that is an explosion, and short paper files that are not page turns.)
+- **Slicing long recordings**: `earshot find FILE "a single page being turned" --top 3` gives start/end seconds of the
+  best moments; use them as `{"id": N, "slice": [a, b]}` in `real_sfx.map` (that is how paper variety went 1.0 -> 8.4).
+- **After every build** `tools/real_sfx.sh` runs `earshot timeline FINAL --cues build/cues.json`: how many cue frames
+  get a sound within 40 ms, and what the film sounds like section by section (`build/rsfx/earshot_timeline.txt`).
+- Also useful: `earshot match FILE "description" --alts ...` before adding a sound, `earshot describe FILE`,
+  `earshot realness FILE`. Each CLI call loads the models (~30 s); batch work goes through `from earshot import api`.
+- Not used: `earshot forge` / the `sfx` bank (they synthesize sound; this channel uses real recordings) and the repo's
+  `real-sound` skill (it duplicates real-sfx).
+- Install: `python3 -m venv kit/.venv-earshot && kit/.venv-earshot/bin/pip install torch --index-url
+  https://download.pytorch.org/whl/cpu && kit/.venv-earshot/bin/pip install "earshot @ git+https://github.com/Leonxlnx/earshot@591fa3e"
+  && kit/.venv-earshot/bin/earshot doctor --fetch`.

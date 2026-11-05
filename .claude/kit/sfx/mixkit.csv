@@ -2,7 +2,7 @@ id,type,name
 1438,camera,vintage camera shutter
 1440,camera,classic camera click
 1133,camera,camera shutter click
-432,camera,reporters crowd and camera flashes
+432,ambience,reporters crowd and camera flashes
 1097,paper,turning the newspaper big page
 1105,paper,big paper page turn
 1530,paper,paper slide
@@ -11,7 +11,7 @@ id,type,name
 2386,paper,pages of paper moving
 1104,paper,page turn single
 1372,typing,old typewriter typing
-1378,typing,data input on typewriter
+1378,other,data input on typewriter
 1379,typing,data short input on typewriter
 1381,foley,typewriter classic return
 1368,foley,typewriter return bell
@@ -24,9 +24,8 @@ id,type,name
 2182,foley,wood hard hit stamp
 2150,foley,impact of a blow thud
 833,foley,metal hammer hit
-1700,other,distant gunshot with long echo
+1700,other,distant explosion with long echo
 1443,atmosphere,antique movie projector hum
-1441,atmosphere,vintage film projector working
 3199,atmosphere,cinematic room tone loop
 1634,ambience,train waiting at station
 1629,ambience,train arrival at station
@@ -37,3 +36,7 @@ id,type,name
 2623,whoosh,ghostly whoosh passing
 1630,other,steam train passing
 1628,other,old train departure
+1101,paper,single book paging
+1103,paper,stiff paper book paging
+1100,paper,paper magazine paging
+1099,paper,browsing book by pages

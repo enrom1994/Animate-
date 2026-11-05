@@ -88,8 +88,8 @@ def emit(name, t):
     if name in KIND: cue(t, KIND[name])
     elif name == "stamp3": [cue(t + .5 + i * .3, "thump") for i in range(3)]
     elif name == "type": cue(t + .15, "key", .8, len=.9, n=10)
-    elif name == "burst":  # a burst of real single gunshots, distant and fading (no machine-gun recording in the library)
-        for i in range(9): cue(t + i / 9.5, "gunshot", .85 - i * .05)
+    elif name == "burst":  # no real gunfire recording in the library (earshot: the "gunshot" is an explosion): one dark impact
+        cue(t, "hit", 1.0)
 for s in P["shots"]:
     for name in s["sfx"]:
         if name == "drop":  # score drops out under this shot's first 1.6 s

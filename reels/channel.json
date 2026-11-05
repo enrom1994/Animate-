@@ -24,22 +24,16 @@
  "series_label": false,
  "sfx": "real",
  "real_sfx": {
-  "keys_db": 4,
+  "keys_db": 8,
   "voice_depth": "light",
   "map": {
-   "gunshot": {
-    "pick": {
-     "role": "meme"
-    },
-    "gain_db": -6
-   },
    "hit": {
     "ids": [
-     20,
-     16,
-     18
+     23,
+     19,
+     21
     ],
-    "gain_db": -12
+    "gain_db": -5
    },
    "thump": {
     "ids": [
@@ -47,20 +41,130 @@
      3
     ],
     "role": "foley",
-    "gain_db": 2
+    "gain_db": 5
    },
    "paper": {
-    "pick": {
-     "role": "paper",
-     "max_dur": 0.9
-    },
-    "gain_db": -14
+    "ids": [
+     {
+      "id": 9,
+      "slice": [
+       3.97,
+       5.45
+      ]
+     },
+     {
+      "id": 11,
+      "slice": [
+       0.29,
+       1.8
+      ]
+     },
+     {
+      "id": 15,
+      "slice": [
+       2.34,
+       3.74
+      ]
+     },
+     {
+      "id": 8,
+      "slice": [
+       1.83,
+       2.35
+      ]
+     },
+     {
+      "id": 13,
+      "slice": [
+       3.14,
+       4.7
+      ]
+     },
+     {
+      "id": 10
+     },
+     {
+      "id": 16
+     },
+     {
+      "id": 9,
+      "slice": [
+       0.14,
+       2.05
+      ]
+     },
+     {
+      "id": 11,
+      "slice": [
+       5.85,
+       7.53
+      ]
+     },
+     {
+      "id": 15,
+      "slice": [
+       1.26,
+       1.57
+      ]
+     },
+     {
+      "id": 8,
+      "slice": [
+       0.07,
+       0.53
+      ]
+     },
+     {
+      "id": 13,
+      "slice": [
+       0.0,
+       1.57
+      ]
+     },
+     {
+      "id": 9,
+      "slice": [
+       2.05,
+       3.97
+      ]
+     },
+     {
+      "id": 11,
+      "slice": [
+       2.12,
+       3.67
+      ]
+     },
+     {
+      "id": 15,
+      "slice": [
+       4.99,
+       5.42
+      ]
+     },
+     {
+      "id": 8,
+      "slice": [
+       1.0,
+       1.73
+      ]
+     },
+     {
+      "id": 13,
+      "slice": [
+       7.84,
+       9.41
+      ]
+     }
+    ],
+    "role": "paper",
+    "gain_db": -4
    },
    "camera": {
     "pick": {
      "role": "camera"
     },
-    "gain_db": 1
+    "gain_db": 6
    }
   }
  }

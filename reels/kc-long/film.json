@@ -25,5 +25,150 @@
   "Wikipedia, \"Vernon C. Miller\": https://en.wikipedia.org/wiki/Vernon_C._Miller",
   "FBI, \"Kansas City Massacre / Pretty Boy Floyd\" (archived): https://webarchive.library.unt.edu/web/20130220183753/http://www.fbi.gov/about-us/history/famous-cases/kansas-city-massacre-pretty-boy-floyd",
   "Robert Unger, The Union Station Massacre: The Original Sin of J. Edgar Hoover's FBI (1997)"
- ]
+ ],
+ "real_sfx": {
+  "keys_db": 4,
+  "voice_depth": "normal",
+  "map": {
+   "hit": {
+    "ids": [
+     23,
+     19,
+     21
+    ],
+    "gain_db": -11
+   },
+   "thump": {
+    "ids": [
+     1,
+     3
+    ],
+    "role": "foley",
+    "gain_db": 2
+   },
+   "paper": {
+    "ids": [
+     {
+      "id": 9,
+      "slice": [
+       3.97,
+       5.45
+      ]
+     },
+     {
+      "id": 11,
+      "slice": [
+       0.29,
+       1.8
+      ]
+     },
+     {
+      "id": 15,
+      "slice": [
+       2.34,
+       3.74
+      ]
+     },
+     {
+      "id": 8,
+      "slice": [
+       1.83,
+       2.35
+      ]
+     },
+     {
+      "id": 13,
+      "slice": [
+       3.14,
+       4.7
+      ]
+     },
+     {
+      "id": 10
+     },
+     {
+      "id": 16
+     },
+     {
+      "id": 9,
+      "slice": [
+       0.14,
+       2.05
+      ]
+     },
+     {
+      "id": 11,
+      "slice": [
+       5.85,
+       7.53
+      ]
+     },
+     {
+      "id": 15,
+      "slice": [
+       1.26,
+       1.57
+      ]
+     },
+     {
+      "id": 8,
+      "slice": [
+       0.07,
+       0.53
+      ]
+     },
+     {
+      "id": 13,
+      "slice": [
+       0.0,
+       1.57
+      ]
+     },
+     {
+      "id": 9,
+      "slice": [
+       2.05,
+       3.97
+      ]
+     },
+     {
+      "id": 11,
+      "slice": [
+       2.12,
+       3.67
+      ]
+     },
+     {
+      "id": 15,
+      "slice": [
+       4.99,
+       5.42
+      ]
+     },
+     {
+      "id": 8,
+      "slice": [
+       1.0,
+       1.73
+      ]
+     },
+     {
+      "id": 13,
+      "slice": [
+       7.84,
+       9.41
+      ]
+     }
+    ],
+    "role": "paper",
+    "gain_db": -11
+   },
+   "camera": {
+    "pick": {
+     "role": "camera"
+    },
+    "gain_db": 2
+   }
+  }
+ }
 }

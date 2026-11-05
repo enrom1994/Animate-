@@ -1,0 +1,382 @@
+[
+ {
+  "file": "camera/vintage_camera_shutter_mixkit1438.mp3",
+  "query": "a vintage camera shutter click",
+  "verdict": "strong",
+  "z": 3.94,
+  "p_vs_alts": 0.996,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.958
+ },
+ {
+  "file": "camera/classic_camera_click_mixkit1440.mp3",
+  "query": "a vintage camera shutter click",
+  "verdict": "strong",
+  "z": 4.92,
+  "p_vs_alts": 1.0,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.889
+ },
+ {
+  "file": "camera/camera_shutter_click_mixkit1133.mp3",
+  "query": "a vintage camera shutter click",
+  "verdict": "strong",
+  "z": 3.73,
+  "p_vs_alts": 1.0,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.98
+ },
+ {
+  "file": "camera/reporters_crowd_and_camera_flashes_mixkit432.mp3",
+  "query": "a vintage camera shutter click",
+  "verdict": "no match",
+  "z": 0.34,
+  "p_vs_alts": 0.102,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.968
+ },
+ {
+  "file": "paper/turning_the_newspaper_big_page_mixkit1097.mp3",
+  "query": "paper rustling, a newspaper page turning",
+  "verdict": "strong",
+  "z": 5.13,
+  "p_vs_alts": 0.999,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.912
+ },
+ {
+  "file": "paper/big_paper_page_turn_mixkit1105.mp3",
+  "query": "paper rustling, a newspaper page turning",
+  "verdict": "no match",
+  "z": 0.71,
+  "p_vs_alts": 0.067,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.902
+ },
+ {
+  "file": "paper/paper_slide_mixkit1530.mp3",
+  "query": "paper rustling, a newspaper page turning",
+  "verdict": "strong",
+  "z": 3.28,
+  "p_vs_alts": 0.999,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.929
+ },
+ {
+  "file": "paper/paper_quick_movement_mixkit2380.mp3",
+  "query": "paper rustling, a newspaper page turning",
+  "verdict": "no match",
+  "z": 1.5,
+  "p_vs_alts": 0.24,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.958
+ },
+ {
+  "file": "paper/newspaper_falling_to_the_floor_mixkit386.mp3",
+  "query": "paper rustling, a newspaper page turning",
+  "verdict": "no match",
+  "z": 1.39,
+  "p_vs_alts": 0.539,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.995
+ },
+ {
+  "file": "paper/pages_of_paper_moving_mixkit2386.mp3",
+  "query": "paper rustling, a newspaper page turning",
+  "verdict": "strong",
+  "z": 3.12,
+  "p_vs_alts": 0.982,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.945
+ },
+ {
+  "file": "paper/page_turn_single_mixkit1104.mp3",
+  "query": "paper rustling, a newspaper page turning",
+  "verdict": "no match",
+  "z": 1.41,
+  "p_vs_alts": 0.984,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.957
+ },
+ {
+  "file": "typing/old_typewriter_typing_mixkit1372.mp3",
+  "query": "an old mechanical typewriter typing",
+  "verdict": "strong",
+  "z": 5.44,
+  "p_vs_alts": 0.999,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.994
+ },
+ {
+  "file": "typing/data_input_on_typewriter_mixkit1378.mp3",
+  "query": "an old mechanical typewriter typing",
+  "verdict": "no match",
+  "z": 0.47,
+  "p_vs_alts": 0.016,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.915
+ },
+ {
+  "file": "typing/data_short_input_on_typewriter_mixkit1379.mp3",
+  "query": "an old mechanical typewriter typing",
+  "verdict": "plausible",
+  "z": 2.65,
+  "p_vs_alts": 0.13,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.817
+ },
+ {
+  "file": "foley/typewriter_classic_return_mixkit1381.mp3",
+  "query": "typewriter classic return",
+  "verdict": "strong",
+  "z": 4.29,
+  "p_vs_alts": 1.0,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.965
+ },
+ {
+  "file": "foley/typewriter_return_bell_mixkit1368.mp3",
+  "query": "typewriter return bell",
+  "verdict": "strong",
+  "z": 3.95,
+  "p_vs_alts": 1.0,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.982
+ },
+ {
+  "file": "impact/big_cinematic_impact_mixkit788.mp3",
+  "query": "a deep cinematic impact boom",
+  "verdict": "strong",
+  "z": 3.89,
+  "p_vs_alts": 1.0,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.919
+ },
+ {
+  "file": "impact/epic_movie_impact_mixkit2901.mp3",
+  "query": "a deep cinematic impact boom",
+  "verdict": "no match",
+  "z": 1.68,
+  "p_vs_alts": 0.981,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.97
+ },
+ {
+  "file": "impact/suspense_cinematic_impact_mixkit2917.mp3",
+  "query": "a deep cinematic impact boom",
+  "verdict": "plausible",
+  "z": 2.74,
+  "p_vs_alts": 0.996,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.842
+ },
+ {
+  "file": "impact/horror_impact_mixkit773.mp3",
+  "query": "a deep cinematic impact boom",
+  "verdict": "plausible",
+  "z": 2.74,
+  "p_vs_alts": 0.906,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.951
+ },
+ {
+  "file": "impact/underground_explosion_impact_echo_mixkit1686.mp3",
+  "query": "a deep cinematic impact boom",
+  "verdict": "strong",
+  "z": 4.69,
+  "p_vs_alts": 1.0,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.917
+ },
+ {
+  "file": "impact/deep_heartbeat_impact_mixkit498.mp3",
+  "query": "a deep cinematic impact boom",
+  "verdict": "strong",
+  "z": 4.22,
+  "p_vs_alts": 0.965,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.899
+ },
+ {
+  "file": "foley/wood_hard_hit_stamp_mixkit2182.mp3",
+  "query": "wood hard hit stamp",
+  "verdict": "strong",
+  "z": 3.86,
+  "p_vs_alts": 0.993,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.984
+ },
+ {
+  "file": "foley/impact_of_a_blow_thud_mixkit2150.mp3",
+  "query": "impact of a blow thud",
+  "verdict": "strong",
+  "z": 3.68,
+  "p_vs_alts": 0.819,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.988
+ },
+ {
+  "file": "foley/metal_hammer_hit_mixkit833.mp3",
+  "query": "metal hammer hit",
+  "verdict": "strong",
+  "z": 4.04,
+  "p_vs_alts": 1.0,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.959
+ },
+ {
+  "file": "other/distant_gunshot_with_long_echo_mixkit1700.mp3",
+  "query": "distant gunshot with long echo",
+  "verdict": "weak",
+  "z": 2.4,
+  "p_vs_alts": 0.0,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.93
+ },
+ {
+  "file": "atmosphere/antique_movie_projector_hum_mixkit1443.mp3",
+  "query": "an old film projector running",
+  "verdict": "strong",
+  "z": 5.23,
+  "p_vs_alts": 0.997,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.942
+ },
+ {
+  "file": "atmosphere/vintage_film_projector_working_mixkit1441.mp3",
+  "query": "an old film projector running",
+  "verdict": "no match",
+  "z": 1.68,
+  "p_vs_alts": 0.987,
+  "sounds_like": null,
+  "real": "likely code-synthesized",
+  "p_real": 0.047
+ },
+ {
+  "file": "atmosphere/cinematic_room_tone_loop_mixkit3199.mp3",
+  "query": "an old film projector running",
+  "verdict": "no match",
+  "z": 1.35,
+  "p_vs_alts": 0.014,
+  "sounds_like": null,
+  "real": "uncertain",
+  "p_real": 0.768
+ },
+ {
+  "file": "ambience/train_waiting_at_station_mixkit1634.mp3",
+  "query": "a train station with people and trains",
+  "verdict": "strong",
+  "z": 3.37,
+  "p_vs_alts": 1.0,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.879
+ },
+ {
+  "file": "ambience/train_arrival_at_station_mixkit1629.mp3",
+  "query": "a train station with people and trains",
+  "verdict": "strong",
+  "z": 3.78,
+  "p_vs_alts": 1.0,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.913
+ },
+ {
+  "file": "ambience/train_station_depart_ambience_mixkit1639.mp3",
+  "query": "a train station with people and trains",
+  "verdict": "strong",
+  "z": 4.04,
+  "p_vs_alts": 1.0,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.883
+ },
+ {
+  "file": "ambience/busy_crowd_at_airport_terminal_station_mixkit1573.mp3",
+  "query": "a train station with people and trains",
+  "verdict": "strong",
+  "z": 4.08,
+  "p_vs_alts": 0.679,
+  "sounds_like": null,
+  "real": "uncertain",
+  "p_real": 0.727
+ },
+ {
+  "file": "whoosh/cinematic_whoosh_fast_transition_mixkit1492.mp3",
+  "query": "a fast whoosh",
+  "verdict": "strong",
+  "z": 3.21,
+  "p_vs_alts": 0.856,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.963
+ },
+ {
+  "file": "whoosh/cinematic_tunnel_reverb_whoosh_mixkit1486.mp3",
+  "query": "a fast whoosh",
+  "verdict": "plausible",
+  "z": 2.8,
+  "p_vs_alts": 0.994,
+  "sounds_like": null,
+  "real": "uncertain",
+  "p_real": 0.68
+ },
+ {
+  "file": "whoosh/ghostly_whoosh_passing_mixkit2623.mp3",
+  "query": "a fast whoosh",
+  "verdict": "strong",
+  "z": 3.98,
+  "p_vs_alts": 0.999,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.968
+ },
+ {
+  "file": "other/steam_train_passing_mixkit1630.mp3",
+  "query": "steam train passing",
+  "verdict": "strong",
+  "z": 5.37,
+  "p_vs_alts": 1.0,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.96
+ },
+ {
+  "file": "other/old_train_departure_mixkit1628.mp3",
+  "query": "old train departure",
+  "verdict": "strong",
+  "z": 4.3,
+  "p_vs_alts": 1.0,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.902
+ }
+]
