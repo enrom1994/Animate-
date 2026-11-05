@@ -30,11 +30,11 @@
   "p_real": 0.98
  },
  {
-  "file": "camera/reporters_crowd_and_camera_flashes_mixkit432.mp3",
-  "query": "a vintage camera shutter click",
+  "file": "ambience/reporters_crowd_and_camera_flashes_mixkit432.mp3",
+  "query": "a train station with people and trains",
   "verdict": "no match",
-  "z": 0.34,
-  "p_vs_alts": 0.102,
+  "z": 0.7,
+  "p_vs_alts": 0.04,
   "sounds_like": null,
   "real": "real or pro-produced",
   "p_real": 0.968
@@ -120,11 +120,11 @@
   "p_real": 0.994
  },
  {
-  "file": "typing/data_input_on_typewriter_mixkit1378.mp3",
-  "query": "an old mechanical typewriter typing",
-  "verdict": "no match",
-  "z": 0.47,
-  "p_vs_alts": 0.016,
+  "file": "other/data_input_on_typewriter_mixkit1378.mp3",
+  "query": "data input on typewriter",
+  "verdict": "weak",
+  "z": 2.23,
+  "p_vs_alts": 0.977,
   "sounds_like": null,
   "real": "real or pro-produced",
   "p_real": 0.915
@@ -250,11 +250,11 @@
   "p_real": 0.959
  },
  {
-  "file": "other/distant_gunshot_with_long_echo_mixkit1700.mp3",
-  "query": "distant gunshot with long echo",
-  "verdict": "weak",
-  "z": 2.4,
-  "p_vs_alts": 0.0,
+  "file": "other/distant_explosion_with_long_echo_mixkit1700.mp3",
+  "query": "distant explosion with long echo",
+  "verdict": "strong",
+  "z": 3.22,
+  "p_vs_alts": 0.003,
   "sounds_like": null,
   "real": "real or pro-produced",
   "p_real": 0.93
@@ -268,16 +268,6 @@
   "sounds_like": null,
   "real": "real or pro-produced",
   "p_real": 0.942
- },
- {
-  "file": "atmosphere/vintage_film_projector_working_mixkit1441.mp3",
-  "query": "an old film projector running",
-  "verdict": "no match",
-  "z": 1.68,
-  "p_vs_alts": 0.987,
-  "sounds_like": null,
-  "real": "likely code-synthesized",
-  "p_real": 0.047
  },
  {
   "file": "atmosphere/cinematic_room_tone_loop_mixkit3199.mp3",
@@ -378,5 +368,55 @@
   "sounds_like": null,
   "real": "real or pro-produced",
   "p_real": 0.902
+ },
+ {
+  "file": "paper/single_book_paging_mixkit1101.mp3",
+  "query": "paper rustling, a newspaper page turning",
+  "verdict": "strong",
+  "z": 5.26,
+  "p_vs_alts": 1.0,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.958
+ },
+ {
+  "file": "paper/stiff_paper_book_paging_mixkit1103.mp3",
+  "query": "paper rustling, a newspaper page turning",
+  "verdict": "strong",
+  "z": 4.51,
+  "p_vs_alts": 1.0,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.812
+ },
+ {
+  "file": "paper/paper_magazine_paging_mixkit1100.mp3",
+  "query": "paper rustling, a newspaper page turning",
+  "verdict": "strong",
+  "z": 5.16,
+  "p_vs_alts": 0.999,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.87
+ },
+ {
+  "file": "paper/browsing_book_by_pages_mixkit1099.mp3",
+  "query": "paper rustling, a newspaper page turning",
+  "verdict": "strong",
+  "z": 5.32,
+  "p_vs_alts": 1.0,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.963
+ },
+ {
+  "file": "foley/body_punch_quick_hit_thud_mixkit2153.mp3",
+  "query": "body punch quick hit thud",
+  "verdict": "strong",
+  "z": 4.79,
+  "p_vs_alts": 0.11,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.933
  }
 ]
