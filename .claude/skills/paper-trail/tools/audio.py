@@ -103,7 +103,7 @@ for s in P["shots"]:
         place(sfx, stamp(), s["start"] + .5, .6)
         place(sfx, typing(max(.6, len(s.get("text") or "") * .07)), s["start"] + 1.0, .35)
         place(sfx, typing(.9), s["start"] + 1.4 + len(s.get("text") or "") * .07, .25)
-        tl = len(s.get("text") or ""); cue(s["start"] + .5, "thump", .8)
+        tl = len(s.get("text") or "")   # no stamp on title cards: across a long film one thud per card turned into repetition
         cue(s["start"] + 1.0, "key", .8, len=round(max(.6, tl * .07), 2), n=max(3, len((s.get("text") or "").replace(" ", ""))))
         if s.get("sub"): cue(s["start"] + 1.4 + tl * .07, "key", .6, len=.9, n=12)
     if s["kind"] == "outro":
