@@ -33,4 +33,8 @@ echo "== mux"
 LN=$(python3 "$SK/tools/loudnorm.py" audio/mix.wav -14 -1.5 9)   # two-pass: lands on -14 LUFS
 ffmpeg -v error -y -i build/silent.mp4 -i audio/mix.wav -map 0:v -map 1:a -c:v copy \
   -af "$LN" -c:a aac -b:a 192k -ar 48000 -shortest -movflags +faststart "$NAME.part.mp4"
-mv "$NAME.part.mp4" "$NAME.mp4"; echo "done: $DIR/$NAME.mp4"
+mv "$NAME.part.mp4" "$NAME.mp4"
+if [ -f build/cues.json ]; then   # audio.py writes it only with "sfx": "real"
+  echo "== real sfx"; mv "$NAME.mp4" build/base.mp4; SKT="$SK/tools" bash "$SK/tools/real_sfx.sh" build/base.mp4 build/cues.json "$NAME.mp4" build/rsfx
+fi
+echo "done: $DIR/$NAME.mp4"

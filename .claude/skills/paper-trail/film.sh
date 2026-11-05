@@ -12,6 +12,8 @@ for c in "${CH[@]}"; do
     echo "######## chapter $c"; NOMUX=1 bash "$SK/make.sh" "$c"
   fi
 done
+PY="$(cd "$SK/../../kit" && pwd)/.venv/bin/python"
+for c in "${CH[@]}"; do (cd "$c" && "$PY" "$SK/tools/audio.py" >/dev/null); done   # cheap: score + cue list from each chapter's plan
 mkdir -p build; : > build/v.txt; : > build/a.txt
 for c in "${CH[@]}"; do echo "file '$FILM/$c/build/silent.mp4'" >> build/v.txt; echo "file '$FILM/$c/audio/mix.wav'" >> build/a.txt; done
 ffmpeg -v error -y -f concat -safe 0 -i build/v.txt -c copy build/silent.mp4
@@ -20,6 +22,19 @@ LN=$(python3 "$SK/tools/loudnorm.py" build/mix.wav -14 -1.5 11)   # two-pass: la
 ffmpeg -v error -y -i build/silent.mp4 -i build/mix.wav -map 0:v -map 1:a -c:v copy \
   -af "$LN" -c:a aac -b:a 192k -ar 48000 -shortest -movflags +faststart "$NAME.part.mp4"
 mv "$NAME.part.mp4" "$NAME.mp4"
+# real sound effects over the whole film: every chapter's cues shifted by where the chapter starts
+if [ -f "${CH[0]}/build/cues.json" ]; then
+  python3 - "${CH[@]}" <<'PY'
+import json, sys
+t, out = 0.0, []
+for c in sys.argv[1:]:
+    for q in json.load(open(f"{c}/build/cues.json")): q["t"] = round(q["t"] + t, 3); out.append(q)
+    t += json.load(open(f"{c}/build/plan.json"))["dur"]
+json.dump(out, open("build/cues.json", "w"), indent=0); print(len(out), "cues across the film")
+PY
+  echo "== real sfx"; mv "$NAME.mp4" build/base.mp4
+  SKT="$SK/tools" REEL_JSON="${CH[0]}/reel.json" bash "$SK/tools/real_sfx.sh" build/base.mp4 build/cues.json "$NAME.mp4" build/rsfx
+fi
 # chapters for the YouTube description (timestamps of each title card)
 python3 - "${CH[@]}" <<'PY'
 import json, sys

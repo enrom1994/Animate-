@@ -109,3 +109,25 @@ reels/<film>/08-after/reel.json    "outro": true  (the spoken end card, only onc
 - `kokoro` (default): free, fast, robotic over long durations. `am_onyx` is the deepest.
 - `chatterbox`: Resemble AI's open model (MIT licence, free, commercial use OK). Much more natural; about 5x slower than real time on CPU (an 8 minute film takes about 40 minutes of voice generation; the per-line cache in `audio/cb_lines/` means a rerun only redoes changed lines). Set `"voice": {"engine": "chatterbox", "ref": "../../voices/ref_onyx.wav", "exaggeration": 0.35, "cfg": 0.35}`; `ref` is a 5 to 10 s sample whose voice it imitates (use only a voice you own or have permission for; `reels/voices/ref_onyx.wav` is the synthetic Kokoro onyx voice). Lower `cfg` means slower, more deliberate delivery. Outputs carry Resemble's inaudible watermark. Install once: `python3 -m venv kit/.venv-cb && kit/.venv-cb/bin/pip install torch==2.6.0 torchaudio==2.6.0 --index-url https://download.pytorch.org/whl/cpu && kit/.venv-cb/bin/pip install chatterbox-tts`.
 - Your own recording: put it at `audio/vo.wav` (44.1 kHz mono) and the pipeline times everything to it.
+
+## Sound effects: real recordings (real-sfx)
+With `"sfx": "real"` (the channel default in `reels/channel.json`), the effects are real recordings placed by the
+`real-sfx` skill instead of being synthesized:
+- `audio.py` still builds voice + score, but leaves the synthesized effects out and writes `build/cues.json`, a typed
+  event list on the exact frames: `paper` (page cuts), `camera` (flash cuts), `hit`, `thump` (stamps, end-card ticks),
+  `key` (typed stamps and titles: cut into real typewriter keystrokes), `gunshot` (a burst of real single shots).
+- `make.sh` (Shorts) and `film.sh` (long form, over the whole stitched film) then run `tools/real_sfx.sh`:
+  `from_cues.py` -> `mix.py --voice-safe` -> `critique.py`. Output: the final mp4, `build/rsfx/critique.md` (scoreboard)
+  and `build/rsfx/listen.wav` (the moments to check by ear: Claude cannot hear, the person should).
+- Tuning lives in `channel.json` `"real_sfx"`: `map` (per kind: ids or a pick, and `gain_db`), `keys_db`, `voice_depth`.
+  The current values came from five critique rounds on the Kansas City Short: impacts and paper low (they land on cuts
+  in mid-sentence), keystrokes +4 dB, light ducking. `ids` refer to `real-sfx/library_index.json`; after rebuilding the
+  index, check them with `python3 ../real-sfx/scripts/search.py --role hit`.
+- The library: `.claude/kit/sfx/mixkit.csv` lists 38 Mixkit recordings (typewriter, vintage camera shutter, reporters'
+  flashes, newspaper pages, impacts, a distant gunshot, projector hum, train station). Mixkit's licence allows use in
+  videos but not redistributing the files, so they are not in git: `python3 .claude/kit/sfx/fetch.py`, then
+  `python3 .claude/skills/real-sfx/scripts/setup.py init --library noir=<abs path>/.claude/kit/sfx/library --index`.
+  To add a sound: a row in `mixkit.csv` (type = whoosh, impact, camera, paper, typing, foley, ambience, atmosphere,
+  other), fetch, rebuild the index.
+- Known limits: there is no real machine-gun recording in the library (the burst repeats one gunshot, so the critique's
+  `variety` axis stays near 6); `"sfx": "synth"` in a reel brings back the old synthesized effects.

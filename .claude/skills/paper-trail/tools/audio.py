@@ -78,22 +78,37 @@ def stamp3():
     return out
 FX = {"stamp": (stamp, .7), "stamp3": (stamp3, .7), "paper": (paper, .55), "flash": (flash, .7), "hit": (hit, .9), "burst": (burst, .55), "type": (typing, .35)}
 sfx = np.zeros(N + 4 * SR)
+# REAL sound effects (real-sfx skill): the same events become a typed cue list (build/cues.json) and the synthesized
+# effects stay out of the mix; they are still made here only so the score keeps exactly the level it had.
+REAL = R.get("sfx", "synth") == "real"
+CUES = []
+def cue(t, kind, g=1.0, **kw): CUES.append({"t": round(float(t), 3), "type": kind, "g": round(g, 2), **kw})
+KIND = {"paper": "paper", "flash": "camera", "hit": "hit", "stamp": "thump"}
+def emit(name, t):
+    if name in KIND: cue(t, KIND[name])
+    elif name == "stamp3": [cue(t + .5 + i * .3, "thump") for i in range(3)]
+    elif name == "type": cue(t + .15, "key", .8, len=.9, n=10)
+    elif name == "burst":  # a burst of real single gunshots, distant and fading (no machine-gun recording in the library)
+        for i in range(9): cue(t + i / 9.5, "gunshot", .85 - i * .05)
 for s in P["shots"]:
     for name in s["sfx"]:
         if name == "drop":  # score drops out under this shot's first 1.6 s
             i, j = int(s["start"] * SR), int((s["start"] + 1.6) * SR); g = np.ones(N)
             g[i:j] = 0; g = np.convolve(g, np.ones(2205) / 2205, "same"); score *= g
         elif name in FX:
-            f, gain = FX[name]; place(sfx, f(), s["start"] + (.15 if name == "type" else 0), gain)
+            f, gain = FX[name]; place(sfx, f(), s["start"] + (.15 if name == "type" else 0), gain); emit(name, s["start"])
         else: print("unknown sfx", name)
 for s in P["shots"]:
     if s["kind"] == "chapter":
         place(sfx, stamp(), s["start"] + .5, .6)
         place(sfx, typing(max(.6, len(s.get("text") or "") * .07)), s["start"] + 1.0, .35)
         place(sfx, typing(.9), s["start"] + 1.4 + len(s.get("text") or "") * .07, .25)
+        tl = len(s.get("text") or ""); cue(s["start"] + .5, "thump", .8)
+        cue(s["start"] + 1.0, "key", .8, len=round(max(.6, tl * .07), 2), n=max(3, len((s.get("text") or "").replace(" ", ""))))
+        if s.get("sub"): cue(s["start"] + 1.4 + tl * .07, "key", .6, len=.9, n=12)
     if s["kind"] == "outro":
-        for t in s["ticks"]: place(sfx, stamp(), s["start"] + t - .02, .7)
-        place(sfx, typing(.5), s["start"] + s["more_t"], .35)
+        for t in s["ticks"]: place(sfx, stamp(), s["start"] + t - .02, .7); cue(s["start"] + t - .02, "thump")
+        place(sfx, typing(.5), s["start"] + s["more_t"], .35); cue(s["start"] + s["more_t"], "key", .7, len=.5, n=8)
 sfx = sfx[:N]
 
 # ---- mix: duck the score under the voice ----
@@ -103,7 +118,12 @@ duck = 1 - .5 * np.clip(env * 3, 0, 1)
 bed = score * .3 * duck + sfx * (1 - .3 * np.clip(env * 3, 0, 1))
 rms = lambda x: np.sqrt((x ** 2).mean()) + 1e-9
 BED_DB = R.get("bed_db", -14)  # score + SFX sit this many dB under the narration (overall RMS)
-bed *= rms(v) * 10 ** (BED_DB / 20) / rms(bed)
+k_bed = rms(v) * 10 ** (BED_DB / 20) / rms(bed); bed *= k_bed
+if not REAL and os.path.exists("build/cues.json"): os.remove("build/cues.json")
+if REAL:  # same score level as the synthesized version, effects left to real-sfx
+    bed = score * .3 * duck * k_bed
+    CUES.sort(key=lambda c: c["t"]); json.dump(CUES, open("build/cues.json", "w"), indent=0)
+    print(f"real sfx: {len(CUES)} cues -> build/cues.json (synthesized effects left out of the mix)")
 mix = v + bed
 mix = mix / max(1e-6, np.abs(mix).max()) * .89
 NF = round(P["dur"] * 30) * SR // 30  # exactly the video's length, so chapters stitch without drift

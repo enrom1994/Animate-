@@ -19,3 +19,8 @@ reels/**/*.mp4
 reels/**/*.m4a
 .claude/kit/.venv-cb/
 reels/**/_pool/
+.claude/kit/sfx/library/
+.claude/skills/real-sfx/library_index.json
+.claude/skills/real-sfx/config.json
+.claude/skills/real-sfx/venv/
+.claude/skills/real-sfx/vendor/models/
