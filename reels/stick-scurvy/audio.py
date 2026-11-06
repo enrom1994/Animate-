@@ -81,38 +81,45 @@ def heartbeat():
     out = np.zeros(int(.8 * SR)); place(out, thud(55, .3, .8), 0); place(out, thud(50, .3, .6), .22); return out
 
 sfx = np.zeros(N)
-whips = [3.8, 5.45, 8.2, 13.9, 21.65, 28.95, 32.25]
-for w in whips: place(sfx, whoosh(.36), w - .22, .35)
-place(sfx, waves(12.45), 0, .18)
-# A
-place(sfx, pop(500), 2.9, .35); place(sfx, sparkle_sfx(), 3.05, .3)
-# B/C swing
-place(sfx, whoosh(.7), 5.5, .3); place(sfx, thud(65, .4), 6.27, .5); place(sfx, hp(rng.standard_normal(int(.2 * SR)), 800) * np.exp(-T(int(.2 * SR)) * 25) * .3, 6.27)
-# D panic
-place(sfx, boing(300, .4), 8.47, .4)
-for i in range(18): place(sfx, thud(140 + (i % 3) * 20, .08, .25), 8.5 + i * .09)
-for jt in [1.05, 1.38, 1.7]: place(sfx, thud(60, .3, .6), 8.2 + jt + .55)
-# E
-place(sfx, whoosh(.5, False), 10.6 + .62, .35); place(sfx, thud(55, .5, .6), 10.6 + .62 + .62)
-# F blink + heartbeat
-place(sfx, tick() * .5, 12.55); place(sfx, tick() * .5, 13.75); place(sfx, heartbeat(), 12.7, .5); place(sfx, heartbeat(), 13.35, .45)
-# G
-place(sfx, chime(1320, 1.0) * .6, 13.95, .25); place(sfx, whoosh(.5, False), 15.35, .3)
-for i in range(16): place(sfx, tick(), 15.9 + i * .056, .35)
-place(sfx, chime(1046, 1.2), 16.8, .4)
-# H
-place(sfx, heartbeat(), 18.5, .4)
-place(sfx, clang(480), 18.45 + 1.36, .75); place(sfx, clang(560), 18.45 + 2.5, .75); place(sfx, tweet(), 18.45 + 2.6, .6)
-# I
-place(sfx, whoosh(.4, False), 21.7, .25); place(sfx, thud(60, .35, .8), 21.65 + .55)
-place(sfx, whoosh(.25), 21.65 + 1.9, .35); place(sfx, sparkle_sfx(), 21.65 + 2.05, .35)
-# J
-place(sfx, riser(2.8), 25.35, .45); place(sfx, pop(700), 28.05, .5); place(sfx, boing(260, .4), 28.08, .35)
-# K
-for i in range(3): place(sfx, scribble(), 28.95 + .9 + i * .35, .5)
-place(sfx, thud(50, .6, .7), 28.95 + 2.6); place(sfx, clang(180, .5) * .3, 28.95 + 2.6)
-# L
-place(sfx, sparkle_sfx(), 32.25 + 3.95, .35)
+# whip transitions between the twelve scenes
+for w in [3.6, 8.08, 12.48, 16.0, 19.92, 24.64, 28.64, 32.8, 35.76, 39.28]: place(sfx, whoosh(.36), w - .22, .35)
+for t0, t1 in [(0, 8.08), (12.48, 16.0), (28.64, 35.76), (42.72, 48.0)]: place(sfx, waves(t1 - t0), t0, .16)   # deck scenes
+def stampfx(t, g=.6): place(sfx, thud(60, .4), t, g); place(sfx, clang(190, .5) * .25, t, g)
+# A cannon, then the fruit
+place(sfx, thud(42, .8, 1.0), 1.85, .8); place(sfx, hp(rng.standard_normal(int(.5 * SR)), 300) * np.exp(-T(int(.5 * SR)) * 7) * .5, 1.85, .5)
+place(sfx, pop(520), 2.9, .35); place(sfx, sparkle_sfx(), 3.0, .3)
+# B weak, bleeding, wounds
+place(sfx, heartbeat(), 5.0, .4); place(sfx, heartbeat(), 5.85, .35)
+for i in range(3): place(sfx, pop(300 + i * 40), 6.05 + i * .09, .18)
+place(sfx, pop(900), 6.8, .3)
+# C scurvy stamp, the tally
+stampfx(8.5); place(sfx, riser(1.1), 10.38, .3); place(sfx, pop(640), 11.45, .35)
+# D Lind walks in, 1747, name, idea
+for k in range(4): place(sfx, thud(150, .08, .25), 12.55 + k * .31)
+stampfx(12.64, .45); place(sfx, chime(1320, .8) * .5, 12.7, .3); place(sfx, pop(700), 14.43, .3); place(sfx, sparkle_sfx(), 15.2, .4)
+# E six pairs pop in, numbers, question marks
+for i in range(6): place(sfx, pop(480 + i * 55), 16.2 + i * .13, .3)
+for i in range(6): place(sfx, tick(), 17.7 + i * .1, .35)
+place(sfx, boing(240, .4), 19.1, .3)
+# F the four cures
+for i, tt in enumerate([19.92, 20.72, 21.6, 22.8]): place(sfx, pop(520 + i * 90), tt + .05, .4)
+place(sfx, sparkle_sfx(), 23.62, .4); place(sfx, chime(1568, 1.0) * .5, 23.65, .25)
+# G back on his feet
+place(sfx, boing(330, .5), 25.64, .35); place(sfx, sparkle_sfx(), 25.7, .35); place(sfx, tweet(), 26.9, .4); stampfx(27.04, .45)
+for k in range(6): place(sfx, thud(160, .07, .2), 26.95 + k * .225)
+# H counting the years, the lemon juice arrives
+for i in range(24): place(sfx, tick(), 28.94 + i * .058, .3)
+place(sfx, chime(1046, 1.0), 30.34, .35); place(sfx, thud(70, .4, .8), 31.49, .55); place(sfx, tweet(), 31.6, .35)
+# I coins, the crate flips, cheaper
+for i in range(5): place(sfx, chime(2093 + i * 120, .35) * .6, 33.2 + i * .1, .25)
+place(sfx, whoosh(.4, False), 34.0, .3); stampfx(34.9, .45)
+# J the chart grows, scurvy creeps back
+place(sfx, riser(.9), 36.26, .3); place(sfx, pop(380), 37.2, .3); place(sfx, boing(200, .6), 38.0, .3); place(sfx, heartbeat(), 38.1, .35)
+# K question marks, the molecule, decades later
+for i in range(4): place(sfx, pop(420 + i * 30), 39.3 + i * .08, .25)
+place(sfx, sparkle_sfx(), 40.3, .4); place(sfx, whoosh(.3), 40.88, .25); stampfx(41.73, .4)
+# L limeys
+place(sfx, whoosh(.3), 45.3, .25); stampfx(45.72, .6); place(sfx, sparkle_sfx(), 45.8, .4)
 
 # ---------------- music (procedural sea-shanty jig, D minor, 6/8) ----------------
 BPM = 132  # dotted-quarter = beat; eighth = 60/BPM/... use eighth duration
@@ -195,23 +202,21 @@ def sneak(t0, t1, g=1.0):
     while t < t1 - .05:
         place(music, reed(steps[i % 8] + 12, .2, .8), t, g); place(music, pizz(steps[i % 8], .35, .6), t, g)
         t += BEAT * (1 if i % 2 == 0 else 1); i += 1
-# 0-12.45 sunny deck: light playful, no glock until the boarding
-playful(0, 12.45, DM, .8, glock_on=False)
-for (bt, m) in motif: place(music, glock(m, 1.0, .3), 3.85 + bt * BEAT * .5)  # little sparkle at "Picture this"
-# 12.45-18.45 darkness + explainer: low string pad, sparse pizz
-place(music, strings((50, 57, 62), 6.2, .35), 12.4)
-for k in range(8): place(music, pizz([38, 45][k % 2], .6, .55), 12.5 + k * BEAT * 1.5)
-# 18.45-21.65 sneaking up: tiptoe reed + pizz, cuts on hits
-sneak(18.45, 19.78, .9); sneak(20.15, 20.92, .9)
-place(music, strings((50, 56, 62), 3.2, .25), 18.45)
-# 21.65-28.95 buddy + reveal: pizz returns, rising glock arpeggio, pad swell
-playful(21.65, 25.2, DM, .6, glock_on=False, stabs=False)
-place(music, strings((50, 57, 62, 65), 3.9, .45), 25.1)
-for k, m in enumerate([62, 65, 69, 72, 74, 77, 81, 84, 86, 89]): place(music, glock(m, .9, .28 + k * .02), 25.3 + k * .28)
-# 28.95-37.4 payoff: bright D major, full playful with glock
-playful(28.95, 36.9, DMAJ, .9)
-place(music, strings((50, 57, 62, 66), 1.4, .5), 36.85)
-for m in (62, 66, 69, 74): place(music, pizz(m - 12, .8, .5), 36.9); place(music, glock(m + 12, 1.3, .25), 36.9)
+# arrangement against the scenes (seconds of the voiceover)
+playful(0, 8.08, DM, .75, glock_on=False)
+for (bt, m) in motif: place(music, glock(m, 1.0, .3), 2.95 + bt * BEAT * .5)        # the fruit sparkles
+place(music, strings((50, 57, 62), 4.6, .38), 8.0)                                  # scurvy: dark pad, sparse pizz
+for k in range(6): place(music, pizz([38, 45][k % 2], .6, .55), 8.1 + k * BEAT * 1.5)
+playful(12.48, 24.64, DM, .62, glock_on=True, stabs=False)                          # the experiment
+place(music, strings((50, 57, 62, 66), 4.2, .4), 24.5)                               # recovery: bright swell
+for k, m in enumerate([62, 66, 69, 74, 78, 81, 86, 90]): place(music, glock(m, .9, .28 + k * .02), 25.5 + k * .22)
+sneak(28.64, 35.6, .8)                                                              # impatience, then penny-pinching
+place(music, strings((50, 56, 62), 3.6, .3), 35.7)                                   # scurvy creeps back
+place(music, strings((50, 57, 62, 65), 3.5, .32), 39.2)
+for k, m in enumerate([62, 65, 69, 72, 74, 77]): place(music, glock(m, .9, .26 + k * .02), 40.3 + k * .25)
+playful(42.72, 47.4, DMAJ, .9)                                                      # limeys: bright finale
+place(music, strings((50, 57, 62, 66), 1.4, .5), 47.3)
+for m in (62, 66, 69, 74): place(music, pizz(m - 12, .8, .5), 47.35); place(music, glock(m + 12, 1.3, .25), 47.35)
 music = lp(music, 6000)
 
 # ---------------- VO + mix ----------------
