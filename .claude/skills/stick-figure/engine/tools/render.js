@@ -12,6 +12,7 @@ const fs = require('fs');
   await page.goto('file://' + process.cwd() + '/web/index.html');
   await page.evaluate(async () => { await document.fonts.load('700 40px Poppins'); await document.fonts.load('700 40px Lora'); await document.fonts.load('600 40px Lora'); });
   const total = await page.evaluate(() => window.TOTAL_FRAMES);
+  if (mode === 'count') { console.log('SHOTS', await page.evaluate(() => (window.SHOT_SPANS || SHOTS).length)); await browser.close(); return; }
   if (mode === 'stills') {
     const times = process.argv[3].split(',').map(Number);
     fs.mkdirSync('stills', { recursive: true });

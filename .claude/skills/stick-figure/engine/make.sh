@@ -39,7 +39,7 @@ echo "== music + sfx mix"
 if [ "${AUDIO_ONLY:-0}" != "1" ] || [ ! -f silent.mp4 ]; then
   echo "== rendering shots with $WORKERS workers"
   rm -rf seg; mkdir -p seg
-  N=$(grep -c "SHOTS.push" web/shots.js)
+  N=$(node "$ENGINE/tools/render.js" count | grep -oE "^SHOTS [0-9]+" | cut -d" " -f2)   # ask the page: shots may be added by helpers, not literal SHOTS.push lines
   pids=()
   for ((w = 0; w < WORKERS; w++)); do
     ids=""; for ((i = w; i < N; i += WORKERS)); do ids="${ids:+$ids,}$i"; done
