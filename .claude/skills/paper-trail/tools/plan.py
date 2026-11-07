@@ -33,10 +33,22 @@ SMALL = {"the", "a", "an", "to", "of", "and", "at", "in", "for", "with"}
 
 def footage_frames(name, src, t0, dur):
     """Pre-extract a film clip to numbered JPEGs at 30 fps (the renderer draws them frame-exact)."""
-    d = f"build/frames/{name}"
-    if not glob.glob(f"{d}/*.jpg"):
-        os.makedirs(d, exist_ok=True)
-        subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", str(t0), "-t", str(dur + .5), "-i", src, "-vf", "fps=30,scale=-2:1080", "-q:v", "3", f"{d}/%05d.jpg"], check=True)
+    d = f"build/frames/{name}"; key = f"{t0}:{dur:.2f}"
+    if not glob.glob(f"{d}/*.jpg") or not os.path.exists(f"{d}/key") or open(f"{d}/key").read() != key:
+        import shutil; shutil.rmtree(d, ignore_errors=True); os.makedirs(d, exist_ok=True)
+        # archive reels carry black side bars (4:3 inside 16:9): crop them off
+        cd = subprocess.run(["ffmpeg", "-ss", str(t0), "-t", str(min(dur + .5, 6)), "-i", src, "-vf", "cropdetect=24:2:0", "-f", "null", "-"], capture_output=True, text=True).stderr
+        crops = re.findall(r"crop=(\d+:\d+:\d+:\d+)", cd); vf = (f"crop={crops[-1]}," if crops else "") + "fps=30,scale=-2:1080"
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", str(t0), "-t", str(dur + .5), "-i", src, "-vf", vf, "-q:v", "3", f"{d}/%05d.jpg"], check=True)
+        # live-TV dropouts: frames that are (nearly) black are replaced by the last good frame
+        bd = subprocess.run(["ffmpeg", "-ss", str(t0), "-t", str(dur + .5), "-i", src, "-vf", "blackdetect=d=0:pix_th=0.12", "-an", "-f", "null", "-"], capture_output=True, text=True).stderr
+        files = sorted(glob.glob(f"{d}/*.jpg"))
+        for a, b in re.findall(r"black_start:([\d.]+) black_end:([\d.]+)", bd):
+            i0, i1 = int(float(a) * 30), int(float(b) * 30) + 1
+            good = files[i0 - 1] if i0 > 0 else next((files[j] for j in range(i1, len(files))), None)
+            for j in range(i0, min(i1, len(files))):
+                if good: shutil.copy(good, files[j])
+        open(f"{d}/key", "w").write(key)
     return len(glob.glob(f"{d}/*.jpg"))
 
 if __name__ == "__main__":
@@ -84,7 +96,7 @@ if __name__ == "__main__":
             sh.update({"img": n, "layout": layout, "clip": clip, "from": fr, "to": to,
                        "marks": [{"box": box(n, m, .04), "style": m.get("style", "box"), "t": m.get("at", .4), **({"line": m["line"], "word": m.get("word", 0)} if "line" in m else {})} for m in s.get("marks", [])]})
         elif kind == "footage":
-            n = s["img"]; sh.update({"img": n, "src0": s.get("from_s", 0)})
+            n = s["img"]; sh.update({"img": n, "src0": s.get("from_s", 0), "fill": s.get("fill", False)})
         elif kind in ("card", "map", "timeline"):
             sh.update({k2: s[k2] for k2 in ("text", "sub", "title", "blocks", "points", "route", "routes", "xs", "style", "drawings", "span", "years", "move", "move_at", "move_dur", "events", "push") if k2 in s})
             if kind == "map" and not sh["label"]: sh["label"] = "ILLUSTRATION"

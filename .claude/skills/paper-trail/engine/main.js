@@ -9,6 +9,7 @@ const L = WIDE ? { capY: 968, capW: 1500, capPx: 64, capLH: 76, stampY: 96, labe
 const cv = Object.assign(document.getElementById('c'), { width: W, height: H }), ctx = cv.getContext('2d');
 const G = Object.assign({ sepia: .38, contrast: 1.3, bright: .9, grain: .09, vignette: .75 }, P.grade || {});
 const INK = '#c4161c', PAPER = '#efe6d2', DARK = '#0b0907';
+const TAU = Math.PI * 2;
 const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
 const ease = { inout: t => -(Math.cos(Math.PI * t) - 1) / 2, out: t => 1 - Math.pow(1 - t, 3), in: t => t * t * t, linear: t => t };
 function rnd(i) { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }
@@ -372,7 +373,7 @@ function drawApollo(d, t, X, Y, M) {  // side view: command module (cone) + serv
     ctx.save(); ctx.translate(bx, by); ctx.rotate(.2); ctx.beginPath();
     for (let i = 0; i < 18; i++) { const r = (i % 2 ? .45 : 1) * smH * .55 * bk; ctx.lineTo(Math.cos(i / 18 * TAU) * r, Math.sin(i / 18 * TAU) * r); }
     ctx.closePath(); ctx.fillStyle = 'rgba(196,22,28,.85)'; ctx.fill(); ctx.restore();
-    ctx.strokeStyle = INK; ctx.lineWidth = 3; for (let i = 0; i < 7; i++) { const a = -Math.PI / 2 + (i - 3) * .35, r0 = smH * .5, r1 = r0 + bt * 160; inkLine([[bx + Math.cos(a) * r0, by + Math.sin(a) * r0], [bx + Math.cos(a) * r1, by + Math.sin(a) * r1]]); }
+    ctx.strokeStyle = INK; ctx.lineWidth = 3; for (let i = 0; i < 7; i++) { const a = -Math.PI / 2 + (i - 3) * .35, r0 = smH * .5, r1 = r0 + Math.min(bt, .5) * 160; inkLine([[bx + Math.cos(a) * r0, by + Math.sin(a) * r0], [bx + Math.cos(a) * r1, by + Math.sin(a) * r1]]); }
   }
   ctx.restore();
 }
@@ -466,9 +467,18 @@ function footFrame(sh, i) {
 }
 KINDS.footage = (sh, t) => {
   const im = sh._im; ctx.fillStyle = DARK; ctx.fillRect(0, 0, W, H); if (!im) return;
-  const s = Math.max(W / im.width, H / im.height) * (1 + .05 * clamp(t / (sh.end - sh.start)));
-  ctx.save(); ctx.filter = `grayscale(1) sepia(${G.sepia}) contrast(${G.contrast}) brightness(${G.bright})`;
-  ctx.drawImage(im, (W - im.width * s) / 2, (H - im.height * s) / 2, im.width * s, im.height * s); ctx.restore();
+  const push = 1 + .05 * clamp(t / (sh.end - sh.start)), grade = `grayscale(1) sepia(${G.sepia}) contrast(${G.contrast}) brightness(${G.bright})`;
+  const wideInTall = im.width / im.height > (W / H) * 1.25;  // 4:3 or 16:9 film in a vertical frame: cropping would zoom it ~2.5x
+  if (!wideInTall || sh.fill) {
+    const s = Math.max(W / im.width, H / im.height) * push;
+    ctx.save(); ctx.filter = grade; ctx.drawImage(im, (W - im.width * s) / 2, (H - im.height * s) / 2, im.width * s, im.height * s); ctx.restore(); return;
+  }
+  // a full-width print of the film over a dark, blurred copy of itself
+  const sb = Math.max(W / im.width, H / im.height) * 1.1;
+  ctx.save(); ctx.filter = `${grade} blur(24px) brightness(.4)`; ctx.drawImage(im, (W - im.width * sb) / 2, (H - im.height * sb) / 2, im.width * sb, im.height * sb); ctx.restore();
+  const s = W * .94 / im.width * push, w = im.width * s, h = im.height * s, x = (W - w) / 2, y = H * .42 - h / 2;
+  ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.85)'; ctx.shadowBlur = 50; ctx.shadowOffsetY = 16; ctx.fillStyle = '#0b0907'; ctx.fillRect(x, y, w, h); ctx.restore();
+  ctx.save(); ctx.filter = grade; ctx.drawImage(im, x, y, w, h); ctx.restore();
 };
 KINDS.outro = (sh, t) => {  // case-file checklist: each box gets a red tick
   ctx.drawImage(VIG, 0, 0); ctx.fillStyle = DARK; ctx.fillRect(0, 0, W, H);

@@ -43,15 +43,15 @@
   "earth": "as13-60-8588",
   "reentry": "S70-17646",
   "mcc_return": "s70-35368",
-  "launch": "KSC-19700411-MH-NAS01-0001-Apollo_13_Launch_Post_Launch_with_Spiro_Agnew_and_Billie_Brandt_B_0664 [1156s +22s]",
-  "chutes": "KSC-19700417-MH-NAS01-0001-Apollo_13_Splashdown_and_Recovery_B_1373 [700s +12s]",
-  "capsule": "KSC-19700417-MH-NAS01-0001-Apollo_13_Splashdown_and_Recovery_B_1373 [1025s +20s]"
+  "launch": "KSC-19700411-MH-NAS01-0001-Apollo_13_Launch_Post_Launch_with_Spiro_Agnew_and_Billie_Brandt_B_0664 [1170s +26s]",
+  "capsule": "KSC-19700417-MH-NAS01-0001-Apollo_13_Splashdown_and_Recovery_B_1373 [1025s +20s]",
+  "sm_c": "AS13-59-8562 (shows the lunar module Aquarius)"
  },
  "shots": [
   {
    "line": 0,
    "kind": "photo",
-   "img": "sm_damage",
+   "img": "earth",
    "in": "cut",
    "sfx": [
     "hit"
@@ -67,10 +67,10 @@
    },
    "to": {
     "box": [
-     0.18,
-     0.1,
-     0.82,
-     0.9
+     0.12,
+     0.12,
+     0.88,
+     0.88
     ]
    }
   },
@@ -78,8 +78,9 @@
    "line": 1,
    "kind": "footage",
    "img": "launch",
-   "from_s": 8.5,
-   "sfx": []
+   "from_s": 5,
+   "sfx": [],
+   "fill": true
   },
   {
    "line": 1,
@@ -184,6 +185,26 @@
     "word": 5,
     "dur": 2.0
    }
+  },
+  {
+   "line": 4,
+   "word": 11,
+   "img": "sm_c",
+   "layout": "clip",
+   "rot": -1,
+   "clip": {
+    "box": [
+     0.05,
+     0.05,
+     0.95,
+     0.95
+    ]
+   },
+   "label": "THE LUNAR MODULE AQUARIUS",
+   "in": "cut",
+   "sfx": [
+    "flash"
+   ]
   },
   {
    "line": 5,
@@ -335,10 +356,27 @@
   },
   {
    "line": 9,
-   "kind": "footage",
-   "img": "chutes",
-   "from_s": 0,
-   "sfx": []
+   "kind": "photo",
+   "img": "splash",
+   "from": {
+    "box": [
+     0.0,
+     0.0,
+     1.0,
+     1.0
+    ]
+   },
+   "to": {
+    "box": [
+     0.05,
+     0.0,
+     0.95,
+     0.8
+    ]
+   },
+   "sfx": [
+    "flash"
+   ]
   },
   {
    "line": 9,
