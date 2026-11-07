@@ -16,8 +16,8 @@ cut() {   # name start end line1 line2 colour
   local name=$1 a=$2 b=$3 l1=$4 l2=$5 col=$6
   ffmpeg -v error -y -ss "$(echo "$a - 0.15" | bc)" -to "$(echo "$b - 0.25" | bc)" -i "$EP" -filter_complex "
     color=c=$col:s=1080x1920:r=30[bg];
-    [0:v]crop=1500:1080:210:0,scale=1080:778,pad=1096:794:8:8:color=0x2a2026[v];
-    [bg][v]overlay=-8:520:shortest=1,
+    [0:v]crop=1800:1080:60:0,scale=1080:648,pad=1096:664:8:8:color=0x2a2026[v];
+    [bg][v]overlay=-8:580:shortest=1,
     drawtext=fontfile=$FONT:text='$l1':fontsize=96:fontcolor=white:borderw=10:bordercolor=0x2a2026:x=(w-tw)/2:y=210,
     drawtext=fontfile=$FONT:text='$l2':fontsize=96:fontcolor=white:borderw=10:bordercolor=0x2a2026:x=(w-tw)/2:y=330,
     drawtext=fontfile=$FONT:text='PIP & BISCUIT':fontsize=64:fontcolor=0x2a2026:x=(w-tw)/2:y=1490,
