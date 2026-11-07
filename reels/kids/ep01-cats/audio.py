@@ -101,13 +101,13 @@ for a_, b_ in SH[1:]: place(sfx, whoosh(.32), a_ - .2, .26)
 for ph in ('Mystery number one', 'Mystery number two', 'Mystery number three'):   # chapter cards
     place(sfx, pop(520), AT(ph), .4); place(sfx, sparkle_sfx(), AT(ph) + .1, .35)
 place(sfx, pop(560), .2, .3); place(sfx, chime(1568, .8) * .5, AT('Biscuit'), .3)
-for i in range(3): place(sfx, pop(600 + i * 120), AT('three things') + i * .25, .35)
-for ph in ('She purrs', 'lands on her feet', 'squishes her paws'): place(sfx, pop(700), AT(ph), .35)
+for i in range(4): place(sfx, pop(600 + i * 120), AT('four things') + i * .25, .35)
+for ph in ('She purrs', 'lands on her feet', 'squishes her paws', 'jumps into every box'): place(sfx, pop(700), AT(ph), .35)
 place(sfx, sparkle_sfx(), AT("Let's go"), .35)
 # purring cats on screen
-for ph0, ph1, g in [('She purrs', 'lands on her feet', .35), ('Listen Biscuit is purring', "But here's something surprising", .7), ('That wobbling makes', 'A few years ago', .9),
+for ph0, ph1, g in [('She purrs', 'lands on her feet', .35), ('Listen Biscuit is purring', 'Can I purr too', .7), ('That wobbling makes', 'A few years ago', .9),
                     ('Mother cats purr', 'Big cats are different', .55), ('Cheetahs can purr', 'lions and tigers', .5), ('So Biscuit has a little', 'Mystery number two', .6),
-                    ('When cats grow up', 'Cats also have scent', .4), ('So when Biscuit kneads', 'So now we know', .5)]:
+                    ('When cats grow up', 'Cats also have scent', .4), ('So when Biscuit kneads', 'Mystery number four', .5), ('Boxes are warm too', "And here's the funniest", .4), ('So if your cat sits', 'So now we know', .45)]:
     t0, t1 = AT(ph0), AT(ph1); place(sfx, purr(max(.5, t1 - t0 - .2)), t0, g)
 place(sfx, chime(1568, .8) * .5, AT('it does'), .3)
 for ph in ('scared', 'or sick', 'or hurt'): place(sfx, pop(520), AT(ph), .4)
@@ -138,9 +138,38 @@ place(sfx, pop(700), AT('milk come out'), .35)
 place(sfx, chime(1568, .8) * .5, AT('feel safe'), .3); place(sfx, chime(1760, .8) * .5, AT('and happy'), .3)
 place(sfx, sparkle_sfx(), AT('scent spots'), .3)
 place(sfx, sparkle_sfx(), AT('my cozy spot'), .35)
+# ---- new beats ----
+def LINE_END(phrase):
+    p = _n(phrase).split(' ')
+    for i in range(len(_W) - len(p) + 1):
+        if all(_n(_W[i + q]['w']) == p[q] and _W[i + q]['line'] == _W[i]['line'] for q in range(len(p))):
+            return max(x['e'] for x in _W if x['line'] == _W[i]['line'])
+    raise SystemExit('phrase not found: ' + phrase)
+for ph, a_, b_ in [('Quick guess first', 'Yes or no', 'or no'), ('Guess first When she turns', 'all at once', 'one half at a time'),
+                   ('Guess first Did it start', 'when they were tiny', 'all grown up'), ('Guess first Do cats like boxes', "because they're bored", 'make them feel safe')]:
+    place(sfx, sparkle_sfx(), AT(ph), .3); place(sfx, pop(560), AT(a_), .35); place(sfx, pop(700), AT(b_), .35)
+    e = LINE_END(ph)
+    for k in range(3): place(sfx, tick(), e + k, .5); place(sfx, tick(), e + k + .5, .2)
+    place(sfx, chime(1568, .9) * .6, e + 3.0, .35)          # the reveal
+place(sfx, boing(180, .6), AT('I tried'), .3); place(sfx, pop(500), AT('toy car'), .35); place(sfx, boing(420, .3), AT('toy car') + .2, .2)
+for i in range(5): place(sfx, tick(), AT('special fast camera') + i * .45, .45); place(sfx, pop(900), AT('special fast camera') + i * .45, .15)   # film frames
+for i in range(10): place(sfx, tick(), AT('For the first time') + i * .12, .18)   # projector rattle
+place(sfx, sparkle_sfx(), AT('one happy cat'), .3); place(sfx, pop(800), AT('or drool'), .3)
+# the box
+place(sfx, thud(90, .3, .6), AT('Yesterday a big box') + .8, .45)          # box lands
+place(sfx, whoosh(.6), AT('jumped in'), .35); place(sfx, thud(120, .3, .6), AT('jumped in') + .7, .5); place(sfx, boing(300, .4), AT('jumped in') + .72, .25)
+place(sfx, boing(160, .7), AT('squeezes right in'), .3)
+place(sfx, chime(1318, .9) * .5, AT('feel safe'), .3); place(sfx, pop(600), AT('sneak up behind'), .3)
+place(sfx, pop(520), AT('so they can rest', 3), .3); place(sfx, pop(640), AT('keep watch'), .3)
+place(sfx, sparkle_sfx(), AT('calmed down faster'), .3)
+place(sfx, riser(1.5) * .6, AT('keeps the heat in'), .25); place(sfx, chime(1046, .8) * .5, AT('warmer than we do'), .3)
+place(sfx, scribble(.5), AT('square made of tape'), .4)
+for i in range(6): place(sfx, pop(1200 + i * 40) * .4, AT('on the floor') + i * .27, .25)   # paw steps
+for i in range(3): place(sfx, chime(1568 + i * 200, .6) * .4, AT('walked right into') + i * .35 + .5, .3)
+place(sfx, sparkle_sfx(), AT("that's enough"), .35); place(sfx, sparkle_sfx(), AT('safe warm hideout'), .3)
 # outro
 place(sfx, sparkle_sfx(), AT('So now we know'), .35)
-for ph in ('purrs with a tiny', 'lands on her feet by', 'makes biscuits because'): place(sfx, pop(620), AT(ph), .35)
+for ph in ('purrs with a tiny', 'lands on her feet by', 'makes biscuits because', 'loves boxes because'): place(sfx, pop(620), AT(ph), .35)
 for i, ph in enumerate(('A dog', 'A bee', 'An owl')): place(sfx, pop(600 + i * 120), AT(ph), .35)
 place(sfx, sparkle_sfx(), AT('Bye Biscuit'), .3)
 
@@ -226,15 +255,16 @@ def sneak(t0, t1, g=1.0):
         place(music, reed(steps[i % 8] + 12, .2, .8), t, g); place(music, pizz(steps[i % 8], .35, .6), t, g)
         t += BEAT * (1 if i % 2 == 0 else 1); i += 1
 # gentle, bright underscore all the way through (a kids' video: no dark turns)
-END = _W[-1]['e'] + 1.2
-CH = [AT('Mystery number one'), AT('Mystery number two'), AT('Mystery number three'), AT('So now we know')]
+END = _W[-1]['e'] + 1.5
+CH = [AT('Mystery number one'), AT('Mystery number two'), AT('Mystery number three'), AT('Mystery number four'), AT('So now we know')]
 playful(0, CH[0], DMAJ, .7)
 playful(CH[0], AT("Deep in Biscuit's"), DMAJ, .6, stabs=False)
 place(music, strings((50, 57, 62, 66), max(1, AT('A few years ago') - AT("Deep in Biscuit's")), .3), AT("Deep in Biscuit's"))   # inside the voice box: soft pad
 playful(AT('A few years ago'), CH[1], DMAJ, .6, stabs=False)
 playful(CH[1], CH[2], DMAJ, .65)
 playful(CH[2], CH[3], DMAJ, .6, stabs=False)
-playful(CH[3], END - .4, DMAJ, .8)
+playful(CH[3], CH[4], DMAJ, .65)
+playful(CH[4], END - .4, DMAJ, .8)
 place(music, strings((50, 57, 62, 66), 1.4, .45), END - .5)
 for m in (62, 66, 69, 74): place(music, pizz(m - 12, .8, .5), END - .45); place(music, glock(m + 12, 1.3, .25), END - .45)
 music = lp(music, 6000)

@@ -99,6 +99,12 @@ function AT(phrase, offset = 0) {
     for (let j = 0; j + p.length <= ws.length; j++) if (p.every((x, q) => ws[j + q] === x)) return WORDS[idx[Math.min(idx.length - 1, j + offset)]].s; }
   console.log('AT: phrase not found: ' + phrase); return 0;
 }
+function LINE_END(phrase) {   // when the line holding this phrase finishes
+  const p = _norm(phrase).split(' ');
+  for (const k of Object.keys(_LINES)) { const idx = _LINES[k], ws = idx.map(i => _norm(WORDS[i].w));
+    for (let j = 0; j + p.length <= ws.length; j++) if (p.every((x, q) => ws[j + q] === x)) return WORDS[idx[idx.length - 1]].e; }
+  console.log('LINE_END: phrase not found: ' + phrase); return 0;
+}
 const talking = t => WORDS.some(w => t >= w.s && t < w.e - .03);
 const pipFace = (t, extra = {}) => Object.assign({ eyes: 'normal', mouth: talking(t) ? (Math.floor(t * 9) % 2 ? 'o' : 'smile') : 'smile' }, extra);
 const PIP = { cols: PAL.red, hat: 'none', belt: false };
@@ -172,17 +178,18 @@ shot(0, 'cut', (ctx, lt, t) => {   // Pip and Biscuit on the sofa
   drawCat(ctx, { x: 1260, y: 640, s: 320, coat: BISCUIT, mood: t > AT('Biscuit') ? 'happy' : 'normal', look: [-1, 0], purr: .4, blush: true }, t);
   bubbleText(ctx, 'BISCUIT', 1270, 260, clamp((t - AT('Biscuit')) / .3), '#f2b52a', '#fff', 60);
 });
-shot(AT('Biscuit does three'), 'whip', (ctx, lt, t) => {   // three mysteries: question marks over Biscuit
+shot(AT('Biscuit does four'), 'whip', (ctx, lt, t) => {   // three mysteries: question marks over Biscuit
   applyCam(ctx, camOf(t, 1.05, 1.15, lt, 3), 1); room(ctx, t, { shelf: false });
   drawCat(ctx, { x: CX, y: 860, s: 520, coat: BISCUIT, mood: 'normal', look: [Math.sin(t * 2), -.5] }, t);
-  for (let i = 0; i < 3; i++) { const k = kf(t, [[AT('three things') + i * .25, 0], [AT('three things') + i * .25 + .25, 1, backOut]]); if (k > 0) text(ctx, '?', CX - 360 + i * 360, 260 + Math.sin(t * 3 + i) * 14, 170 * k, '#ffe14d', INK, 16); }
+  for (let i = 0; i < 4; i++) { const k = kf(t, [[AT('four things') + i * .25, 0], [AT('four things') + i * .25 + .25, 1, backOut]]); if (k > 0) text(ctx, '?', CX - 540 + i * 360, 260 + Math.sin(t * 3 + i) * 14, 170 * k, '#ffe14d', INK, 16); }
 });
 shot(AT('She purrs'), 'whip', (ctx, lt, t) => {   // purrs / lands on her feet / squishes her paws
   applyCam(ctx, camOf(t, 1.0, 1.0, lt, 3), 1); room(ctx, t, { shelf: false });
-  const items = [[AT('She purrs'), 420, 'PURRS'], [AT('lands on her feet'), CX, 'LANDS'], [AT('squishes her paws'), 1500, 'SQUISHES']];
+  const items = [[AT('She purrs'), 300, 'PURRS'], [AT('lands on her feet'), 740, 'LANDS'], [AT('squishes her paws'), 1180, 'SQUISHES'], [AT('jumps into every box'), 1620, 'BOXES']];
   for (const [at, x, name] of items) { const k = kf(t, [[at - .05, 0], [at + .25, 1, backOut]]); if (k <= 0) continue;
-    ctx.save(); ctx.translate(x, 760); ctx.scale(k, k); ctx.translate(-x, -760);
+    ctx.save(); ctx.translate(x, 760); ctx.scale(k * .85, k * .85); ctx.translate(-x, -760);
     if (name === 'LANDS') { const ph = clamp((t - at) / .9); rotCat(ctx, x, lerp(300, 560, ph), 260, lerp(Math.PI, 0, ease(ph)), { coat: BISCUIT, mood: ph > .9 ? 'happy' : 'wide' }, t); }
+    else if (name === 'BOXES') catInBox(ctx, x, 730, 300, 160, 250, { coat: BISCUIT, mood: 'happy' }, t);
     else { if (name === 'SQUISHES') blanket(ctx, x, 760, 380, 80, Math.sin(t * 6)); drawCat(ctx, { x, y: 730, s: 290, coat: BISCUIT, mood: 'happy', purr: name === 'PURRS' ? 1 : 0, knead: name === 'SQUISHES' }, t); if (name === 'PURRS') purrRings(ctx, x + 15, 510, 290, t, .9); }
     text(ctx, name, x, 120, 70, '#fff', INK, 12); ctx.restore(); }
 });
@@ -410,13 +417,14 @@ shot(AT('So when Biscuit kneads my blanket'), 'whip', (ctx, lt, t) => {   // thi
 // ===== OUTRO =====
 shot(AT('So now we know'), 'whip', (ctx, lt, t) => {   // the recap: three cards
   applyCam(ctx, camOf(t, 1.0, 1.0, lt, 3), 1); nightSky(ctx, t, '#f2b52a');
-  const cards = [[AT('purrs with a tiny engine'), 400, 'PURR ENGINE', '#e0392f'], [AT('lands on her feet by'), CX, 'TWIST & LAND', '#2f63c9'], [AT('makes biscuits because'), 1520, 'MAKING BISCUITS', '#3fa35b']];
+  const cards = [[AT('purrs with a tiny engine'), 270, 'PURR ENGINE', '#e0392f'], [AT('lands on her feet by'), 730, 'TWIST & LAND', '#2f63c9'], [AT('makes biscuits because'), 1190, 'MAKING BISCUITS', '#3fa35b'], [AT('loves boxes because'), 1650, 'SAFE BOX', '#7a4bc4']];
   if (lt < 1.2) stamp(ctx, 'NOW WE KNOW!', CX, CY, 130, lt, '#fff', -.03);
   for (const [at, x, name, col] of cards) { const k = kf(t, [[at - .05, 0], [at + .25, 1, backOut]]); if (k <= 0) continue;
-    ctx.save(); ctx.translate(x, 520); ctx.scale(k, k); ctx.rotate((x - CX) * .00005); rrect(ctx, -250, -330, 500, 660, 40); fillStroke(ctx, '#fff7e6', 10);
+    ctx.save(); ctx.translate(x, 500); ctx.scale(k * .8, k * .8); ctx.rotate((x - CX) * .00005); rrect(ctx, -250, -330, 500, 660, 40); fillStroke(ctx, '#fff7e6', 10);
     if (name === 'PURR ENGINE') { drawCat(ctx, { x: 0, y: 160, s: 300, coat: BISCUIT, mood: 'happy', purr: 1, shadow: false }, t); purrRings(ctx, 10, -70, 300, t, .8, '#f2b52a'); }
     if (name === 'TWIST & LAND') rotCat(ctx, 0, 40, 260, Math.sin(t * 2) * .6, { coat: BISCUIT, mood: 'happy' }, t);
     if (name === 'MAKING BISCUITS') { blanket(ctx, 0, 160, 360, 70, Math.sin(t * 6)); drawCat(ctx, { x: 0, y: 160, s: 280, coat: BISCUIT, mood: 'happy', knead: true, shadow: false }, t); }
+    if (name === 'SAFE BOX') catInBox(ctx, 0, 170, 280, 200, 280, { coat: BISCUIT, mood: 'happy', shadow: false }, t);
     text(ctx, name, 0, 270, 46, col, null, 0); ctx.restore(); }
 });
 shot(AT('Which animal should we'), 'whip', (ctx, lt, t) => {   // which animal is next?
@@ -430,6 +438,168 @@ shot(AT('Bye for now'), 'cut', (ctx, lt, t) => {   // bye!
   drawStick(ctx, C(PIP, { x: 900, y: 770, s: 580, legs: { L: [1.45, -1.5], R: [1.45, -1.5] }, arms: { L: [.3, -.1], R: [2.6 + Math.sin(t * 9) * .3, .3] }, face: pipFace(t, { eyes: 'happy' }) }));
   drawCat(ctx, { x: 1260, y: 620, s: 300, coat: BISCUIT, mood: t > AT('Bye Biscuit') ? 'happy' : 'normal', look: [-1, 0], tail: t * 2, blush: true }, t);
   if (t > AT('Bye Biscuit')) hearts(ctx, 1260, 260, t, 3, 1);
+});
+
+// ---------- props for the new scenes ----------
+function boxBack(ctx, x, y, w, h) { path(ctx, [[x - w / 2, y - h], [x - w / 2 + w * .08, y - h - h * .28], [x + w / 2 - w * .08, y - h - h * .28], [x + w / 2, y - h]]); fillStroke(ctx, '#b97c43', 7); }
+function boxFront(ctx, x, y, w, h) {
+  path(ctx, [[x - w / 2, y - h], [x - w / 2 - w * .16, y - h - h * .2], [x - w / 2 - w * .1, y - h + h * .12]]); fillStroke(ctx, '#d9a066', 7);
+  path(ctx, [[x + w / 2, y - h], [x + w / 2 + w * .16, y - h - h * .2], [x + w / 2 + w * .1, y - h + h * .12]]); fillStroke(ctx, '#d9a066', 7);
+  rrect(ctx, x - w / 2, y - h, w, h, 8); fillStroke(ctx, '#d9a066', 8);
+  ctx.fillStyle = 'rgba(255,240,200,.45)'; ctx.fillRect(x - w * .09, y - h + 6, w * .18, h - 12);
+  line(ctx, x - w * .3, y - h * .45, x - w * .12, y - h * .45, 5, 'rgba(120,70,30,.5)'); line(ctx, x + w * .12, y - h * .6, x + w * .32, y - h * .6, 5, 'rgba(120,70,30,.5)');
+}
+function catInBox(ctx, x, y, w, h, s, o, t, show = .55) {   // show: how much of the cat sits above the box rim (fraction of s)
+  boxBack(ctx, x, y, w, h); drawCat(ctx, Object.assign({ x, y: y - h + s * show, s, shadow: false }, o), t); boxFront(ctx, x, y, w, h);
+}
+function tapeSquare(ctx, x, y, w = 520, d = 90, col = '#ffd23a') { path(ctx, [[x - w / 2, y], [x + w / 2, y], [x + w / 2 - 60, y - d], [x - w / 2 + 60, y - d]]); ctx.lineJoin = 'round'; ctx.lineWidth = 30; ctx.strokeStyle = INK; ctx.stroke(); ctx.lineWidth = 20; ctx.strokeStyle = col; ctx.stroke(); }
+function toyCar(ctx, x, y, s) { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); rrect(ctx, -90, -60, 180, 60, 18); fillStroke(ctx, '#e0392f', 6); rrect(ctx, -50, -100, 100, 46, 14); fillStroke(ctx, '#e0392f', 6); rrect(ctx, -38, -92, 34, 30, 6); fillStroke(ctx, '#bfe6f8', 4); rrect(ctx, 4, -92, 34, 30, 6); fillStroke(ctx, '#bfe6f8', 4); for (const wx of [-50, 50]) { circle(ctx, wx, 0, 24); fillStroke(ctx, '#2a2026', 5); circle(ctx, wx, 0, 9); ctx.fillStyle = '#ccc'; ctx.fill(); } ctx.restore(); }
+function oldCamera(ctx, x, y) { line(ctx, x, y, x - 70, y + 260, 10, '#6b3d1e'); line(ctx, x, y, x + 70, y + 260, 10, '#6b3d1e'); line(ctx, x, y, x, y + 270, 10, '#6b3d1e');
+  rrect(ctx, x - 110, y - 120, 220, 140, 14); fillStroke(ctx, '#7a4a26', 8); rrect(ctx, x + 100, y - 85, 70, 70, 10); fillStroke(ctx, '#3a3036', 7); circle(ctx, x + 175, y - 50, 30); fillStroke(ctx, '#9aa3ad', 6); circle(ctx, x - 40, y - 150, 34); fillStroke(ctx, '#3a3036', 6); circle(ctx, x + 40, y - 150, 34); fillStroke(ctx, '#3a3036', 6); }
+function guessShot(phrase, a, aAt, b, bAt, bg = '#ff9f43') {   // Pip asks, two choices pop, a 3-2-1 countdown while kids answer
+  shot(AT(phrase), 'whip', (ctx, lt, t) => {
+    applyCam(ctx, camOf(t, 1.0, 1.04, lt, 6), 1); nightSky(ctx, t, bg);
+    const end = LINE_END(phrase), wait = t - end;
+    drawStick(ctx, C(PIP, { x: 330, y: 930, s: 520, arms: { L: [.3, -.1], R: { ik: [.08, -.72] } }, face: pipFace(t, { eyes: wait > 0 ? 'happy' : 'normal', look: [.6, -.3] }) }));
+    drawCat(ctx, { x: 1640, y: 930, s: 330, coat: BISCUIT, mood: 'normal', look: [-1, -.3], headTilt: Math.sin(t * 2) * .18 }, t);
+    stamp(ctx, 'GUESS FIRST!', CX, 150, 110, lt, '#fff', -.03);
+    const ka = clamp((t - aAt) / .3), kb = clamp((t - bAt) / .3);
+    bubbleText(ctx, a, CX, 350, ka, '#fff7e6', '#2a2026', 62); bubbleText(ctx, b, CX, 560, kb, '#fff7e6', '#2a2026', 62);
+    if (kb > 0) text(ctx, 'OR', CX, 458, 50, '#fff', INK, 9);
+    if (wait > 0 && wait < 3.2) { const n = 3 - Math.floor(wait), f = wait % 1, k = backOut(clamp(f / .25));
+      ctx.save(); ctx.translate(CX, 770); ctx.scale(k * .9, k * .9); circle(ctx, 0, 0, 105); fillStroke(ctx, '#fff7e6', 10);
+      ctx.beginPath(); ctx.arc(0, 0, 105, -Math.PI / 2, -Math.PI / 2 + TAU * f); ctx.lineWidth = 14; ctx.strokeStyle = '#e0392f'; ctx.stroke();
+      text(ctx, String(Math.max(1, n)), 0, 8, 120, '#2a2026', null, 0); ctx.restore(); }
+    else if (wait <= 0 && kb > 0) text(ctx, '?', CX, 790 + Math.sin(t * 5) * 12, 170, '#ffe14d', INK, 16);
+  });
+}
+
+// ===== new beats in the first three mysteries =====
+shot(AT('Can I purr too'), 'whip', (ctx, lt, t) => {   // Pip tries to purr: a toy car
+  applyCam(ctx, camOf(t, 1.05, 1.12, lt, 4), 1); room(ctx, t, { shelf: false });
+  const tried = t > AT('I tried'), car = t > AT('toy car');
+  drawStick(ctx, C(PIP, { x: 720 + (tried && !car ? Math.sin(t * 60) * 4 : 0), y: 900, s: 560, arms: { L: [.3, -.1], R: car ? [2.2, .2] : [.3, -.1] }, face: pipFace(t, { eyes: car ? 'happy' : tried ? 'squint' : 'normal', mouth: tried && !car ? 'o' : undefined }) }));
+  drawCat(ctx, { x: 1300, y: 900, s: 360, coat: BISCUIT, mood: car ? 'normal' : 'happy', look: [-1, 0], purr: car ? 0 : .8, headTilt: car ? .25 : 0 }, t);
+  if (tried && !car) text(ctx, 'BRRRRR!', 720, 260, 90, '#fff', INK, 12);
+  if (car) { const k = backOut(clamp((t - AT('toy car')) / .3)); ctx.save(); ctx.translate(980, 380); ctx.scale(k, k); toyCar(ctx, 0, 0, 1.4); ctx.restore(); text(ctx, 'VROOM?', 980, 180, 70, '#e0392f', INK, 11); }
+});
+guessShot('Quick guess first', 'YES', AT('Yes or no'), 'NO', AT('Yes or no', 2));
+guessShot('Guess first When she turns', 'ALL AT ONCE', AT('all at once'), 'HALF AT A TIME', AT('one half at a time'), '#5d8fd8');
+shot(AT('More than a hundred years ago'), 'whip', (ctx, lt, t) => {   // 1894: the first fast camera pictures of a falling cat
+  applyCam(ctx, camOf(t, 1.0, 1.06, lt, 8), 1); ctx.fillStyle = '#efdcb4'; ctx.fillRect(-800, -800, W + 1600, H + 1600);
+  for (let i = 0; i < 70; i++) { const R = rng(i + 31); circle(ctx, R() * W, R() * H, 2 + R() * 3); ctx.fillStyle = 'rgba(120,80,40,.15)'; ctx.fill(); }
+  oldCamera(ctx, 260, 560); stamp(ctx, '1894', 260, 190, 110, lt, '#7a4a26', -.05);
+  const n = 5, k0 = AT('special fast camera');
+  rrect(ctx, 520, 340, 1340, 300, 10); fillStroke(ctx, '#2a2026', 6);
+  for (let i = 0; i < 26; i++) { rrect(ctx, 540 + i * 51, 352, 26, 20, 4); ctx.fillStyle = '#efdcb4'; ctx.fill(); rrect(ctx, 540 + i * 51, 608, 26, 20, 4); ctx.fill(); }
+  for (let i = 0; i < n; i++) { const at = k0 + i * .45 + (t > AT('For the first time') ? -10 : 0), k = clamp((t - at) / .25), x = 640 + i * 262;
+    rrect(ctx, x - 115, 385, 230, 210, 8); fillStroke(ctx, k > 0 ? '#f5ead2' : '#4a3d45', 5);
+    if (k > 0) { ctx.save(); ctx.globalAlpha = k; rotCat(ctx, x, 490, 150, lerp(Math.PI, 0, i / (n - 1)), { coat: BISCUIT, mood: i === n - 1 ? 'happy' : 'wide' }, t); ctx.restore(); } }
+  if (t > AT('one picture at a time')) for (let i = 0; i < n; i++) text(ctx, String(i + 1), 640 + i * 262, 720, 64, '#7a4a26', '#fff', 8);
+});
+shot(AT('Some cats even close'), 'whip', (ctx, lt, t) => {   // eyes closed, purring, a little drool
+  applyCam(ctx, camOf(t, 1.1, 1.25, lt, 6), 1); room(ctx, t, { shelf: false });
+  blanket(ctx, CX, 900, 900, 150, Math.sin(t * 6));
+  drawCat(ctx, { x: CX, y: 900, s: 600, coat: BISCUIT, mood: 'happy', purr: t > AT('eyes purr') ? 1 : 0, knead: true, blush: true }, t);
+  if (t > AT('eyes purr')) purrRings(ctx, CX + 30, 480, 600, t, .7);
+  if (t > AT('or drool')) { const f = (t * .7) % 1; ellipse(ctx, CX + 18, 610 + f * 50, 12, 16 + f * 8); fillStroke(ctx, '#bfe6f8', 4); }
+  bubbleText(ctx, 'EYES CLOSED', 470, 330, (t - AT('close their eyes')) / .3, '#fff7e6', '#2a2026', 50);
+  bubbleText(ctx, 'PURR', 1450, 330, (t - AT('eyes purr', 1)) / .3, '#fff7e6', '#2a2026', 50);
+  bubbleText(ctx, 'A LITTLE DROOL', 1450, 470, (t - AT('or drool')) / .3, '#7fd3e0', '#2a2026', 50);
+  if (t > AT('one happy cat')) stamp(ctx, 'ONE HAPPY CAT!', CX, 150, 100, t - AT('one happy cat'), '#f2b52a', -.03);
+});
+guessShot('Guess first Did it start', 'AS KITTENS', AT('when they were tiny'), 'AS GROWN-UPS', AT('all grown up'), '#3fa35b');
+
+// ===== MYSTERY 4: THE BOX =====
+shot(AT('Mystery number four'), 'whip', (ctx, lt, t) => card(ctx, t, lt, 'MYSTERY #4', 'THE BOX', '#7a4bc4'));
+shot(AT('Yesterday a big box'), 'whip', (ctx, lt, t) => {   // the delivery box; Biscuit jumps in first
+  applyCam(ctx, camOf(t, 1.0, 1.06, lt, 6), 1); room(ctx, t);
+  const bx = lerp(2300, 1250, ease(clamp(lt / .8))), j = AT('jumped in'), ph = clamp((t - j) / .7);
+  drawStick(ctx, C(PIP, { x: 820, y: 900, s: 540, arms: ph > 0 ? POSE.handsUp.arms : { L: [.3, -.1], R: [1.6, .1] }, face: pipFace(t, { eyes: ph > 0 ? 'wide' : 'happy', look: [1, 0] }) }));
+  if (ph <= 0) { boxBack(ctx, bx, 900, 420, 280); boxFront(ctx, bx, 900, 420, 280); drawCat(ctx, { x: 460, y: 900, s: 300, coat: BISCUIT, mood: 'normal', look: [1, 0] }, t); }
+  else if (ph < 1) { boxBack(ctx, bx, 900, 420, 280); rotCat(ctx, lerp(460, bx, ph), lerp(760, 620, ph) - Math.sin(ph * Math.PI) * 330, 300, ph * .6 - .3, { coat: BISCUIT, mood: 'wide' }, t); boxFront(ctx, bx, 900, 420, 280); }
+  else catInBox(ctx, bx, 900, 420, 280, 300, { coat: BISCUIT, mood: 'happy', look: [-1, 0] }, t, .62);
+  if (ph >= 1 && t < j + 1.6) stamp(ctx, 'BOING!', bx, 330, 100, t - j - .7, '#f2b52a', .05);
+  if (t > AT('before I even opened')) text(ctx, '?!', 820, 250, 110, '#e0392f', INK, 12);
+});
+shot(AT('Biscuit Even when a box'), 'whip', (ctx, lt, t) => {   // a box that is far too small
+  applyCam(ctx, camOf(t, 1.05, 1.15, lt, 4), 1); room(ctx, t, { shelf: false });
+  const sq = t > AT('squeezes right in');
+  catInBox(ctx, CX, 920, 230, 130, 440, { coat: BISCUIT, mood: sq ? 'happy' : 'normal', blush: true, fluff: true }, t, .25);
+  if (t > AT('way too small')) { line(ctx, CX - 115, 1000, CX + 115, 1000, 6, '#fff'); text(ctx, 'TOO SMALL?', CX + 470, 760, 64, '#fff', INK, 10); }
+  if (sq) stamp(ctx, 'IF I FITS, I SITS!', CX, 160, 100, t - AT('squeezes right in'), '#f2b52a', -.03);
+});
+guessShot('Guess first Do cats like boxes', 'BORED', AT("because they're bored"), 'SAFE', AT('make them feel safe'), '#7a4bc4');
+shot(AT('Boxes make them feel safe'), 'whip', (ctx, lt, t) => {   // nobody can sneak up behind you
+  applyCam(ctx, camOf(t, 1.05, 1.12, lt, 5), 1); room(ctx, t, { shelf: false });
+  catInBox(ctx, 760, 920, 520, 330, 460, { coat: BISCUIT, mood: 'happy', look: [Math.sin(t * 1.5), 0] }, t, .5);
+  stamp(ctx, 'SAFE!', 760, 200, 120, t - AT('feel safe'), '#3fa35b', -.04);
+  if (t > AT('sneak up behind')) { const k = clamp((t - AT('sneak up behind')) / .3); ctx.save(); ctx.globalAlpha = k;
+    rrect(ctx, 1230, 380, 520, 300, 30); fillStroke(ctx, '#fff7e6', 8); text(ctx, 'WALLS ALL AROUND', 1490, 470, 46, '#2a2026', null, 0);
+    for (const [dx, a] of [[-120, 0], [0, 0], [120, 0]]) { line(ctx, 1490 + dx, 520, 1490 + dx, 620, 14, '#d9a066'); } text(ctx, 'NO SNEAKING!', 1490, 650, 44, '#e0392f', null, 0); ctx.restore(); }
+});
+shot(AT('Wild cats hide'), 'whip', (ctx, lt, t) => {   // a wild cat in a rocky den
+  applyCam(ctx, camOf(t, 1.0, 1.06, lt, 5), 1); savanna(ctx, t);
+  ctx.beginPath(); ctx.ellipse(1100, 860, 460, 330, 0, Math.PI, 0); ctx.closePath(); fillStroke(ctx, '#9a8f86', 9);
+  ctx.beginPath(); ctx.ellipse(1100, 860, 230, 200, 0, Math.PI, 0); ctx.closePath(); ctx.fillStyle = '#3a3036'; ctx.fill();
+  drawCat(ctx, { x: 1100, y: 880, s: 300, coat: CHEETAH, mood: t > AT('so they can rest') && t < AT('keep watch') ? 'sleepy' : 'normal', look: [Math.sin(t * 1.3), 0] }, t);
+  bubbleText(ctx, 'REST', 560, 330, (t - AT('so they can rest', 3)) / .3, '#fff7e6', '#2a2026', 60);
+  bubbleText(ctx, 'KEEP WATCH', 1600, 300, (t - AT('keep watch')) / .3, '#fff7e6', '#2a2026', 60);
+});
+shot(AT('Scientists tested this'), 'whip', (ctx, lt, t) => {   // the shelter study: box vs no box
+  applyCam(ctx, camOf(t, 1.0, 1.04, lt, 6), 1); nightSky(ctx, t, '#5d8fd8');
+  const calm = t > AT('calmed down faster');
+  for (const [x, hasBox] of [[540, true], [1380, false]]) {
+    rrect(ctx, x - 330, 300, 660, 640, 30); fillStroke(ctx, '#fff7e6', 9);
+    if (hasBox) catInBox(ctx, x, 880, 360, 230, 300, { coat: KIT2, mood: calm ? 'happy' : 'normal' }, t, .6);
+    else drawCat(ctx, { x, y: 880, s: 300, coat: KIT1, mood: 'scared', fluff: true, mouth: 'frown' }, t);
+    for (let i = 0; i < 7; i++) line(ctx, x - 300 + i * 100, 310, x - 300 + i * 100, 930, 6, 'rgba(42,32,38,.25)');
+    text(ctx, hasBox ? 'WITH A BOX' : 'NO BOX', x, 250, 56, '#fff', INK, 10);
+  }
+  if (calm) { bubbleText(ctx, 'CALM FASTER', 540, 400, (t - AT('calmed down faster')) / .3, '#3fa35b', '#fff', 54); bubbleText(ctx, 'STILL WORRIED', 1380, 400, (t - AT('calmed down faster') - .3) / .3, '#e0392f', '#fff', 54); }
+});
+shot(AT('Boxes are warm too'), 'whip', (ctx, lt, t) => {   // cardboard keeps heat in
+  applyCam(ctx, camOf(t, 1.05, 1.12, lt, 6), 1); room(ctx, t, { shelf: false });
+  catInBox(ctx, 760, 920, 460, 280, 400, { coat: BISCUIT, mood: 'sleepy', blush: true }, t, .5);
+  if (t > AT('keeps the heat in')) for (let i = 0; i < 4; i++) { const f = (t * .5 + i / 4) % 1; ctx.save(); ctx.globalAlpha = 1 - f; ctx.beginPath(); const x0 = 620 + i * 90, y0 = 560 - f * 220; ctx.moveTo(x0, y0); ctx.bezierCurveTo(x0 + 25, y0 - 30, x0 - 25, y0 - 60, x0, y0 - 90); ctx.lineWidth = 10; ctx.strokeStyle = '#ff9f43'; ctx.stroke(); ctx.restore(); }
+  const th = clamp((t - AT('keeps the heat in')) / 1.5);
+  rrect(ctx, 1440, 260, 80, 520, 40); fillStroke(ctx, '#fff', 8); circle(ctx, 1480, 800, 75); fillStroke(ctx, '#e0392f', 8);
+  rrect(ctx, 1458, lerp(700, 330, th), 44, lerp(80, 450, th), 22); ctx.fillStyle = '#e0392f'; ctx.fill();
+  if (t > AT('warmer than we do')) stamp(ctx, 'TOASTY!', 1180, 200, 110, t - AT('warmer than we do'), '#ff9f43', -.04);
+});
+shot(AT("And here's the funniest part"), 'whip', (ctx, lt, t) => {   // a tape square on the floor
+  applyCam(ctx, camOf(t, 1.0, 1.05, lt, 6), 1); room(ctx, t, { shelf: false });
+  const tp = clamp((t - AT('square made of tape')) / .6);
+  if (tp > 0) { ctx.save(); ctx.globalAlpha = tp; tapeSquare(ctx, CX, 930); ctx.restore(); }
+  const w0 = AT('on the floor'), wk = clamp((t - w0) / 1.6);
+  drawCat(ctx, { x: lerp(1700, CX, ease(wk)), y: 890 - (wk > 0 && wk < 1 ? Math.abs(Math.sin(t * 10)) * 10 : 0), s: 330, coat: BISCUIT, mood: wk >= 1 ? 'happy' : 'normal', look: [wk < 1 ? -1 : 0, 0] }, t);
+  stamp(ctx, 'FUNNIEST PART', CX, 160, 96, t - AT('funniest part'), '#f2b52a', -.03);
+  if (wk >= 1) text(ctx, 'NO BOX?!', CX, 330, 90, '#fff', INK, 12);
+});
+shot(AT('Scientists asked cat owners'), 'whip', (ctx, lt, t) => {   // the home experiment: some cats sit in the square
+  applyCam(ctx, camOf(t, 1.0, 1.03, lt, 6), 1); room(ctx, t, { shelf: false });
+  const sat = AT('walked right into');
+  [[380, KIT1, true], [960, KIT3, false], [1540, KIT2, true]].forEach(([x, coat, sits], i) => {
+    ctx.save(); ctx.translate(x, 900); ctx.scale(.6, .6); ctx.translate(-x, -900); tapeSquare(ctx, x, 940); ctx.restore();
+    const k = clamp((t - sat - i * .35) / .5);
+    if (sits) { drawCat(ctx, { x: lerp(x + 260, x, ease(k)), y: 900, s: 240, coat, mood: k >= 1 ? 'happy' : 'normal' }, t); if (k >= 1) text(ctx, '✓', x, 520, 110, '#3fa35b', INK, 12); }
+    else drawCat(ctx, { x: x + 200, y: 900, s: 240, coat, mood: 'sleepy', look: [1, 0], flip: -1 }, t);
+  });
+  if (t > AT('try this at home')) bubbleText(ctx, 'TRY IT AT HOME', CX, 220, (t - AT('try this at home')) / .3, '#fff7e6', '#2a2026', 60);
+});
+shot(AT("There's no box at all"), 'whip', (ctx, lt, t) => {   // just a square, and that's enough
+  applyCam(ctx, camOf(t, 1.05, 1.1, lt, 4), 1); room(ctx, t, { shelf: false });
+  tapeSquare(ctx, 1150, 930); drawCat(ctx, { x: 1150, y: 890, s: 330, coat: BISCUIT, mood: 'happy', blush: true }, t);
+  const en = t > AT("that's enough");
+  drawStick(ctx, C(PIP, { x: 520, y: 900, s: 540, arms: en ? POSE.handsUp.arms : POSE.hips.arms, face: pipFace(t, { eyes: en ? 'happy' : 'normal' }) }));
+  bubbleText(ctx, 'JUST A SQUARE', 1150, 330, (t - AT('Just a square')) / .3, '#2f9be0', '#fff', 60);
+  if (en) stamp(ctx, 'ENOUGH!', 1150, 170, 110, t - AT("that's enough"), '#3fa35b', -.04);
+});
+shot(AT('So if your cat sits in a box'), 'whip', (ctx, lt, t) => {   // a safe, warm hideout
+  applyCam(ctx, camOf(t, 1.05, 1.15, lt, 5), 1); room(ctx, t); sofa(ctx, 1080, 790);
+  catInBox(ctx, 1080, 780, 420, 260, 360, { coat: BISCUIT, mood: 'sleepy', purr: .6, blush: true }, t, .55);
+  hearts(ctx, 1080, 260, t, 3, clamp((t - AT('not being silly')) / .4));
+  if (t > AT('safe warm hideout')) stamp(ctx, 'SAFE, WARM HIDEOUT', 1080, 150, 92, t - AT('safe warm hideout'), '#7a4bc4', -.03);
 });
 SHOTS.sort((a, b) => a.start - b.start);
 for (let i = 0; i < SHOTS.length; i++) SHOTS[i].end = i + 1 < SHOTS.length ? SHOTS[i + 1].start : (WORDS.length ? WORDS[WORDS.length - 1].e + 1.6 : 60);

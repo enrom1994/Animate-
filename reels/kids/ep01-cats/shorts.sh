@@ -30,3 +30,4 @@ cut() {   # name start end line1 line2 colour
 cut short1-purr    "${T[1]}" "${T[2]}" 'WHY DO CATS' 'PURR?'          0xf2b52a
 cut short2-landing "${T[2]}" "${T[3]}" 'HOW DO CATS LAND' 'ON THEIR FEET?' 0x5d8fd8
 cut short3-knead   "${T[3]}" "${T[4]}" 'WHY DO CATS' 'MAKE BISCUITS?' 0x3fa35b
+cut short4-box     "${T[4]}" "${T[5]}" 'WHY DO CATS' 'LOVE BOXES?'    0x7a4bc4
