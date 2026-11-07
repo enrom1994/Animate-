@@ -1,0 +1,382 @@
+{
+ "title": "Apollo 13",
+ "voice": {
+  "engine": "chatterbox",
+  "ref": "../voices/ref_onyx.wav",
+  "exaggeration": 0.35,
+  "cfg": 0.35,
+  "gap": 0.32
+ },
+ "script": [
+  "About two hundred thousand miles from Earth, an explosion tore through Apollo 13.",
+  "It was April 1970, and three astronauts were on their way to the Moon.",
+  "Then an oxygen tank burst, and the crew radioed: Houston, we've had a problem.",
+  "Their spacecraft was bleeding oxygen and losing power.",
+  "So they climbed into the lunar module, Aquarius, and used it as a lifeboat.",
+  "It was built to keep two men alive for two days. Now it had to keep three alive for four.",
+  "Then carbon dioxide began to build up. The spare filters were the wrong shape.",
+  "Engineers in Houston improvised a fix from bags, cardboard and tape, and talked the crew through building it.",
+  "To get home, Apollo 13 swung around the far side of the Moon.",
+  "Four days after the explosion, the capsule splashed down in the Pacific.",
+  "All three men came home. NASA called it a successful failure."
+ ],
+ "say": {
+  "1970": "nineteen seventy",
+  "13": "thirteen"
+ },
+ "emph": [
+  "explosion",
+  "problem",
+  "lifeboat",
+  "four",
+  "home"
+ ],
+ "nasa_assets": {
+  "sm_damage": "as13-59-8500",
+  "mcc_failure": "S70-34902",
+  "crew": "S70-36485",
+  "mailbox": "as13-62-8929",
+  "farside": "as13-60-8635",
+  "recovery": "S70-35651",
+  "mcc_splash": "S70-35471",
+  "splash": "S70-35638",
+  "earth": "as13-60-8588",
+  "reentry": "S70-17646",
+  "mcc_return": "s70-35368",
+  "launch": "KSC-19700411-MH-NAS01-0001-Apollo_13_Launch_Post_Launch_with_Spiro_Agnew_and_Billie_Brandt_B_0664 [1156s +22s]",
+  "chutes": "KSC-19700417-MH-NAS01-0001-Apollo_13_Splashdown_and_Recovery_B_1373 [700s +12s]",
+  "capsule": "KSC-19700417-MH-NAS01-0001-Apollo_13_Splashdown_and_Recovery_B_1373 [1025s +20s]"
+ },
+ "shots": [
+  {
+   "line": 0,
+   "kind": "photo",
+   "img": "sm_damage",
+   "in": "cut",
+   "sfx": [
+    "hit"
+   ],
+   "stamp": "APRIL 13, 1970",
+   "from": {
+    "box": [
+     0.0,
+     0.0,
+     1.0,
+     1.0
+    ]
+   },
+   "to": {
+    "box": [
+     0.18,
+     0.1,
+     0.82,
+     0.9
+    ]
+   }
+  },
+  {
+   "line": 1,
+   "kind": "footage",
+   "img": "launch",
+   "from_s": 8.5,
+   "sfx": []
+  },
+  {
+   "line": 1,
+   "word": 5,
+   "img": "crew",
+   "layout": "clip",
+   "rot": -1.5,
+   "clip": {
+    "box": [
+     0.02,
+     0.02,
+     0.98,
+     0.98
+    ]
+   },
+   "sfx": [
+    "flash"
+   ]
+  },
+  {
+   "line": 2,
+   "kind": "photo",
+   "img": "mcc_failure",
+   "from": {
+    "box": [
+     0.0,
+     0.0,
+     1.0,
+     1.0
+    ]
+   },
+   "to": {
+    "box": [
+     0.1,
+     0.15,
+     0.9,
+     0.95
+    ]
+   },
+   "sfx": [
+    "paper"
+   ]
+  },
+  {
+   "line": 2,
+   "word": 9,
+   "kind": "card",
+   "style": "quote",
+   "text": "Houston, we've had a problem.",
+   "in": "cut",
+   "sfx": [
+    "stamp"
+   ]
+  },
+  {
+   "line": 3,
+   "kind": "map",
+   "title": "Apollo 13 \u00b7 56 hours in",
+   "sfx": [
+    "paper"
+   ],
+   "drawings": [
+    {
+     "type": "apollo",
+     "x": 0.5,
+     "y": 0.42,
+     "w": 0.95,
+     "at": 0.1,
+     "burst_line": 3,
+     "burst_word": 3
+    }
+   ],
+   "routes": [
+    {
+     "pts": [
+      [
+       0.43,
+       0.33
+      ],
+      [
+       0.54,
+       0.22
+      ],
+      [
+       0.66,
+       0.33
+      ]
+     ],
+     "style": "car",
+     "line": 4,
+     "word": 2,
+     "dur": 1.2,
+     "label": "the crew",
+     "ly": -34
+    }
+   ],
+   "push": {
+    "x": 0.62,
+    "y": 0.42,
+    "z": 1.35,
+    "line": 4,
+    "word": 5,
+    "dur": 2.0
+   }
+  },
+  {
+   "line": 5,
+   "kind": "card",
+   "style": "title",
+   "text": "2 men \u00b7 2 days",
+   "sub": "what Aquarius was built for",
+   "sfx": [
+    "stamp"
+   ]
+  },
+  {
+   "line": 5,
+   "word": 11,
+   "kind": "card",
+   "style": "number",
+   "text": "3 men \u00b7 4 days",
+   "sub": "what it had to do",
+   "in": "cut",
+   "sfx": [
+    "stamp"
+   ]
+  },
+  {
+   "line": 6,
+   "kind": "card",
+   "style": "number",
+   "text": "CO2",
+   "sub": "rising in the lunar module",
+   "sfx": [
+    "stamp"
+   ]
+  },
+  {
+   "line": 6,
+   "word": 7,
+   "kind": "map",
+   "title": "The wrong shape",
+   "in": "cut",
+   "sfx": [
+    "paper"
+   ],
+   "drawings": [
+    {
+     "type": "peg",
+     "x": 0.5,
+     "y": 0.45,
+     "w": 0.5,
+     "at": 0.1,
+     "x_line": 6,
+     "x_word": 12
+    }
+   ]
+  },
+  {
+   "line": 7,
+   "img": "mailbox",
+   "layout": "clip",
+   "rot": 1.5,
+   "clip": {
+    "box": [
+     0.02,
+     0.02,
+     0.98,
+     0.98
+    ]
+   },
+   "stamp": "HOUSTON'S FIX",
+   "sfx": [
+    "flash",
+    "type"
+   ]
+  },
+  {
+   "line": 8,
+   "kind": "map",
+   "title": "The way home",
+   "sfx": [
+    "paper"
+   ],
+   "drawings": [
+    {
+     "type": "planet",
+     "body": "earth",
+     "x": 0.22,
+     "y": 0.78,
+     "r": 0.11,
+     "label": "Earth",
+     "at": 0.1
+    },
+    {
+     "type": "planet",
+     "body": "moon",
+     "x": 0.78,
+     "y": 0.2,
+     "r": 0.07,
+     "label": "Moon",
+     "at": 0.3
+    }
+   ],
+   "routes": [
+    {
+     "pts": [
+      [
+       0.28,
+       0.7
+      ],
+      [
+       0.55,
+       0.38
+      ],
+      [
+       0.74,
+       0.08
+      ],
+      [
+       0.9,
+       0.14
+      ],
+      [
+       0.88,
+       0.3
+      ],
+      [
+       0.62,
+       0.46
+      ],
+      [
+       0.32,
+       0.7
+      ]
+     ],
+     "style": "car",
+     "at": 0.5,
+     "dur": 2.6
+    }
+   ]
+  },
+  {
+   "line": 8,
+   "word": 8,
+   "kind": "photo",
+   "img": "farside",
+   "label": "THE FAR SIDE, PHOTOGRAPHED BY APOLLO 13",
+   "in": "cut",
+   "sfx": [
+    "flash"
+   ]
+  },
+  {
+   "line": 9,
+   "kind": "footage",
+   "img": "chutes",
+   "from_s": 0,
+   "sfx": []
+  },
+  {
+   "line": 9,
+   "word": 5,
+   "kind": "footage",
+   "img": "capsule",
+   "from_s": 6,
+   "in": "cut",
+   "sfx": []
+  },
+  {
+   "line": 10,
+   "kind": "photo",
+   "img": "recovery",
+   "sfx": [
+    "flash"
+   ]
+  },
+  {
+   "line": 10,
+   "word": 5,
+   "kind": "photo",
+   "img": "mcc_splash",
+   "in": "cut",
+   "sfx": [
+    "flash"
+   ]
+  },
+  {
+   "line": 10,
+   "word": 8,
+   "kind": "card",
+   "style": "title",
+   "text": "A successful failure.",
+   "in": "cut",
+   "sfx": [
+    "hit"
+   ]
+  }
+ ]
+}

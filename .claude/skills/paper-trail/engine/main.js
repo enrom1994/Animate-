@@ -349,6 +349,58 @@ KINDS.timeline = (sh, t) => {
   if (sh.text) { const n = Math.floor(clamp((t - .6) / 1.2) * sh.text.length); ctx.font = '500 48px Inter'; ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.fillText(sh.text.toLowerCase().slice(0, n), W / 2, H * (WIDE ? .3 : .35)); }
   ctx.restore();
 };
+
+function drawApollo(d, t, X, Y, M) {  // side view: command module (cone) + service module (cylinder) docked nose-to-nose with the lunar module
+  const w = d.w * M.w, x0 = X(d.x) - w / 2, cy = Y(d.y), k = clamp((t - (d.at ?? .1)) / .7); if (k <= 0) return;
+  ctx.save(); ctx.globalAlpha = k; ctx.strokeStyle = INKC; ctx.lineJoin = 'round'; ctx.lineWidth = 4; ctx.fillStyle = '#e8dfc9';
+  const smW = w * .36, smH = w * .2, cmW = w * .14, nz = w * .05;
+  const smX = x0, cmX = x0 + smW;
+  ctx.beginPath(); ctx.moveTo(smX - w * .05, cy - smH * .28); ctx.lineTo(smX, cy - smH * .38); ctx.lineTo(smX, cy + smH * .38); ctx.lineTo(smX - w * .05, cy + smH * .28); ctx.closePath(); ctx.fill(); ctx.stroke();  // engine bell
+  ctx.fillRect(smX, cy - smH / 2, smW, smH); ctx.strokeRect(smX, cy - smH / 2, smW, smH);                          // service module
+  ctx.lineWidth = 2; for (let i = 1; i < 6; i++) inkLine([[smX + smW * i / 6, cy - smH / 2], [smX + smW * i / 6, cy + smH / 2]]); ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.moveTo(cmX, cy - smH / 2); ctx.lineTo(cmX + cmW, cy - smH * .12); ctx.lineTo(cmX + cmW, cy + smH * .12); ctx.lineTo(cmX, cy + smH / 2); ctx.closePath(); ctx.fill(); ctx.stroke();   // command module
+  ctx.fillRect(cmX + cmW, cy - smH * .07, nz, smH * .14); ctx.strokeRect(cmX + cmW, cy - smH * .07, nz, smH * .14);     // docking tunnel
+  const lx = cmX + cmW + nz, lw = w * .26, lh = w * .3;                                                               // lunar module: ascent stage + gold descent stage + legs
+  ctx.beginPath(); ctx.moveTo(lx, cy - lh * .22); ctx.lineTo(lx + lw * .38, cy - lh * .3); ctx.lineTo(lx + lw * .38, cy + lh * .3); ctx.lineTo(lx, cy + lh * .22); ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#d8b25a'; ctx.fillRect(lx + lw * .38, cy - lh * .34, lw * .38, lh * .68); ctx.strokeRect(lx + lw * .38, cy - lh * .34, lw * .38, lh * .68);
+  for (const sy of [-1, 1]) { inkLine([[lx + lw * .76, cy + sy * lh * .3], [lx + lw * 1.0, cy + sy * lh * .5]]); inkLine([[lx + lw * .96, cy + sy * lh * .5], [lx + lw * 1.04, cy + sy * lh * .5]]); }
+  ctx.font = `800 ${Math.round(L.mapFont * 1.05)}px "Inter Tight"`; ctx.fillStyle = INKC; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('ODYSSEY', cmX + cmW * .4, cy - smH * .95); ctx.fillText('AQUARIUS', lx + lw * .45, cy - lh * .62);
+  ctx.font = `500 ${Math.round(L.mapFont * .8)}px "JB Mono"`; ctx.fillText('SERVICE MODULE', smX + smW / 2, cy + smH * .85);
+  const bt = t - (d.burst_at ?? 1e9); if (bt > 0) {  // the oxygen tank bursts: a red ink star, a puff of gas, debris
+    const bk = ease.out(clamp(bt / .25)), bx = smX + smW * .55, by = cy - smH * .25;
+    ctx.save(); ctx.translate(bx, by); ctx.rotate(.2); ctx.beginPath();
+    for (let i = 0; i < 18; i++) { const r = (i % 2 ? .45 : 1) * smH * .55 * bk; ctx.lineTo(Math.cos(i / 18 * TAU) * r, Math.sin(i / 18 * TAU) * r); }
+    ctx.closePath(); ctx.fillStyle = 'rgba(196,22,28,.85)'; ctx.fill(); ctx.restore();
+    ctx.strokeStyle = INK; ctx.lineWidth = 3; for (let i = 0; i < 7; i++) { const a = -Math.PI / 2 + (i - 3) * .35, r0 = smH * .5, r1 = r0 + bt * 160; inkLine([[bx + Math.cos(a) * r0, by + Math.sin(a) * r0], [bx + Math.cos(a) * r1, by + Math.sin(a) * r1]]); }
+  }
+  ctx.restore();
+}
+function drawPeg(d, t, X, Y, M) {  // a square filter that will not go into a round socket
+  const k = clamp((t - (d.at ?? .2)) / .5); if (k <= 0) return; const s = d.w * M.w, cx = X(d.x), cy = Y(d.y);
+  ctx.save(); ctx.globalAlpha = k; ctx.strokeStyle = INKC; ctx.lineWidth = 6;
+  ctx.beginPath(); ctx.arc(cx, cy + s * .45, s * .28, 0, TAU); ctx.fillStyle = '#2a2420'; ctx.fill(); ctx.stroke();                  // round socket
+  const drop = ease.inout(clamp((t - (d.at ?? .2) - .4) / .8)), jig = Math.sin(t * 30) * 6 * clamp((t - (d.at ?? .2) - 1.2) / .2) * (1 - clamp((t - (d.at ?? .2) - 2.2) / .3));
+  const py = cy - s * .2 + drop * s * .32;
+  ctx.save(); ctx.translate(cx + jig, py); ctx.rotate(jig * .004); ctx.fillStyle = '#e8dfc9'; ctx.fillRect(-s * .3, -s * .3, s * .6, s * .6); ctx.strokeRect(-s * .3, -s * .3, s * .6, s * .6);
+  ctx.lineWidth = 2; for (let i = 1; i < 6; i++) inkLine([[-s * .3, -s * .3 + i * s * .1], [s * .3, -s * .3 + i * s * .1]]); ctx.restore();
+  ctx.font = `800 ${Math.round(L.mapFont * 1.1)}px "Inter Tight"`; ctx.fillStyle = INKC; ctx.textAlign = 'center';
+  ctx.fillText('COMMAND MODULE FILTER', cx, cy - s * .62); ctx.fillText('LUNAR MODULE SOCKET', cx, cy + s * .9);
+  const xk = t - (d.x_at ?? 1e9); if (xk > 0) { const a = ease.out(clamp(xk / .15)), r = s * .2 * (1.4 - .4 * a); ctx.strokeStyle = INK; ctx.lineWidth = 14; ctx.lineCap = 'round'; ctx.globalAlpha = a;
+    inkLine([[cx + s * .42 - r, cy - r], [cx + s * .42 + r, cy + r]]); inkLine([[cx + s * .42 + r, cy - r], [cx + s * .42 - r, cy + r]]); }
+  ctx.restore();
+}
+function drawPlanet(d, t, X, Y, M) {  // a body in ink: Earth (blue wash) or Moon (grey with craters)
+  const k = clamp((t - (d.at ?? .1)) / .5); if (k <= 0) return; const r = d.r * M.w, cx = X(d.x), cy = Y(d.y);
+  ctx.save(); ctx.globalAlpha = k; ctx.strokeStyle = INKC; ctx.lineWidth = 5;
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, TAU); ctx.fillStyle = d.body === 'earth' ? '#9fb7c9' : '#cfc6b4'; ctx.fill(); ctx.stroke();
+  ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, r, 0, TAU); ctx.clip(); ctx.lineWidth = 2;
+  if (d.body === 'earth') { ctx.fillStyle = '#c2b48a'; for (const [a, b, c] of [[-.3, -.2, .45], [.35, .25, .35], [-.1, .45, .25]]) { ctx.beginPath(); ctx.ellipse(cx + a * r, cy + b * r, c * r, c * r * .6, a, 0, TAU); ctx.fill(); ctx.stroke(); } }
+  else for (const [a, b, c] of [[-.35, -.25, .18], [.3, .1, .24], [-.05, .45, .12], [.4, -.4, .1]]) { ctx.beginPath(); ctx.arc(cx + a * r, cy + b * r, c * r, 0, TAU); ctx.stroke(); }
+  ctx.restore();
+  if (d.label) { ctx.font = `800 ${Math.round(L.mapFont * 1.1)}px "Inter Tight"`; ctx.fillStyle = INKC; ctx.textAlign = 'center'; ctx.fillText(d.label.toUpperCase(), cx, cy + r + L.mapFont * 1.4); }
+  ctx.restore();
+}
 KINDS.map = (sh, t) => {  // ink diagram: blocks [x0,y0,x1,y1,label], points [{x,y,label}], route [[x,y]...], xs [{x,y,at}]
   paper(t, sh);
   const M = L.map, X = x => M.x + x * M.w, Y = y => M.y + y * M.h;  // map area inside the safe zone, above the captions
@@ -365,7 +417,7 @@ KINDS.map = (sh, t) => {  // ink diagram: blocks [x0,y0,x1,y1,label], points [{x
       ctx.fillStyle = INKC; ctx.fillText(b[4], (X(b[0]) + X(b[2])) / 2, (Y(b[1]) + Y(b[3])) / 2); }
   }
   ctx.globalAlpha = 1;
-  for (const d of sh.drawings || []) ({ car: drawCar, station: drawStation, prison: drawPrison, figure: drawFigure }[d.type])(d, t, X, Y, M);
+  for (const d of sh.drawings || []) ({ car: drawCar, station: drawStation, prison: drawPrison, figure: drawFigure, apollo: drawApollo, peg: drawPeg, planet: drawPlanet }[d.type])(d, t, X, Y, M);
   drawRoutes(sh, t, X, Y);
   const R = sh.route || []; if (R.length > 1) {  // red route draws itself
     const k = ease.inout(clamp((t - .6) / Math.max(.8, (sh.end - sh.start) * .55))); let L = 0; const seg = [];

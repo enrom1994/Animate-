@@ -102,6 +102,7 @@ if __name__ == "__main__":
             for d in sh.get("drawings", []) or []:  # drawing parts timed to words
                 for el in [d] + (d.get("occupants") or []) + ([d["driver"]] if d.get("driver") else []):
                     if "line" in el: el["at"] = round(t_of(el) - sh["start"], 3)
+                    if "burst_line" in el: el["burst_at"] = round(t_of({"line": el["burst_line"], "word": el.get("burst_word", 0)}) - sh["start"], 3)
                     if "x_line" in el: el["x_at"] = round(t_of({"line": el["x_line"], "word": el.get("x_word", 0)}) - sh["start"], 3)
             if sh.get("push") and "line" in sh["push"]: sh["push"]["at"] = round(t_of(sh["push"]) - sh["start"], 3)
             for el in sh.get("routes", []) or []:
@@ -122,7 +123,7 @@ if __name__ == "__main__":
             iw, ih = img_size(f"assets/{sh['img']}.jpg"); images[sh["img"]] = {"src": f"assets/{sh['img']}.jpg", "w": iw, "h": ih}
     for i, sh in enumerate(shots):
         if sh["kind"] == "footage":
-            src = next(iter(glob.glob(f"assets/{sh['img']}.*")))
+            src = next(iter(sorted(glob.glob(f"assets/{sh['img']}.*"), key=lambda f: not f.endswith((".mp4", ".mov", ".webm")))))
             sh["frames"] = footage_frames(sh["img"], src, sh["src0"], sh["end"] - sh["start"])
     if O: shots.append({"kind": "outro", "start": o_start, "end": dur, "in": "black", "sfx": [], "marks": [], "text": O["text"], "items": O["items"],
                         "ticks": ticks or [.5 + i * .3 for i in range(len(O["items"]))], "more_t": more_t or 1.3})
