@@ -1,5 +1,6 @@
 // ---------- core helpers ----------
-const W = 1080, H = 1920, FPS = 30;
+// format: web/format.js may set window.FORMAT = '16:9' (long form); default is the 9:16 Short
+const WIDE = window.FORMAT === '16:9', W = WIDE ? 1920 : 1080, H = WIDE ? 1080 : 1920, FPS = 30;
 const INK = '#221c22';
 const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
 const lerp = (a, b, t) => a + (b - a) * t;

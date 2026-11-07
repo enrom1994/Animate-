@@ -29,7 +29,7 @@ const capText = s => s.toLowerCase().replace(/[-\u2013\u2014]/g, ' ').replace(/[
 function drawCaption(ctx, t) {
   const c = CHUNKS.find(c => t >= c.s && t < c.e); if (!c) return;
   const k = clamp((t - c.s) / .1); const sc = .82 + .18 * backOut(k);
-  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.translate(540, 1345); ctx.scale(sc, sc);
+  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.translate(W / 2, WIDE ? H * .87 : 1345); ctx.scale(sc, sc);
   ctx.shadowColor = 'rgba(0,0,0,.55)'; ctx.shadowBlur = 18; ctx.shadowOffsetY = 5;
   text(ctx, capText(c.text), 0, 0, 70, '#fff', '#111', 13, 'Poppins', 700);
   ctx.shadowColor = 'transparent'; text(ctx, capText(c.text), 0, 0, 70, '#fff', '#111', 0, 'Poppins', 700);
@@ -63,7 +63,7 @@ function renderFrame(f) {
   blit(buf, dx, blur);
   // grade: vignette + grain
   out.save(); out.setTransform(1, 0, 0, 1, 0, 0);
-  const g = out.createRadialGradient(540, 900, 500, 540, 960, 1250); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(10,5,20,.32)'); out.fillStyle = g; out.fillRect(0, 0, W, H);
+  const g = out.createRadialGradient(W / 2, H * .47, Math.min(W, H) * .46, W / 2, H / 2, Math.max(W, H) * .65); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(10,5,20,.32)'); out.fillStyle = g; out.fillRect(0, 0, W, H);
   out.globalCompositeOperation = 'overlay'; out.globalAlpha = .07; const gr = grains[f % 4]; const pat = out.createPattern(gr, 'repeat'); out.fillStyle = pat; out.translate((f * 37) % 256, (f * 91) % 256); out.fillRect(-256, -256, W + 512, H + 512);
   out.restore();
   drawCaption(out, tNew);

@@ -6,7 +6,8 @@ const fs = require('fs');
 (async () => {
   const mode = process.argv[2];
   const browser = await chromium.launch({ ...(process.env.CHROME ? { executablePath: process.env.CHROME } : {}), args: ['--allow-file-access-from-files'] });
-  const page = await browser.newPage({ viewport: { width: 1080, height: 1920 } });
+  const wide = require('fs').existsSync('web/format.js') && /16:9/.test(require('fs').readFileSync('web/format.js', 'utf8'));
+  const page = await browser.newPage({ viewport: { width: wide ? 1920 : 1080, height: wide ? 1080 : 1920 } });
   page.on('console', m => console.log('[page]', m.text()));
   page.on('pageerror', e => console.log('[err]', e.message));
   await page.goto('file://' + process.cwd() + '/web/index.html');
