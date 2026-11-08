@@ -19,4 +19,6 @@ Each chapter also becomes a 45 to 60 second Short. Made for kids: label every vi
 - Bright, gentle music; cartoon sound effects; no sudden loud sounds.
 - Captions on screen, lowercase, 1 to 2 words.
 
+**Music.** Sampled instruments (pizzicato strings, glockenspiel, string pad) via the Lemo-Opuscar sampler: `music_sampled.py`, called by `audio.py` (synth fallback when the library is not installed). Chosen over the synth bed in an A/B test.
+
 **Episode shape (from ep01).** ~5 min, 4 mysteries. Each mystery gets one "Guess first!" question: two choices pop up, then a 3 s countdown (pauses.json) before the answer. Chapter card per mystery, recap cards in the outro, end on "which animal next?". One 9:16 Short per mystery is cut with `shorts.sh`.

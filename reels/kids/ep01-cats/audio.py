@@ -268,6 +268,15 @@ playful(CH[4], END - .4, DMAJ, .8)
 place(music, strings((50, 57, 62, 66), 1.4, .45), END - .5)
 for m in (62, 66, 69, 74): place(music, pizz(m - 12, .8, .5), END - .45); place(music, glock(m + 12, 1.3, .25), END - .45)
 music = lp(music, 6000)
+# Real instruments when the Lemo-Opuscar sample library is installed (same notes, level matched); the synth bed above is the fallback
+import subprocess as _sp, os as _o
+_LIB = _o.path.realpath(_o.path.join(_o.path.dirname(_o.path.abspath(__file__)), '..', '..', '..', '.claude', 'kit', 'lemo-opuscar'))
+if _o.environ.get('MUSIC', 'sampled') == 'sampled' and _o.path.exists(f'{_LIB}/.venv/bin/python') and _sp.run([f'{_LIB}/.venv/bin/python', 'music_sampled.py', _LIB]).returncode == 0:
+    _b, _sr = sf.read('audio/music_sampled.wav'); _b = _b.mean(1) if _b.ndim > 1 else _b
+    _b = signal.resample_poly(_b, SR, _sr); _ref = np.sqrt(np.mean(music ** 2)); _sb = np.sqrt(np.mean(_b[:N] ** 2))
+    music = np.zeros(N); music[:min(N, len(_b))] = _b[:N] * _ref / _sb
+    print('music: sampled instruments')
+else: print('music: synth fallback (install the library: sh .claude/skills/lemo-opuscar/scripts/setup.sh deps)')
 
 # ---------------- VO + mix ----------------
 vo, vsr = sf.read('audio/vo.wav')
