@@ -19,8 +19,8 @@ for pair in [('cairo_1984', 'cairo_2025'), ('capital_2015', 'capital_2025'), ('r
         out = np.zeros_like(c)
         for i in range(3): lo, hi = np.percentile(c[..., i][v], [0.5, 99.5]); out[..., i] = np.clip((c[..., i] - lo) / (hi - lo + 1e-6), 0, 1)
         if not str(z['coll']).endswith('l2'):   # old MSS scenes: trim the scan edge (it carries a red fringe)
-            from scipy.ndimage import binary_erosion; v = binary_erosion(v, iterations=6)
-        out = out ** .85; out[~v] = 0
+            from scipy.ndimage import binary_erosion; v = binary_erosion(v, iterations=16)
+        out = np.maximum(out ** .85, 3 / 255); out[~v] = 0     # valid pixels never pure black: black means no data
         Image.fromarray((out * 255).astype(np.uint8)).save(f'{OUT}/{n}.jpg', quality=92)
         info[n] = {'bbox': [float(x) for x in z['bbox']], 'item': str(z['item']), 'date': str(z['date'])}
 json.dump(info, open(f'{OUT}/plates.json', 'w'), indent=1); print('plates', list(info))

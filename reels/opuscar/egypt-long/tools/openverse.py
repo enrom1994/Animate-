@@ -2,7 +2,7 @@
 CC0, Public Domain Mark, CC BY (attribution required: kept in assets/media/<name>.json and CREDITS).
   python3 -I tools/openverse.py search "aswan high dam" [--count 12]
   python3 -I tools/openverse.py fetch <openverse id> <name>          -> assets/media/<name>.jpg (+ .json: title, creator, licence, source page)"""
-import sys, os, json, time, urllib.request, urllib.parse
+import sys, os, json, time, urllib.request, urllib.parse, urllib.error
 API = 'https://api.openverse.org/v1/images/'
 UA = {'User-Agent': 'animate-film/1.0 (documentary video; images credited per licence)'}
 SAFE = 'cc0,pdm,by'
@@ -26,12 +26,21 @@ elif cmd == 'fetch':
     r = get(API + oid + '/')
     assert r['license'] in SAFE.split(','), f"licence {r['license']} not allowed"
     os.makedirs('assets/media', exist_ok=True)
-    url = r['url']
+    url = r['url']; cands = [url]
     if 'upload.wikimedia.org/wikipedia/commons/' in url and '/thumb/' not in url:   # Wikimedia asks tools to use its standard thumbnail sizes
         head, tail = url.split('/wikipedia/commons/'); fn = tail.split('/')[-1]
-        url = f"{head}/wikipedia/commons/thumb/{tail}/1920px-{fn}" + ('.jpg' if fn.lower().endswith(('.tif', '.tiff')) else '')
-    time.sleep(2)
-    data = get(url, raw=True); open(f"assets/media/{name}.jpg", "wb").write(data)
+        cands = [f"{head}/wikipedia/commons/thumb/{tail}/{w}px-{fn}" for w in (1920, 1280)] + [url]
+    data = None
+    for u in cands:
+        for k in range(3):
+            time.sleep(3 + 30 * k)
+            try: data = urllib.request.urlopen(urllib.request.Request(u, headers=UA), timeout=120).read(); break
+            except urllib.error.HTTPError as e:
+                if e.code == 429: continue
+                break
+        if data: break
+    assert data, 'no size could be downloaded'
+    open(f"assets/media/{name}.jpg", "wb").write(data)
     meta = {k: r.get(k) for k in ('id', 'title', 'creator', 'creator_url', 'license', 'license_version', 'license_url', 'foreign_landing_url', 'url', 'source', 'attribution')}
     json.dump(meta, open(f'assets/media/{name}.json', 'w'), indent=1)
     print('saved', name, r['license'], r.get('license_version'), '|', r.get('title'), '|', r.get('creator'))

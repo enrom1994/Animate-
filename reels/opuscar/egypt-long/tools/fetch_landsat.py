@@ -16,6 +16,7 @@ PLATES = {   # name: bbox (w, s, e, n), degrees per pixel, collection, platforms
   'rosetta_1973': ((30.20, 31.36, 30.50, 31.56), .0003, 'landsat-c2-l1', ['landsat-1'], '1972-08-01/1973-12-31', MSS),
   'rosetta_2025': ((30.20, 31.36, 30.50, 31.56), .0003, 'landsat-c2-l2', ['landsat-8', 'landsat-9'], '2025-01-01/2025-10-31', L2),
   'toshka_2002': ((30.40, 22.55, 31.70, 23.45), .0006, 'landsat-c2-l2', ['landsat-7'], '2001-10-01/2002-12-31', L2),
+  'aswan_2025': ((32.78, 23.88, 33.05, 24.12), .0003, 'landsat-c2-l2', ['landsat-8', 'landsat-9'], '2025-01-01/2025-10-31', L2),
   'toshka_2021': ((30.40, 22.55, 31.70, 23.45), .0006, 'landsat-c2-l2', ['landsat-8'], '2021-01-01/2021-12-31', L2),
 }
 def http(url, data=None):

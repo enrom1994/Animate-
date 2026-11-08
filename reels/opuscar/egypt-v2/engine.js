@@ -92,7 +92,7 @@ vec3 detail(vec3 day, vec2 ll, sampler2D A, sampler2D B, sampler2D O, vec4 bb, f
   vec3 a = texture(A, uv).rgb, b = texture(B, uv).rgb;
   float s = smoothstep(swp - .004, swp + .004, ll.x);
   vec3 c = mix(a, b, s);
-  if (c.g + c.b < .03) w *= 0.;                          // no data (and the red scan-edge line of old scenes)            // no data: let the coarser plate show
+  if (max(c.r, max(c.g, c.b)) < .004) w *= 0.;   // only true no-data (dark sea is real data)                          // no data (and the red scan-edge line of old scenes)            // no data: let the coarser plate show
   vec4 ov = texture(O, uv); c = mix(c, ov.rgb, ov.a * over);
   glow += vec3(.7, .85, 1.) * exp(-pow((ll.x - swp) / .0025, 2.)) * on * .5 * w;
   return mix(day, c, w);

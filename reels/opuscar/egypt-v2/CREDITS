@@ -1,0 +1,44 @@
+Egypt: One River — studio edit (v2)
+
+Style: Satellite Briefing, from Lemo-Opuscar by Lemomo (github.com/lemomo-ai/lemo-opuscar). Camera maths (top of engine.js) from the
+  style's demo; the imagery shader, film, measurements and mix are this film's own. Code: MIT.
+  If published, the description should credit: "Style: Lemo-Opuscar by Lemomo (CC BY 4.0)".
+Imagery (public domain): NASA Blue Marble: Next Generation and VIIRS Black Marble 2016 via NASA GIBS; USGS Landsat Collection 2
+  (Landsat 1 MSS, 5 TM, 7 ETM+, 8 and 9 OLI), courtesy of the U.S. Geological Survey, accessed through the Microsoft Planetary Computer.
+  Scene IDs in assets/plates/plates.json and FACTS.md; every request in assets/raw/manifest.jsonl. No borders are drawn.
+Voice: Kokoro-82M (Apache-2.0), voice bm_george.
+Music samples (CC0): VS Chamber Orchestra Community Edition and Versilian Community Sample Library (vibraphone, timpani, trombone,
+  tuba, gran cassa, suspended cymbal) via the library's sampler.py. Synth parts and foley: in code.
+Fonts (SIL OFL 1.1): Barlow, Barlow Condensed, IBM Plex Mono, IBM Plex Serif.
+
+Archive photos (shown as prints with caption + source on screen):
+  ph_cairo_2003: Earth observations taken by the Expedition Seven crew | https://images.nasa.gov/details/iss007e12914 | NASA media: generally not copyrighted (US government work); no NASA endorsement implied
+  ph_cairo_night: Cairo and Alexandria, Egypt at Night (NASA, International Space Station Science, 10:28:10) | https://images.nasa.gov/details/GSFC_20171208_Archive_e001998 | NASA media: generally not copyrighted (US government work); no NASA endorsement implied
+  ph_cairo_street_1903: Street life in Cairo, Egypt | http://www.loc.gov/item/2019639366/ | Library of Congress Prints & Photographs: No known restrictions on publication.
+  ph_inundation_1900: The inundation of the Nile, Egypt | http://www.loc.gov/item/2002699574/ | Library of Congress Prints & Photographs: No known restrictions on publication.
+  ph_inundation_1905: Inundation of the Nile, Egypt | http://www.loc.gov/item/2002699577/ | Library of Congress Prints & Photographs: No known restrictions on publication.
+  ph_nasser_1968: Lake Nasser on Nile River in Egypt as seen from the Apollo 7 spacecraft | https://images.nasa.gov/details/as07-11-1999 | NASA media: generally not copyrighted (US government work); no NASA endorsement implied
+  ph_nasser_2025: Lake Nasser, created by the Aswan High Dam in southern Egypt | https://images.nasa.gov/details/iss073e0879542 | NASA media: generally not copyrighted (US government work); no NASA endorsement implied
+  ph_shaduf_1899: A lone shaduf irrigating the fields, Egypt | http://www.loc.gov/item/2019637445/ | Library of Congress Prints & Photographs: No known restrictions on publication.
+  ph_toshka_2005: Earth observations taken by the Expedition 12 crew | https://images.nasa.gov/details/iss012e11654 | NASA media: generally not copyrighted (US government work); no NASA endorsement implied
+  ph_toshka_farms: Agricultural activity supported by the Toshka Lakes in Egypt | https://images.nasa.gov/details/iss072e574769 | NASA media: generally not copyrighted (US government work); no NASA endorsement implied
+  Library of Congress stereographs (Keystone View Co., Underwood & Underwood, Strohmeyer & Wyman, 1899-1903) are cropped to one
+  half of the card. LoC marks them "No known restrictions on publication"; they were published before 1930, so they are in the
+  US public domain. NASA photos: not copyrighted (US government work); no NASA endorsement is implied.
+Sound effects: real recordings from Mixkit (free licence for videos): air woosh, transition windy swoosh, movie impact intro
+  presentation, movie logo intro impact, paper slide, desert ambience, river water flowing, sea waves ambience, city traffic ambience.
+
+Photos via Openverse (CC0 / CC BY only; no share-alike), as used in the film:
+  Flickr - Bakar 88 - Cairo, Egypt (HDR) — Andrew A. Shenouda from Cairo, Egypt — BY 2.0 — https://commons.wikimedia.org/w/index.php?curid=10266287
+  Cairo skyline, Nile River, Egypt — Vyacheslav Argenberg — BY 4.0 — https://commons.wikimedia.org/w/index.php?curid=121354651
+  Egypt. Agriculture. Egyptian cotton field — libraryofcongress — CC0 1.0 — https://www.rawpixel.com/image/6814657/egypt-agriculture-egyptian-cotton-field-the-matson-photo-service
+  Aswan High Dam, built to control the Nile floods, store water and produce 2,1 GW of electricity (14470862415) — Jorge Láscar from Melbourne, Australia — BY 2.0 — https://commons.wikimedia.org/w/index.php?curid=66261297
+  Aswan High Dam, Aswan, AG, EGY (48027133273) — Warren LeMay from Cullowhee, NC, United States — CC0 1.0 — https://commons.wikimedia.org/w/index.php?curid=83168245
+  Power plant at Aswan High Dam, Aswan, Egypt — Vyacheslav Argenberg — BY 4.0 — https://commons.wikimedia.org/w/index.php?curid=108840065
+  Western Desert, Sahara Desert, Egypt — Vyacheslav Argenberg — BY 4.0 — https://commons.wikimedia.org/w/index.php?curid=108843309
+  Nile River, Felucca boat, Aswan, Egypt — Vyacheslav Argenberg — BY 4.0 — https://commons.wikimedia.org/w/index.php?curid=94263623
+  Luxor, Egypt, West bank of Nile River — Vyacheslav Argenberg — BY 4.0 — https://commons.wikimedia.org/w/index.php?curid=107810935
+  View of Lake Nasser from Aswan High Dam, Aswan, AG, EGY (48027083016) — Warren LeMay from Cullowhee, NC, United States — CC0 1.0 — https://commons.wikimedia.org/w/index.php?curid=83168256
+  Egypt. Types & agriculture. Ploughing — libraryofcongress — CC0 1.0 — https://www.rawpixel.com/image/6854260/egypt-types-agriculture-ploughing-with-buffalos-the-matson-photo-service
+3D terrain: NASADEM elevation (NASA/JPL, public domain) via the Microsoft Planetary Computer, heights ×3, with the Landsat 9 plate draped on it.
+Elevation profiles (valley at 26.06°N, delta along 31.0–31.1°E): NASADEM.
