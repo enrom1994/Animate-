@@ -1,0 +1,273 @@
+[
+ {
+  "id": "c0a",
+  "ch": 0,
+  "text": "From space, at night, Egypt is almost completely dark."
+ },
+ {
+  "id": "c0b",
+  "ch": 0,
+  "text": "Except for one line."
+ },
+ {
+  "id": "c0c",
+  "ch": 0,
+  "text": "More than a hundred million people, packed along a single river.",
+  "sub": "More than 100 million people, packed along a single river."
+ },
+ {
+  "id": "c0d",
+  "ch": 0,
+  "text": "This is how that line was drawn, and why it is now under pressure."
+ },
+ {
+  "id": "c1a",
+  "ch": 1,
+  "text": "Egypt is bigger than France and Germany put together."
+ },
+ {
+  "id": "c1b",
+  "ch": 1,
+  "text": "But about ninety-five percent of Egyptians live along the Nile, on roughly four percent of the land.",
+  "sub": "But about 95% of Egyptians live along the Nile, on roughly 4% of the land.",
+  "fix": [
+   [
+    "lˈaɪv",
+    "lˈɪv"
+   ]
+  ]
+ },
+ {
+  "id": "c1c",
+  "ch": 1,
+  "text": "The rest is the Sahara. Cairo gets less than three centimetres of rain in a whole year.",
+  "sub": "The rest is the Sahara. Cairo gets less than 3 cm of rain in a whole year."
+ },
+ {
+  "id": "c1d",
+  "ch": 1,
+  "text": "So about ninety-seven percent of Egypt's water comes from one river.",
+  "sub": "So about 97% of Egypt's water comes from one river."
+ },
+ {
+  "id": "c1e",
+  "ch": 1,
+  "text": "And along most of its length, the green strip it waters is narrow."
+ },
+ {
+  "id": "c1f",
+  "ch": 1,
+  "text": "Near Qena, we measured it on a satellite image from 2025.",
+  "sub": "Near Qena, we measured it on a 2025 satellite image."
+ },
+ {
+  "id": "c1g",
+  "ch": 1,
+  "text": "At the narrowest point, the whole strip is just eight point four kilometres wide.",
+  "sub": "At the narrowest point, the whole strip is just 8.4 km wide."
+ },
+ {
+  "id": "c1h",
+  "ch": 1,
+  "text": "Fields, villages, roads, and the river itself. Sand on both sides."
+ },
+ {
+  "id": "c2a",
+  "ch": 2,
+  "text": "For thousands of years, that strip was made by a flood."
+ },
+ {
+  "id": "c2b",
+  "ch": 2,
+  "text": "Every summer, rain in the Ethiopian highlands swelled the Nile, and the river spilled over its banks."
+ },
+ {
+  "id": "c2c",
+  "ch": 2,
+  "text": "When the water drew back, it left a layer of dark, fertile mud."
+ },
+ {
+  "id": "c2d",
+  "ch": 2,
+  "text": "Ancient Egyptians called their country Kemet. The black land."
+ },
+ {
+  "id": "c2e",
+  "ch": 2,
+  "text": "Then, in nineteen seventy, Egypt finished the Aswan High Dam.",
+  "sub": "Then, in 1970, Egypt finished the Aswan High Dam."
+ },
+ {
+  "id": "c2f",
+  "ch": 2,
+  "text": "Behind it grew Lake Nasser, one of the largest man-made lakes in the world."
+ },
+ {
+  "id": "c2f2",
+  "ch": 2,
+  "text": "It stretches about five hundred and fifty kilometres, from Egypt into Sudan.",
+  "sub": "It stretches about 550 km, from Egypt into Sudan."
+ },
+ {
+  "id": "c2g",
+  "ch": 2,
+  "text": "The dam ended the floods. It gave Egypt water all year round, and electricity."
+ },
+ {
+  "id": "c2h",
+  "ch": 2,
+  "text": "But it also stopped the mud. More than ninety-eight percent of the river's sediment now settles in the lake.",
+  "sub": "But it also stopped the mud. More than 98% of the river's sediment now settles in the lake."
+ },
+ {
+  "id": "c2i",
+  "ch": 2,
+  "text": "Farmers downstream had to replace the river's mud with fertiliser. And the coast lost its supply of new land."
+ },
+ {
+  "id": "c3a",
+  "ch": 3,
+  "text": "This is Rosetta, where one branch of the Nile meets the Mediterranean."
+ },
+ {
+  "id": "c3b",
+  "ch": 3,
+  "text": "In nineteen seventy-two, the river mouth reached far out to sea, built up over centuries of Nile mud.",
+  "sub": "In 1972, the river mouth reached far out to sea, built up over centuries of Nile mud."
+ },
+ {
+  "id": "c3c",
+  "ch": 3,
+  "text": "Here is the same place in twenty twenty-five.",
+  "sub": "Here is the same place in 2025."
+ },
+ {
+  "id": "c3d",
+  "ch": 3,
+  "text": "The tip of the land has pulled back three point eight kilometres. We measured it on the two images.",
+  "sub": "The tip of the land has pulled back 3.8 km. We measured it on the two images."
+ },
+ {
+  "id": "c3e",
+  "ch": 3,
+  "text": "Without new mud, the sea kept eating the coast, until Egypt built a sea wall here in the early nineties.",
+  "sub": "Without new mud, the sea kept eating the coast, until Egypt built a sea wall here in the early '90s."
+ },
+ {
+  "id": "c3f",
+  "ch": 3,
+  "text": "Today, this coast is held in place by concrete, not by the river."
+ },
+ {
+  "id": "c3g",
+  "ch": 3,
+  "text": "And much of the northern delta lies barely above sea level."
+ },
+ {
+  "id": "c4a",
+  "ch": 4,
+  "text": "Meanwhile, the people kept coming."
+ },
+ {
+  "id": "c4b",
+  "ch": 4,
+  "text": "Egypt had about twenty-seven million people in nineteen sixty. Today it has more than a hundred and nine million.",
+  "sub": "Egypt had about 27 million people in 1960. Today it has more than 109 million."
+ },
+ {
+  "id": "c4c",
+  "ch": 4,
+  "text": "Cairo alone has roughly twenty-five million. It is the largest city in Africa.",
+  "sub": "Cairo alone has roughly 25 million. It is the largest city in Africa."
+ },
+ {
+  "id": "c4d",
+  "ch": 4,
+  "text": "This is Cairo in nineteen eighty-four.",
+  "sub": "This is Cairo in 1984."
+ },
+ {
+  "id": "c4e",
+  "ch": 4,
+  "text": "And this is Cairo in twenty twenty-five.",
+  "sub": "And this is Cairo in 2025."
+ },
+ {
+  "id": "c4f",
+  "ch": 4,
+  "text": "New cities have spread into the sand on both sides. But Cairo has also grown over its own fields."
+ },
+ {
+  "id": "c4g",
+  "ch": 4,
+  "text": "Comparing the two images, roughly one in four of the fields that were green here in nineteen eighty-four are now built over.",
+  "sub": "Comparing the two images, roughly 1 in 4 of the fields that were green here in 1984 are now built over."
+ },
+ {
+  "id": "c4g2",
+  "ch": 4,
+  "text": "Most of it happened one building at a time, as villages and towns spread into the fields around them."
+ },
+ {
+  "id": "c4h",
+  "ch": 4,
+  "text": "In a country with so little farmland, every field lost to concrete is hard to replace."
+ },
+ {
+  "id": "c5a",
+  "ch": 5,
+  "text": "So Egypt is trying to move people out of the valley."
+ },
+ {
+  "id": "c5b",
+  "ch": 5,
+  "text": "East of Cairo, this was empty sand in twenty fifteen.",
+  "sub": "East of Cairo, this was empty sand in 2015."
+ },
+ {
+  "id": "c5c",
+  "ch": 5,
+  "text": "Ten years later, it is a new capital city, with government ministries and the tallest building in Africa."
+ },
+ {
+  "id": "c5c2",
+  "ch": 5,
+  "text": "Whether millions of people will follow is still an open question."
+ },
+ {
+  "id": "c5d",
+  "ch": 5,
+  "text": "Far to the south, the river is pushed into the desert too."
+ },
+ {
+  "id": "c5e",
+  "ch": 5,
+  "text": "In wet years, Lake Nasser overflows into the Toshka depression, and lakes appear where there was only sand."
+ },
+ {
+  "id": "c5f",
+  "ch": 5,
+  "text": "They first formed in nineteen ninety-eight, and they grow and shrink with the floods.",
+  "sub": "They first formed in 1998, and they grow and shrink with the floods."
+ },
+ {
+  "id": "c5g",
+  "ch": 5,
+  "text": "Next to them, new farms are now watered from the lake. Green circles, in one of the driest places on Earth."
+ },
+ {
+  "id": "c6a",
+  "ch": 6,
+  "text": "From space, Egypt is still one bright line."
+ },
+ {
+  "id": "c6b",
+  "ch": 6,
+  "text": "A line drawn by a river, held in place by a dam, and squeezed by more than a hundred million people."
+ },
+ {
+  "id": "c6c",
+  "ch": 6,
+  "text": "Which country should we look at next? Tell us in the comments."
+ }
+]

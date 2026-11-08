@@ -1,0 +1,352 @@
+[
+ {
+  "ch": 0,
+  "title": null,
+  "card": 0,
+  "dur": 22.569,
+  "lines": [
+   {
+    "id": "c0a",
+    "t": 1.2,
+    "d": 4.076,
+    "text": "From space, at night, Egypt is almost completely dark."
+   },
+   {
+    "id": "c0b",
+    "t": 5.726,
+    "d": 1.615,
+    "text": "Except for one line."
+   },
+   {
+    "id": "c0c",
+    "t": 8.991,
+    "d": 3.943,
+    "text": "More than 100 million people, packed along a single river."
+   },
+   {
+    "id": "c0d",
+    "t": 13.384,
+    "d": 4.535,
+    "text": "This is how that line was drawn, and why it is now under pressure."
+   }
+  ]
+ },
+ {
+  "ch": 1,
+  "title": "A country of 4%",
+  "card": 3.8,
+  "dur": 53.876,
+  "lines": [
+   {
+    "id": "c1a",
+    "t": 4.2,
+    "d": 3.785,
+    "text": "Egypt is bigger than France and Germany put together."
+   },
+   {
+    "id": "c1b",
+    "t": 8.435,
+    "d": 6.437,
+    "text": "But about 95% of Egyptians live along the Nile, on roughly 4% of the land."
+   },
+   {
+    "id": "c1c",
+    "t": 15.922,
+    "d": 6.302,
+    "text": "The rest is the Sahara. Cairo gets less than 3 cm of rain in a whole year."
+   },
+   {
+    "id": "c1d",
+    "t": 22.674,
+    "d": 4.812,
+    "text": "So about 97% of Egypt's water comes from one river."
+   },
+   {
+    "id": "c1e",
+    "t": 27.936,
+    "d": 4.366,
+    "text": "And along most of its length, the green strip it waters is narrow."
+   },
+   {
+    "id": "c1f",
+    "t": 32.752,
+    "d": 5.646,
+    "text": "Near Qena, we measured it on a 2025 satellite image."
+   },
+   {
+    "id": "c1g",
+    "t": 40.448,
+    "d": 5.162,
+    "text": "At the narrowest point, the whole strip is just 8.4 km wide."
+   },
+   {
+    "id": "c1h",
+    "t": 47.66,
+    "d": 4.966,
+    "text": "Fields, villages, roads, and the river itself. Sand on both sides."
+   }
+  ]
+ },
+ {
+  "ch": 2,
+  "title": "The flood that built Egypt",
+  "card": 3.8,
+  "dur": 67.074,
+  "lines": [
+   {
+    "id": "c2a",
+    "t": 4.2,
+    "d": 3.677,
+    "text": "For thousands of years, that strip was made by a flood."
+   },
+   {
+    "id": "c2b",
+    "t": 8.327,
+    "d": 6.577,
+    "text": "Every summer, rain in the Ethiopian highlands swelled the Nile, and the river spilled over its banks."
+   },
+   {
+    "id": "c2c",
+    "t": 16.354,
+    "d": 4.12,
+    "text": "When the water drew back, it left a layer of dark, fertile mud."
+   },
+   {
+    "id": "c2d",
+    "t": 20.924,
+    "d": 4.237,
+    "text": "Ancient Egyptians called their country Kemet. The black land."
+   },
+   {
+    "id": "c2e",
+    "t": 27.011,
+    "d": 4.387,
+    "text": "Then, in 1970, Egypt finished the Aswan High Dam."
+   },
+   {
+    "id": "c2f",
+    "t": 33.048,
+    "d": 4.786,
+    "text": "Behind it grew Lake Nasser, one of the largest man-made lakes in the world."
+   },
+   {
+    "id": "c2f2",
+    "t": 38.284,
+    "d": 5.587,
+    "text": "It stretches about 550 km, from Egypt into Sudan."
+   },
+   {
+    "id": "c2g",
+    "t": 44.321,
+    "d": 5.749,
+    "text": "The dam ended the floods. It gave Egypt water all year round, and electricity."
+   },
+   {
+    "id": "c2h",
+    "t": 50.52,
+    "d": 6.984,
+    "text": "But it also stopped the mud. More than 98% of the river's sediment now settles in the lake."
+   },
+   {
+    "id": "c2i",
+    "t": 57.954,
+    "d": 7.87,
+    "text": "Farmers downstream had to replace the river's mud with fertiliser. And the coast lost its supply of new land."
+   }
+  ]
+ },
+ {
+  "ch": 3,
+  "title": "The coast pulls back",
+  "card": 3.8,
+  "dur": 50.439,
+  "lines": [
+   {
+    "id": "c3a",
+    "t": 4.2,
+    "d": 4.813,
+    "text": "This is Rosetta, where one branch of the Nile meets the Mediterranean."
+   },
+   {
+    "id": "c3b",
+    "t": 10.263,
+    "d": 7.144,
+    "text": "In 1972, the river mouth reached far out to sea, built up over centuries of Nile mud."
+   },
+   {
+    "id": "c3c",
+    "t": 18.457,
+    "d": 3.315,
+    "text": "Here is the same place in 2025."
+   },
+   {
+    "id": "c3d",
+    "t": 24.222,
+    "d": 6.456,
+    "text": "The tip of the land has pulled back 3.8 km. We measured it on the two images."
+   },
+   {
+    "id": "c3e",
+    "t": 32.528,
+    "d": 7.06,
+    "text": "Without new mud, the sea kept eating the coast, until Egypt built a sea wall here in the early '90s."
+   },
+   {
+    "id": "c3f",
+    "t": 40.038,
+    "d": 4.604,
+    "text": "Today, this coast is held in place by concrete, not by the river."
+   },
+   {
+    "id": "c3g",
+    "t": 45.092,
+    "d": 4.097,
+    "text": "And much of the northern delta lies barely above sea level."
+   }
+  ]
+ },
+ {
+  "ch": 4,
+  "title": "A city on its own fields",
+  "card": 3.8,
+  "dur": 64.727,
+  "lines": [
+   {
+    "id": "c4a",
+    "t": 4.2,
+    "d": 2.293,
+    "text": "Meanwhile, the people kept coming."
+   },
+   {
+    "id": "c4b",
+    "t": 6.943,
+    "d": 7.885,
+    "text": "Egypt had about 27 million people in 1960. Today it has more than 109 million."
+   },
+   {
+    "id": "c4c",
+    "t": 15.278,
+    "d": 5.797,
+    "text": "Cairo alone has roughly 25 million. It is the largest city in Africa."
+   },
+   {
+    "id": "c4d",
+    "t": 22.125,
+    "d": 2.977,
+    "text": "This is Cairo in 1984."
+   },
+   {
+    "id": "c4e",
+    "t": 26.952,
+    "d": 3.081,
+    "text": "And this is Cairo in 2025."
+   },
+   {
+    "id": "c4f",
+    "t": 32.483,
+    "d": 6.893,
+    "text": "New cities have spread into the sand on both sides. But Cairo has also grown over its own fields."
+   },
+   {
+    "id": "c4g",
+    "t": 40.426,
+    "d": 8.113,
+    "text": "Comparing the two images, roughly 1 in 4 of the fields that were green here in 1984 are now built over."
+   },
+   {
+    "id": "c4g2",
+    "t": 50.389,
+    "d": 6.63,
+    "text": "Most of it happened one building at a time, as villages and towns spread into the fields around them."
+   },
+   {
+    "id": "c4h",
+    "t": 57.469,
+    "d": 6.008,
+    "text": "In a country with so little farmland, every field lost to concrete is hard to replace."
+   }
+  ]
+ },
+ {
+  "ch": 5,
+  "title": "Into the desert",
+  "card": 3.8,
+  "dur": 56.61,
+  "lines": [
+   {
+    "id": "c5a",
+    "t": 4.2,
+    "d": 3.483,
+    "text": "So Egypt is trying to move people out of the valley."
+   },
+   {
+    "id": "c5b",
+    "t": 8.133,
+    "d": 4.045,
+    "text": "East of Cairo, this was empty sand in 2015."
+   },
+   {
+    "id": "c5c",
+    "t": 13.628,
+    "d": 7.015,
+    "text": "Ten years later, it is a new capital city, with government ministries and the tallest building in Africa."
+   },
+   {
+    "id": "c5c2",
+    "t": 22.093,
+    "d": 4.131,
+    "text": "Whether millions of people will follow is still an open question."
+   },
+   {
+    "id": "c5d",
+    "t": 26.674,
+    "d": 3.653,
+    "text": "Far to the south, the river is pushed into the desert too."
+   },
+   {
+    "id": "c5e",
+    "t": 31.577,
+    "d": 7.14,
+    "text": "In wet years, Lake Nasser overflows into the Toshka depression, and lakes appear where there was only sand."
+   },
+   {
+    "id": "c5f",
+    "t": 39.767,
+    "d": 4.97,
+    "text": "They first formed in 1998, and they grow and shrink with the floods."
+   },
+   {
+    "id": "c5g",
+    "t": 47.187,
+    "d": 7.173,
+    "text": "Next to them, new farms are now watered from the lake. Green circles, in one of the driest places on Earth."
+   }
+  ]
+ },
+ {
+  "ch": 6,
+  "title": null,
+  "card": 0,
+  "dur": 21.387,
+  "lines": [
+   {
+    "id": "c6a",
+    "t": 1.2,
+    "d": 3.365,
+    "text": "From space, Egypt is still one bright line."
+   },
+   {
+    "id": "c6b",
+    "t": 5.015,
+    "d": 6.849,
+    "text": "A line drawn by a river, held in place by a dam, and squeezed by more than a hundred million people."
+   },
+   {
+    "id": "c6c",
+    "t": 13.514,
+    "d": 3.623,
+    "text": "Which country should we look at next? Tell us in the comments."
+   }
+  ]
+ }
+]

@@ -1,0 +1,12 @@
+Egypt: One River — long form (Satellite Briefing style)
+
+Style: Satellite Briefing, from Lemo-Opuscar by Lemomo (github.com/lemomo-ai/lemo-opuscar). Camera maths (top of engine.js) from the
+  style's demo; the imagery shader, film, measurements and mix are this film's own. Code: MIT.
+  If published, the description should credit: "Style: Lemo-Opuscar by Lemomo (CC BY 4.0)".
+Imagery (public domain): NASA Blue Marble: Next Generation and VIIRS Black Marble 2016 via NASA GIBS; USGS Landsat Collection 2
+  (Landsat 1 MSS, 5 TM, 7 ETM+, 8 and 9 OLI), courtesy of the U.S. Geological Survey, accessed through the Microsoft Planetary Computer.
+  Scene IDs in assets/plates/plates.json and FACTS.md; every request in assets/raw/manifest.jsonl. No borders are drawn.
+Voice: Kokoro-82M (Apache-2.0), voice bm_george.
+Music samples (CC0): VS Chamber Orchestra Community Edition and Versilian Community Sample Library (vibraphone, timpani, trombone,
+  tuba, gran cassa, suspended cymbal) via the library's sampler.py. Synth parts and foley: in code.
+Fonts (SIL OFL 1.1): Barlow, Barlow Condensed, IBM Plex Mono, IBM Plex Serif.
