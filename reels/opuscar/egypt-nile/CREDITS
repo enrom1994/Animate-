@@ -1,0 +1,16 @@
+Egypt: One River — Satellite Briefing test (Pip-free, geography channel)
+
+Style: Satellite Briefing, from Lemo-Opuscar by Lemomo (github.com/lemomo-ai/lemo-opuscar). Camera maths (engine.js,
+  top half) copied from the style's demo; the imagery shader, film and mix are this film's own. Code: MIT.
+  If published, the description should credit: "Style: Lemo-Opuscar by Lemomo (CC BY 4.0)".
+Imagery (public domain):
+  NASA Blue Marble: Next Generation (NASA Earth Observatory), via NASA GIBS WMS (layer BlueMarble_NextGeneration).
+  NASA VIIRS Black Marble 2016 (NASA Earth Observatory / Suomi NPP), via NASA GIBS (layer VIIRS_Black_Marble).
+  USGS Landsat 9 Collection 2 Level-2, scene LC09_L2SP_175042_20251008_02_T1 (2025-10-08), courtesy of the U.S. Geological
+  Survey, accessed through the Microsoft Planetary Computer. Every request: assets/raw/manifest.jsonl.
+  No borders are drawn. Delta outline and Cairo position are drawn by hand from the imagery.
+Voice: Kokoro-82M (Apache-2.0), voice bm_george.
+Music samples (CC0): VS Chamber Orchestra Community Edition and Versilian Community Sample Library (vibraphone,
+  timpani, trombone, tuba, gran cassa, suspended cymbal), via the library's sampler.py. Synth parts and foley: in code.
+Fonts (SIL OFL 1.1): Barlow, Barlow Condensed, IBM Plex Mono, IBM Plex Serif.
+Facts and sources: FACTS.md. Measurement: tools/measure.py → assets/measure.json.

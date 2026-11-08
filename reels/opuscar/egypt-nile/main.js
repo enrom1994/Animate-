@@ -1,0 +1,11 @@
+import { makeGlobe } from './engine.js';
+import * as F from './film.js';
+const load = src => new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = src; });
+await Promise.all(['300 40px "Barlow Condensed"', '400 40px Barlow', '500 40px Barlow', '400 40px "IBM Plex Mono"', '400 40px "IBM Plex Serif"'].map(f => document.fonts.load(f)));
+const [WD, WN, ED, EN, Q] = await Promise.all(['world_day', 'world_night', 'egypt_day', 'egypt_night', 'qena'].map(n => load(`assets/plates/${n}.jpg`)));
+const globe = makeGlobe(document.getElementById('gl'), { tWD: WD, tWN: WN, tED: ED, tEN: EN, tQ: Q });
+const g = document.getElementById('ov').getContext('2d');
+F.buildSubs(g);
+window.DUR = F.DUR; window.EV = F.EV; window.SUBS = F.SUBS;
+window.render = t => { const cam = F.cameraAt(t); globe(cam, F.shaderState(t)); F.overlay(g, t, cam); };
+window.READY = true;
