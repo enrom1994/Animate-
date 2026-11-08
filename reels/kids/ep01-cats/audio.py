@@ -159,7 +159,7 @@ place(sfx, sparkle_sfx(), AT('one happy cat'), .3); place(sfx, pop(800), AT('or 
 place(sfx, thud(90, .3, .6), AT('Yesterday a big box') + .8, .45)          # box lands
 place(sfx, whoosh(.6), AT('jumped in'), .35); place(sfx, thud(120, .3, .6), AT('jumped in') + .7, .5); place(sfx, boing(300, .4), AT('jumped in') + .72, .25)
 place(sfx, boing(160, .7), AT('squeezes right in'), .3)
-place(sfx, chime(1318, .9) * .5, AT('feel safe'), .3); place(sfx, pop(600), AT('sneak up behind'), .3)
+place(sfx, chime(1318, .9) * .5, AT('Boxes make them feel safe Inside'), .3); place(sfx, pop(600), AT('sneak up behind'), .3)
 place(sfx, pop(520), AT('so they can rest', 3), .3); place(sfx, pop(640), AT('keep watch'), .3)
 place(sfx, sparkle_sfx(), AT('calmed down faster'), .3)
 place(sfx, riser(1.5) * .6, AT('keeps the heat in'), .25); place(sfx, chime(1046, .8) * .5, AT('warmer than we do'), .3)

@@ -530,10 +530,10 @@ shot(AT('Biscuit Even when a box'), 'whip', (ctx, lt, t) => {   // a box that is
   if (sq) stamp(ctx, 'IF I FITS, I SITS!', CX, 160, 100, t - AT('squeezes right in'), '#f2b52a', -.03);
 });
 guessShot('Guess first Do cats like boxes', 'BORED', AT("because they're bored"), 'SAFE', AT('make them feel safe'), '#7a4bc4');
-shot(AT('Boxes make them feel safe'), 'whip', (ctx, lt, t) => {   // nobody can sneak up behind you
+shot(AT('Boxes make them feel safe Inside'), 'whip', (ctx, lt, t) => {   // nobody can sneak up behind you
   applyCam(ctx, camOf(t, 1.05, 1.12, lt, 5), 1); room(ctx, t, { shelf: false });
   catInBox(ctx, 760, 920, 520, 330, 460, { coat: BISCUIT, mood: 'happy', look: [Math.sin(t * 1.5), 0] }, t, .5);
-  stamp(ctx, 'SAFE!', 760, 200, 120, t - AT('feel safe'), '#3fa35b', -.04);
+  stamp(ctx, 'SAFE!', 760, 200, 120, t - AT('Boxes make them feel safe Inside'), '#3fa35b', -.04);
   if (t > AT('sneak up behind')) { const k = clamp((t - AT('sneak up behind')) / .3); ctx.save(); ctx.globalAlpha = k;
     rrect(ctx, 1230, 380, 520, 300, 30); fillStroke(ctx, '#fff7e6', 8); text(ctx, 'WALLS ALL AROUND', 1490, 470, 46, '#2a2026', null, 0);
     for (const [dx, a] of [[-120, 0], [0, 0], [120, 0]]) { line(ctx, 1490 + dx, 520, 1490 + dx, 620, 14, '#d9a066'); } text(ctx, 'NO SNEAKING!', 1490, 650, 44, '#e0392f', null, 0); ctx.restore(); }
