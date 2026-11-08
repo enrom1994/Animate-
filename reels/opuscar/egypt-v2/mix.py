@@ -1,6 +1,7 @@
-# One chapter's score + telemetry foley + voice → out/mix_<ch>.wav (48 kHz stereo).
-# Reads out/events_<ch>.json (from film.js) and voices/*.wav. Run from the library root with its Python:
-#   cd $LIB && .venv/bin/python <project>/mix.py <ch>
+# The whole film's sound in ONE pass → out/mix.wav (48 kHz stereo): one continuous score that runs across the chapter
+# joins (no restarts, no fades at the joins), place sounds, timpani on readings, voice.
+# Reads out/events_<ch>.json (from film.js), out/ch<ch>.mp4 (for exact chapter lengths) and voices/*.wav.
+#   cd $LIB && .venv/bin/python <project>/mix.py
 # Palette (Satellite Briefing §7): pulse bass with harmonics, detuned-saw pad, timpani + low brass on the key readings,
 # real recorded whooshes, hits and place ambiences (Mixkit); no hiss beds; one wet timbre (vibraphone) for the turns.
 import sys, os, json, numpy as np, soundfile as sf
@@ -8,9 +9,16 @@ HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, os.getcwd(
 from core.audio import sampler as S
 from core.audio import sfx as X
 from core.audio.sfx import SR, add
-CH = int(sys.argv[1]); S.seed(20 + CH)
-E = json.load(open(f'{HERE}/out/events_{CH}.json')); DUR = E['dur']; EV = E['ev']
-N = int((DUR + .3) * SR)
+import subprocess
+S.seed(20)
+FPS = 30
+def frames(c): return int(subprocess.run(['ffprobe', '-v', 'error', '-count_packets', '-select_streams', 'v:0', '-show_entries', 'stream=nb_read_packets', '-of', 'csv=p=0', f'{HERE}/out/ch{c}.mp4'], capture_output=True, text=True, check=True).stdout.strip().rstrip(','))
+CHS = list(range(7)); START = {}; EV = []; t0 = 0.0
+for c in CHS:                                     # chapter c starts where the previous chapter's frames end
+    START[c] = t0; E = json.load(open(f'{HERE}/out/events_{c}.json'))
+    EV += [dict(e, t=e['t'] + t0, ch=c) for e in E['ev']]; t0 += frames(c) / FPS
+DUR = t0; N = int(DUR * SR)
+def chap_at(t): return max(c for c in CHS if START[c] <= t + 1e-6)
 mus, fol, bed, vox = (np.zeros((N, 2), np.float32) for _ in range(4))
 def put(buf, x, t, g=1.0, pan=0.0):
     if x.ndim == 2: x = x.mean(1)
@@ -37,21 +45,30 @@ def servo(d, up=True):
     return X.lp(np.sin(2 * np.pi * ph) + .3 * np.sin(4 * np.pi * ph), 2500) * np.sin(np.pi * np.clip(t / d, 0, 1)) * .07
 def riser(d): t = tt(d); return X.bp(X.noise(d), 1500, 9000) * (t / d) ** 2.2 * .35
 def tick(v=1.0): t = tt(.03); return X.hp(X.noise(.03), 3500) * np.exp(-t * 260) * .5 * v
-# ———— score ————
+# ———— score: one piece for the whole film ————
+# The bar grid and the chord cycle never reset. Each chapter only changes the arrangement (pulse on/off, pad
+# brightness and level), and those changes glide over ~3 s, so a chapter join is heard as the music developing.
 BPM = 96; E8 = 30 / BPM; BAR = 8 * E8
 HARM = [(38, [50, 57, 62, 65]), (34, [46, 53, 58, 62]), (41, [53, 57, 60, 65]), (36, [48, 55, 60, 64])]   # Dm Bb F C
-STYLE = {0: (False, .9, 900), 1: (True, .8, 1300), 2: (False, 1.0, 1100), 3: (True, .7, 1200), 4: (True, .8, 1500), 5: (True, .75, 1300), 6: (False, 1.0, 1300)}[CH]
-pulse_on, pad_v, cut = STYLE
+STYLE = {0: (0, .9, 900), 1: (1, .8, 1300), 2: (0, 1.0, 1100), 3: (1, .7, 1200), 4: (1, .8, 1500), 5: (1, .75, 1300), 6: (0, 1.0, 1300)}
+def glide(i):                                     # style value i at time t, crossfaded over 3 s around each join
+    def f(t):
+        c = chap_at(t); v = STYLE[c][i]
+        if c > 0 and t - START[c] < 1.5: return v + (STYLE[c - 1][i] - v) * (1.5 - (t - START[c])) / 3
+        if c < CHS[-1] and START[c + 1] - t < 1.5: return v + (STYLE[c + 1][i] - v) * (1.5 - (START[c + 1] - t)) / 3
+        return v
+    return f
+pulse_g, pad_g, cut_g = glide(0), glide(1), glide(2)
 t = 0.0; b = 0
 while t < DUR - .2:
-    root, ch = HARM[(b + CH) % 4]; L = min(BAR, DUR - t)
-    put(mus, pad(ch, L + .8, pad_v, cut), t)
-    if pulse_on:
-        for k in range(8):
-            if t + k * E8 < DUR - .5: put(mus, pulse(root + (12 if k % 4 == 3 else 0), E8 * .9, .9 if k % 2 == 0 else .62), t + k * E8, 1, -.1)
+    root, ch = HARM[b % 4]; L = min(BAR, DUR - t)
+    put(mus, pad(ch, L + .8, pad_g(t + BAR / 2), cut_g(t + BAR / 2)), t)
+    for k in range(8):
+        tk = t + k * E8; g = pulse_g(tk)
+        if g > .01 and tk < DUR - .5: put(mus, pulse(root + (12 if k % 4 == 3 else 0), E8 * .9, (.9 if k % 2 == 0 else .62) * g), tk, 1, -.1)
     t += BAR; b += 1
-if CH in (0, 6):
-    for j, m in enumerate([74, 77, 81, 79, 77, 74]): put(mus, S.note('vibraphone', m, 1.8, vel=.45), 1.0 + j * E8 * 3, .5, .25)
+for c0 in (0, 6):                                 # the vibraphone motif opens the film and returns for the last chapter
+    for j, m in enumerate([74, 77, 81, 79, 77, 74]): put(mus, S.note('vibraphone', m, 1.8, vel=.45), START[c0] + 1.0 + j * E8 * 3, .5, .25)
 suck = []
 # ———— real recorded sounds (Mixkit, via .claude/kit/sfx/library; checked with earshot) ————
 import subprocess, functools
@@ -90,9 +107,9 @@ for e in EV:
     if sr != SR: v = np.interp(np.arange(int(len(v) * SR / sr)) / SR, np.arange(len(v)) / sr, v).astype(np.float32)
     v = X.compress(X.hp(v, 75), thr=.2, ratio=2.5); v = v / (np.sqrt(np.mean(v ** 2)) + 1e-9) * .1
     put(vox, v, e['t'])
-venv = np.convolve(np.abs(vox[:, 0]), np.ones(2400) / 2400, 'same'); duck = 1 - .5 * np.clip(venv / .03, 0, 1)
+cs = np.concatenate([[0], np.cumsum(np.abs(vox[:, 0]), dtype=np.float64)]); i = np.arange(N); venv = (cs[np.minimum(N, i + 1200)] - cs[np.maximum(0, i - 1200)]) / 2400; duck = 1 - .5 * np.clip(venv / .03, 0, 1)
 mix = vox + mus * .48 * duck[:, None] + fol * .8 + bed * .7
 mix = X.hp(mix.T, 40).T.astype(np.float32)
-fi, fo = int(.03 * SR), int(.25 * SR); mix[:fi] *= np.linspace(0, 1, fi)[:, None]; mix[-fo:] *= np.linspace(1, 0, fo)[:, None]   # clean chapter joins
+fi, fo = int(.03 * SR), int(2.5 * SR); mix[:fi] *= np.linspace(0, 1, fi)[:, None]; mix[-fo:] *= np.linspace(1, 0, fo)[:, None]   # film start and end only
 mix = X.limit(mix, .9)
-sf.write(f'{HERE}/out/mix_{CH}.wav', mix, SR); print('mix', CH, round(N / SR, 1), 's')
+sf.write(f'{HERE}/out/mix.wav', mix, SR); print('mix', round(N / SR, 2), 's')
