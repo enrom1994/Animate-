@@ -418,5 +418,105 @@
   "sounds_like": null,
   "real": "real or pro-produced",
   "p_real": 0.933
+ },
+ {
+  "file": "whoosh/air_woosh_mixkit1489.mp3",
+  "query": "a fast whoosh",
+  "verdict": "strong",
+  "z": 5.22,
+  "p_vs_alts": 0.999,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.779
+ },
+ {
+  "file": "whoosh/deep_air_woosh_mixkit2604.mp3",
+  "query": "a fast whoosh",
+  "verdict": "strong",
+  "z": 3.3,
+  "p_vs_alts": 0.573,
+  "sounds_like": null,
+  "real": "uncertain",
+  "p_real": 0.231
+ },
+ {
+  "file": "whoosh/transition_windy_swoosh_mixkit1474.mp3",
+  "query": "a fast whoosh",
+  "verdict": "strong",
+  "z": 3.49,
+  "p_vs_alts": 0.99,
+  "sounds_like": null,
+  "real": "uncertain",
+  "p_real": 0.751
+ },
+ {
+  "file": "whoosh/quick_air_woosh_mixkit2605.mp3",
+  "query": "a fast whoosh",
+  "verdict": "strong",
+  "z": 3.79,
+  "p_vs_alts": 0.991,
+  "sounds_like": null,
+  "real": "uncertain",
+  "p_real": 0.261
+ },
+ {
+  "file": "impact/movie_impact_intro_presentation_mixkit2902.mp3",
+  "query": "a deep cinematic impact boom",
+  "verdict": "plausible",
+  "z": 2.87,
+  "p_vs_alts": 0.996,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.972
+ },
+ {
+  "file": "impact/movie_logo_intro_impact_mixkit2900.mp3",
+  "query": "a deep cinematic impact boom",
+  "verdict": "plausible",
+  "z": 2.59,
+  "p_vs_alts": 0.987,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.801
+ },
+ {
+  "file": "ambience/desert_ambience_mixkit2495.mp3",
+  "query": "a train station with people and trains",
+  "verdict": "no match",
+  "z": -0.08,
+  "p_vs_alts": 0.0,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.808
+ },
+ {
+  "file": "ambience/distant_sea_humming_ambiance_mixkit1191.mp3",
+  "query": "a train station with people and trains",
+  "verdict": "no match",
+  "z": 0.38,
+  "p_vs_alts": 0.001,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.868
+ },
+ {
+  "file": "ambience/city_traffic_background_ambience_mixkit2930.mp3",
+  "query": "a train station with people and trains",
+  "verdict": "no match",
+  "z": 1.26,
+  "p_vs_alts": 0.055,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.883
+ },
+ {
+  "file": "ambience/river_water_flowing_mixkit2454.mp3",
+  "query": "a train station with people and trains",
+  "verdict": "no match",
+  "z": 0.48,
+  "p_vs_alts": 0.0,
+  "sounds_like": null,
+  "real": "real or pro-produced",
+  "p_real": 0.818
  }
 ]
