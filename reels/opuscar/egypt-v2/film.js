@@ -20,9 +20,9 @@ function chapter1() {
     over: (g, t) => G.counter(g, t, a('c1b') + .1, a('c1b', .5), { to: 95, fmt: v => Math.round(v) + '%', label: 'OF EGYPTIANS LIVE ALONG THE NILE', sub: 'approx. · FAO, Britannica' }) });
   T(a('c1b', .5), a('c1c'), { type: 'globe', grey: 1, keep: 1, keys: [[a('c1b', .5), 26.7, 30.9, 3000], [a('c1c'), 26.5, 31.2, 2400]],
     over: (g, t) => G.counter(g, t, a('c1b', .5) + .1, a('c1c'), { to: 4, fmt: v => '≈' + Math.round(v) + '%', label: 'OF THE LAND', sub: 'Nile valley + delta · FAO', col: COL.green }) });
-  T(a('c1c'), a('c1c', .48), { type: 'photo', img: 'desert_western', from: [.35, .5, 1.12], to: [.6, .5, 1.02], lower: ['THE SAHARA', 'Western Desert, Egypt'], credit: 'Photo: Vyacheslav Argenberg, CC BY 4.0' });
+  T(a('c1c'), a('c1c', .48), { type: 'photo', img: 'desert_western', from: [.35, .5, 1.12], to: [.6, .5, 1.02], amb: 'desert', lower: ['THE SAHARA', 'Western Desert, Egypt'], credit: 'Photo: Vyacheslav Argenberg, CC BY 4.0' });
   T(a('c1c', .48), a('c1d'), { type: 'graphic', draw: rainGraphic });
-  T(a('c1d'), a('c1e'), { type: 'photo', img: 'felucca_aswan', from: [.45, .45, 1.18], to: [.52, .5, 1.04], credit: 'Photo: Vyacheslav Argenberg, CC BY 4.0',
+  T(a('c1d'), a('c1e'), { type: 'photo', img: 'felucca_aswan', amb: 'river', from: [.45, .45, 1.18], to: [.52, .5, 1.04], credit: 'Photo: Vyacheslav Argenberg, CC BY 4.0',
     over: (g, t) => G.counter(g, t, a('c1d', .25), a('c1e'), { to: 97, fmt: v => '≈' + Math.round(v) + '%', label: "OF EGYPT'S RENEWABLE WATER", sub: 'from the Nile · Nile Basin Initiative', col: COL.teal }) });
   T(a('c1e'), a('c1f'), { type: 'terrain', view: u => ({ x: 49.0 + 1.2 * u, y: 24 + 9 * eio(u), h: 1.1, tx: 49.6, ty: 50 + 6 * u, th: .1, sunAz: 250, sunEl: 15, haze: 55 }),
     lower: ['THE NILE VALLEY NEAR QENA', '3D: NASADEM elevation ×3 · Landsat 9, 2025'] });
@@ -90,10 +90,9 @@ export function setup(timing, ch, g) {
   for (const S of SHOTS) if (S.keys) { const K = S.keys.map(([t, la, lo, d]) => [t, [la, lo, Math.log10(d)]]); const tr = track(K); S.cam = t => { const [la, lo, ld] = tr(t); return makeCamera({ lat: la, lon: lo, d: Math.pow(10, ld), fov: 32 }, W, H); }; }
   SUBS = C.lines.map((L, i) => ({ t0: L.t - .05, t1: Math.min((C.lines[i + 1]?.t ?? DUR) - .1, Math.max(L.t + 1.8, L.t + L.d + .5)), text: L.text }));
   EV = C.lines.map(L => ({ t: L.t, type: 'voice', id: L.id }));
-  SHOTS.forEach((S, i) => { if (i) EV.push({ t: S.t0 - .25, type: 'cut', kind: S.type }); });
+  SHOTS.forEach(S => { if (S.amb) EV.push({ t: S.t0, type: 'amb', name: S.amb, dur: S.t1 - S.t0 }); });   // place sound only under its own shot; cuts are silent
   EV.push({ t: .2, type: 'card' });
   EV.push({ t: at('c1b') + .2, type: 'reading', heavy: 1 }, { t: at('c1b', .5) + .2, type: 'reading', heavy: 0 }, { t: at('c1d', .25) + .2, type: 'reading', heavy: 0 }, { t: at('c1g', .1) + 1.6, type: 'reading', heavy: 1 }, { t: at('c1h', .55), type: 'reading', heavy: 0 });
-  EV.push({ t: at('c1f'), type: 'dive', dur: at('c1f', .9) - at('c1f') }, { t: at('c1f', .4), type: 'stamp' });
 }
 export const dur = () => DUR, events = () => EV;
 const XF = .5;   // crossfade length

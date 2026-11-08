@@ -73,27 +73,15 @@ def bed_from(name, t0, t1, g, pan=0.0, fade=1.5):
 WHOOSH, SWOOSH = 'whoosh/air_woosh_mixkit1489.mp3', 'whoosh/transition_windy_swoosh_mixkit1474.mp3'
 HIT, LOGO = 'impact/movie_impact_intro_presentation_mixkit2902.mp3', 'impact/movie_logo_intro_impact_mixkit2900.mp3'
 DESERT, RIVER, SEA, CITY = 'ambience/desert_ambience_mixkit2495.mp3', 'ambience/river_water_flowing_mixkit2454.mp3', 'ambience/sea_waves_ambience_mixkit1189.mp3', 'ambience/city_traffic_ambience_mixkit2931.mp3'
-first = lambda ty: next((e for e in EV if e['type'] == ty), None)
+# Documentary rule: cuts and camera moves are silent; music and voice carry the edit. Only two kinds of sound:
+#   a soft timpani note when a key number lands, and a place sound under the photo of that place (quiet, faded).
+AMB = {'desert': DESERT, 'river': RIVER, 'sea': SEA, 'city': CITY}
 for e in EV:
     t, ty = e['t'], e['type']
-    if ty == 'card': put(fol, clip(SWOOSH), t, .35, .1)
-    elif ty == 'cut': put(fol, clip(WHOOSH, 1.6, .5), t - .2, .16 if e.get('kind') in ('photo', 'graphic') else .22, .2 * (1 if int(t) % 2 else -1))
-    elif ty == 'title': put(fol, clip(LOGO, 4.0, 1.2), t, .5); put(mus, S.note('vibraphone', 86, 2.5, vel=.45), t + .3, .4, .2)
-    elif ty == 'reading':
-        if e['heavy']: put(fol, clip(HIT, 2.2, .8), t - .05, .42); put(mus, S.note('timpani', 'D2', 1.5, vel=.6), t, .6)
-        else: put(mus, S.note('timpani', 'D2', 1.2, vel=.4), t, .45)
-    elif ty in ('dive', 'climb'): put(fol, clip(WHOOSH), t + max(0, e['dur'] * .5 - .9), .3, -.1 if ty == 'dive' else .1)
-    elif ty == 'scan': put(fol, clip(WHOOSH, 1.8), t, .18, .3)
-    elif ty == 'glass': put(mus, S.note('vibraphone', 86, 2.5, vel=.45), t, .4, -.3)
-    elif ty == 'suckout': suck.append(t)
-    elif ty == 'photo': put(fol, clip('paper/paper_slide_mixkit1530.mp3', 1.2, .3), t, .28, .35)
-    elif ty == 'flood': bed_from(RIVER, t - .5, t + e['dur'] + 2.5, 1.0, -.1, 1.2)
-# places, quietly under the voice
-dv = first('dive'); cl = [e for e in EV if e['type'] == 'climb']
-if CH == 1: bed_from(DESERT, 0, DUR, .55)
-if CH == 3 and dv: bed_from(SEA, dv['t'] + 1, (cl[-1]['t'] + 1.5) if cl else DUR, 1.0)
-if CH == 4 and dv: bed_from(CITY, dv['t'] + .5, DUR, .7)
-if CH == 5: st = first('stamp'); bed_from(DESERT, st['t'] if st else 2, DUR, .8)
+    if ty == 'reading': put(mus, S.note('timpani', 'D2', 1.4, vel=.5 if e.get('heavy') else .35), t, .5 if e.get('heavy') else .35)
+    elif ty == 'amb': bed_from(AMB[e['name']], t - .3, t + e['dur'] + .5, .6, 0, .8)
+    elif ty == 'title': put(mus, S.note('timpani', 'D2', 2.0, vel=.55), t, .55)
+mus = S.room(mus, size=.45, mix=.18)
 # ———— voice ————
 for e in EV:
     if e['type'] != 'voice': continue
