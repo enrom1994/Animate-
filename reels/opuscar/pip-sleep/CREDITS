@@ -1,0 +1,11 @@
+Why Do Cats Sleep So Much? — Pip & Biscuit (crayon picture-book test)
+
+Style: Crayon Picture Book, from Lemo-Opuscar by Lemomo (github.com/lemomo-ai/lemo-opuscar).
+  Drawing engine (gl.js, crayon.js, rig.js) copied from the style's demo and adapted to 9:16. Code: MIT.
+  If this film is published, the description should credit: "Style: Lemo-Opuscar by Lemomo (CC BY 4.0)".
+Voice: Kokoro-82M (Apache-2.0), voice af_heart, pitched for Pip.
+Music samples (CC0, no attribution required): FreePats project (ukulele), VS Chamber Orchestra Community Edition
+  (clarinet, bassoon) and Versilian Community Sample Library (glockenspiel, recorder, woodblock, shaker), via the
+  library's sampler.py. Music box: physically modelled (pluck.py).
+Fonts: Patrick Hand, Gaegu (SIL Open Font License 1.1; licence texts in fonts/).
+Foley and ambience: synthesized in code (core/audio/sfx.py and mix.py).

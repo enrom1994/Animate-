@@ -28,3 +28,6 @@ reels/**/_pool/
 reels/**/seg/
 reels/**/stills/
 reels/**/silent.mp4
+.claude/kit/lemo-opuscar/
+reels/**/out/
+reels/opuscar/**/voices/*.wav
