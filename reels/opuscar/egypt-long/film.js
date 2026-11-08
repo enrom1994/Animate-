@@ -62,7 +62,7 @@ const swapLat = (bb, t, t0, dt = 1.6) => t < t0 ? bb[3] + .05 : lerp(bb[3] + .05
 export function shaderState(t, ch) {
   const cam = cameraAt(t), alt = cam.alt;
   const s = { bE: EGB, b1: PLATES[SLOT_BB[ch]?.[0] ?? 'qena'], b2: PLATES[SLOT_BB[ch]?.[1] ?? 'qena'], uExpo: 1.04, uAtm: clamp((alt - 1500) / 3000), uShade: clamp((alt - 1500) / 4000),
-    uDet1: clamp((700 - alt) / 500), uDet2: clamp((700 - alt) / 500), uSwap1: 90, uSwap2: 90, uNightA: 0, uNightB: 0, uScanLat: 60 };
+    uDet1: clamp((300 - alt) / 200), uDet2: clamp((300 - alt) / 200), uSwap1: 90, uSwap2: 90, uNightA: 0, uNightB: 0, uScanLat: 60 };
   const card = C.card && t < C.card ? 1 : 0; s.uDim = card ? .5 * (1 - pr(t, C.card - .5, C.card)) : 0;
   if (ch === 0) { s.uNightA = s.uNightB = 1; s.uOutline = pr(t, at('c0b'), at('c0b') + 1.2); s.uDim = t > at('c0d', 1) ? pr(t, at('c0d', 1), at('c0d', 1) + .8) * .5 : 0; }
   if (ch === 1) { const g0 = at('c1c'); s.uGrey = eo(pr(t, g0, g0 + 1.4)) * .92; s.uKeep = pr(t, at('c1e'), at('c1e') + 1.4); }
