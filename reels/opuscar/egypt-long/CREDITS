@@ -10,3 +10,20 @@ Voice: Kokoro-82M (Apache-2.0), voice bm_george.
 Music samples (CC0): VS Chamber Orchestra Community Edition and Versilian Community Sample Library (vibraphone, timpani, trombone,
   tuba, gran cassa, suspended cymbal) via the library's sampler.py. Synth parts and foley: in code.
 Fonts (SIL OFL 1.1): Barlow, Barlow Condensed, IBM Plex Mono, IBM Plex Serif.
+
+Archive photos (shown as prints with caption + source on screen):
+  ph_cairo_2003: Earth observations taken by the Expedition Seven crew | https://images.nasa.gov/details/iss007e12914 | NASA media: generally not copyrighted (US government work); no NASA endorsement implied
+  ph_cairo_night: Cairo and Alexandria, Egypt at Night (NASA, International Space Station Science, 10:28:10) | https://images.nasa.gov/details/GSFC_20171208_Archive_e001998 | NASA media: generally not copyrighted (US government work); no NASA endorsement implied
+  ph_cairo_street_1903: Street life in Cairo, Egypt | http://www.loc.gov/item/2019639366/ | Library of Congress Prints & Photographs: No known restrictions on publication.
+  ph_inundation_1900: The inundation of the Nile, Egypt | http://www.loc.gov/item/2002699574/ | Library of Congress Prints & Photographs: No known restrictions on publication.
+  ph_inundation_1905: Inundation of the Nile, Egypt | http://www.loc.gov/item/2002699577/ | Library of Congress Prints & Photographs: No known restrictions on publication.
+  ph_nasser_1968: Lake Nasser on Nile River in Egypt as seen from the Apollo 7 spacecraft | https://images.nasa.gov/details/as07-11-1999 | NASA media: generally not copyrighted (US government work); no NASA endorsement implied
+  ph_nasser_2025: Lake Nasser, created by the Aswan High Dam in southern Egypt | https://images.nasa.gov/details/iss073e0879542 | NASA media: generally not copyrighted (US government work); no NASA endorsement implied
+  ph_shaduf_1899: A lone shaduf irrigating the fields, Egypt | http://www.loc.gov/item/2019637445/ | Library of Congress Prints & Photographs: No known restrictions on publication.
+  ph_toshka_2005: Earth observations taken by the Expedition 12 crew | https://images.nasa.gov/details/iss012e11654 | NASA media: generally not copyrighted (US government work); no NASA endorsement implied
+  ph_toshka_farms: Agricultural activity supported by the Toshka Lakes in Egypt | https://images.nasa.gov/details/iss072e574769 | NASA media: generally not copyrighted (US government work); no NASA endorsement implied
+  Library of Congress stereographs (Keystone View Co., Underwood & Underwood, Strohmeyer & Wyman, 1899-1903) are cropped to one
+  half of the card. LoC marks them "No known restrictions on publication"; they were published before 1930, so they are in the
+  US public domain. NASA photos: not copyrighted (US government work); no NASA endorsement is implied.
+Sound effects: real recordings from Mixkit (free licence for videos): air woosh, transition windy swoosh, movie impact intro
+  presentation, movie logo intro impact, paper slide, desert ambience, river water flowing, sea waves ambience, city traffic ambience.
