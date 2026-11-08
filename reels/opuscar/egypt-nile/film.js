@@ -12,13 +12,13 @@ const back = (x, s = 2.2) => { x = clamp(x) - 1; return 1 + x * x * ((s + 1) * x
 export const LINES = [
   { id: 'n01', t: 0.6, d: 3.785, text: 'Egypt is bigger than France and Germany put together.' },
   { id: 'n02', t: 5.0, d: 2.378, text: 'But look at it from space, at night.' },
-  { id: 'n03', t: 9.2, d: 3.445, text: 'Almost everyone lives on this one thin line.' },
-  { id: 'n04', t: 13.2, d: 4.268, text: 'About 95% of Egyptians live along the Nile.' },
+  { id: 'n03', t: 9.2, d: 3.362, text: 'Almost everyone lives on this one thin line.' },
+  { id: 'n04', t: 13.2, d: 4.285, text: 'About 95% of Egyptians live along the Nile.' },
   { id: 'n05', t: 18.0, d: 4.451, text: 'More than 100 million people, on roughly 4% of the land.' },
   { id: 'n06', t: 23.2, d: 4.962, text: 'The rest is the Sahara. In most of the country, it almost never rains.' },
   { id: 'n07', t: 28.8, d: 4.671, text: 'So every field, every town, every city depends on one river.' },
   { id: 'n08', t: 34.6, d: 4.309, text: 'Here, the whole green strip is only about 8 km wide.' },
-  { id: 'n09', t: 40.0, d: 5.66, text: 'Then the river fans out into the delta, where roughly half of all Egyptians live.' },
+  { id: 'n09', t: 40.0, d: 5.619, text: 'Then the river fans out into the delta, where roughly half of all Egyptians live.' },
   { id: 'n10', t: 46.4, d: 2.962, text: 'And Cairo sits right where the valley opens.' },
   { id: 'n11', t: 50.6, d: 2.635, text: 'One river. A hundred million people.' },
 ];

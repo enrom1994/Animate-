@@ -9,12 +9,32 @@
  },
  {
   "id": "n03",
-  "text": "Almost everyone lives on this one thin line."
+  "text": "Almost everyone lives on this one thin line.",
+  "fix": [
+   [
+    "lˈaɪvz",
+    "lˈɪvz"
+   ],
+   [
+    "lˈaɪv",
+    "lˈɪv"
+   ]
+  ]
  },
  {
   "id": "n04",
   "text": "About ninety-five percent of Egyptians live along the Nile.",
-  "sub": "About 95% of Egyptians live along the Nile."
+  "sub": "About 95% of Egyptians live along the Nile.",
+  "fix": [
+   [
+    "lˈaɪvz",
+    "lˈɪvz"
+   ],
+   [
+    "lˈaɪv",
+    "lˈɪv"
+   ]
+  ]
  },
  {
   "id": "n05",
@@ -36,7 +56,17 @@
  },
  {
   "id": "n09",
-  "text": "Then the river fans out into the delta, where roughly half of all Egyptians live."
+  "text": "Then the river fans out into the delta, where roughly half of all Egyptians live.",
+  "fix": [
+   [
+    "lˈaɪvz",
+    "lˈɪvz"
+   ],
+   [
+    "lˈaɪv",
+    "lˈɪv"
+   ]
+  ]
  },
  {
   "id": "n10",
