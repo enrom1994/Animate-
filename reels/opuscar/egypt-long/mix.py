@@ -2,7 +2,7 @@
 # Reads out/events_<ch>.json (from film.js) and voices/*.wav. Run from the library root with its Python:
 #   cd $LIB && .venv/bin/python <project>/mix.py <ch>
 # Palette (Satellite Briefing §7): pulse bass with harmonics, detuned-saw pad, timpani + low brass on the key readings,
-# FM pings, noise scans, servo whines, ratchets; one wet timbre (vibraphone) for the turns.
+# real recorded whooshes, hits and place ambiences (Mixkit); no hiss beds; one wet timbre (vibraphone) for the turns.
 import sys, os, json, numpy as np, soundfile as sf
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, os.getcwd())
 from core.audio import sampler as S
@@ -52,31 +52,46 @@ while t < DUR - .2:
     t += BAR; b += 1
 if CH in (0, 6):
     for j, m in enumerate([74, 77, 81, 79, 77, 74]): put(mus, S.note('vibraphone', m, 1.8, vel=.45), 1.0 + j * E8 * 3, .5, .25)
-# ———— events ————
 suck = []
+# ———— real recorded sounds (Mixkit, via .claude/kit/sfx/library; checked with earshot) ————
+import subprocess, functools
+LIB = os.path.realpath(os.path.join(HERE, '..', '..', '..', '.claude', 'kit', 'sfx', 'library'))
+@functools.lru_cache(None)
+def rec(name):
+    raw = subprocess.run(['ffmpeg', '-v', 'error', '-i', f'{LIB}/{name}', '-f', 'f32le', '-ac', '1', '-ar', str(SR), '-'], capture_output=True, check=True).stdout
+    return np.frombuffer(raw, np.float32).copy()
+def clip(name, d=None, fade=.4):
+    x = rec(name); x = x[:int(d * SR)] if d else x; n = min(len(x), int(fade * SR))
+    if n: x = x.copy(); x[-n:] *= np.linspace(1, 0, n)
+    return x / (np.abs(x).max() + 1e-9)
+def bed_from(name, t0, t1, g, pan=0.0, fade=1.5):
+    d = max(.5, t1 - t0); x = rec(name)
+    while len(x) < d * SR: x = np.concatenate([x, rec(name)])
+    x = x[:int(d * SR)].copy(); n = min(len(x) // 2, int(fade * SR)); x[:n] *= np.linspace(0, 1, n); x[-n:] *= np.linspace(1, 0, n)
+    x = X.lp(x, 3500, 2)                                         # no hiss: the top end of wind and surf is cut
+    put(bed, x / (np.sqrt(np.mean(x ** 2)) + 1e-9) * .025, t0, g, pan)
+WHOOSH, SWOOSH = 'whoosh/air_woosh_mixkit1489.mp3', 'whoosh/transition_windy_swoosh_mixkit1474.mp3'
+HIT, LOGO = 'impact/movie_impact_intro_presentation_mixkit2902.mp3', 'impact/movie_logo_intro_impact_mixkit2900.mp3'
+DESERT, RIVER, SEA, CITY = 'ambience/desert_ambience_mixkit2495.mp3', 'ambience/river_water_flowing_mixkit2454.mp3', 'ambience/sea_waves_ambience_mixkit1189.mp3', 'ambience/city_traffic_ambience_mixkit2931.mp3'
+first = lambda ty: next((e for e in EV if e['type'] == ty), None)
 for e in EV:
     t, ty = e['t'], e['type']
-    if ty == 'orbit': put(bed, X.lp(X.noise(e['dur']), 160) * .45 * np.minimum(1, tt(e['dur']) / 1.0) * np.minimum(1, (e['dur'] - tt(e['dur'])) / 1.2), t, .8)
-    elif ty == 'card': put(mus, S.hit('gran_cassa', None, .7), t, .8); put(mus, S.hit('sus_cymbal', None, .35), t, .4, .2)
-    elif ty == 'lock': put(fol, ping(1760), t, .8); put(fol, ping(2640, .5), t + .09, .45, .2)
-    elif ty == 'title': put(mus, S.note('timpani', 'D2', 2.0, vel=.75), t, .9); put(mus, S.note('trombone', 'D3', .7, vel=.6), t, .45, -.1); put(mus, S.note('vibraphone', 86, 2.5, vel=.5), t + .3, .45, .2)
-    elif ty == 'scan': put(fol, scan(e['dur'] + .3, down=e['dir'] > 0), t - .1, .8)
-    elif ty == 'glass': put(mus, S.note('vibraphone', 86, 2.5, vel=.55), t, .5, -.3)
-    elif ty == 'ticks': [put(fol, tick(), t + k * e['dur'] / 10, .55, .4 - .08 * k) for k in range(10)]
+    if ty == 'card': put(fol, clip(SWOOSH), t, .35, .1)
+    elif ty == 'title': put(fol, clip(LOGO, 4.0, 1.2), t, .5); put(mus, S.note('vibraphone', 86, 2.5, vel=.45), t + .3, .4, .2)
     elif ty == 'reading':
-        put(mus, S.note('timpani', 'D2', 1.5, vel=.8 if e['heavy'] else .5), t, 1.0 if e['heavy'] else .65)
-        if e['heavy']: put(mus, S.note('trombone', 'D3', .5, vel=.75), t, .55, -.1); put(mus, S.note('tuba', 'D2', .5, vel=.7), t, .45, .1)
-        put(fol, ping(2200, .4), t, .5, .3)
-    elif ty == 'servo': put(fol, servo(e['dur']), t, .9, -.2)
-    elif ty == 'dive': put(fol, riser(e['dur']), t, .7); put(fol, servo(e['dur'], up=False), t, .8, .2)
-    elif ty == 'climb': put(fol, X.whoosh(min(1.6, e['dur']), .7), t, .5); put(fol, servo(e['dur'], up=True), t, .6, -.2)
-    elif ty == 'ratchet': [put(fol, X.click(1.3, .5), t + k * e['dur'] / 9, .55, -.3 + .07 * k) for k in range(9)]
-    elif ty == 'stamp': put(fol, tick(1.2), t, .6, .5); put(fol, ping(3100, .3), t + .05, .35, .5)
-    elif ty == 'flood': d = e['dur']; put(mus, pad([45, 52, 57, 60], d + 1.5, 1.3, 700), t, 1, 0); put(bed, X.lp(X.noise(d + 1), 500) * .25 * np.sin(np.pi * tt(d + 1) / (d + 1)), t, 1, -.2)
+        if e['heavy']: put(fol, clip(HIT, 2.2, .8), t - .05, .42); put(mus, S.note('timpani', 'D2', 1.5, vel=.6), t, .6)
+        else: put(mus, S.note('timpani', 'D2', 1.2, vel=.4), t, .45)
+    elif ty in ('dive', 'climb'): put(fol, clip(WHOOSH), t + max(0, e['dur'] * .5 - .9), .3, -.1 if ty == 'dive' else .1)
+    elif ty == 'scan': put(fol, clip(WHOOSH, 1.8), t, .18, .3)
+    elif ty == 'glass': put(mus, S.note('vibraphone', 86, 2.5, vel=.45), t, .4, -.3)
     elif ty == 'suckout': suck.append(t)
-put(bed, X.hp(X.noise(DUR + .2), 3000) * .013, 0, 1)
-mus = S.room(mus, size=.45, mix=.18)
-for s0 in suck: i0, i1 = int(s0 * SR), int((s0 + .4) * SR); mus[i0:i1] *= .06; fol[i0:i1] *= .06
+    elif ty == 'flood': bed_from(RIVER, t - .5, t + e['dur'] + 2.5, 1.0, -.1, 1.2)
+# places, quietly under the voice
+dv = first('dive'); cl = [e for e in EV if e['type'] == 'climb']
+if CH == 1 and dv: bed_from(DESERT, dv['t'] + 1, DUR, .8)
+if CH == 3 and dv: bed_from(SEA, dv['t'] + 1, (cl[-1]['t'] + 1.5) if cl else DUR, 1.0)
+if CH == 4 and dv: bed_from(CITY, dv['t'] + .5, DUR, .7)
+if CH == 5: st = first('stamp'); bed_from(DESERT, st['t'] if st else 2, DUR, .8)
 # ———— voice ————
 for e in EV:
     if e['type'] != 'voice': continue

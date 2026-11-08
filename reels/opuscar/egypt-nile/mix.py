@@ -68,30 +68,44 @@ section(cue['outro'], DUR, pulse_on=False, pad_v=1.0, cut=1300)
 for j, m in enumerate([74, 77, 81, 86]): put(mus, S.note('vibraphone', m, 2.2, vel=.45), cue['outro'] + .3 + j * E8 * 3, .5, .2)
 # measure: near-silence while the line grows; the reading lands on a pitched hit
 mus[int((cue['measure'] - .6) * SR): int((cue['north'] + .2) * SR)] *= .25
-# ———— events ————
+suck = []
+# ———— real recorded sounds (Mixkit, via .claude/kit/sfx/library; checked with earshot) ————
+import subprocess, functools
+LIB = os.path.realpath(os.path.join(HERE, '..', '..', '..', '.claude', 'kit', 'sfx', 'library'))
+@functools.lru_cache(None)
+def rec(name):
+    raw = subprocess.run(['ffmpeg', '-v', 'error', '-i', f'{LIB}/{name}', '-f', 'f32le', '-ac', '1', '-ar', str(SR), '-'], capture_output=True, check=True).stdout
+    return np.frombuffer(raw, np.float32).copy()
+def clip(name, d=None, fade=.4):
+    x = rec(name); x = x[:int(d * SR)] if d else x; n = min(len(x), int(fade * SR))
+    if n: x = x.copy(); x[-n:] *= np.linspace(1, 0, n)
+    return x / (np.abs(x).max() + 1e-9)
+def bed_from(name, t0, t1, g, pan=0.0, fade=1.5):
+    d = max(.5, t1 - t0); x = rec(name)
+    while len(x) < d * SR: x = np.concatenate([x, rec(name)])
+    x = x[:int(d * SR)].copy(); n = min(len(x) // 2, int(fade * SR)); x[:n] *= np.linspace(0, 1, n); x[-n:] *= np.linspace(1, 0, n)
+    x = X.lp(x, 3500, 2)                                         # no hiss: the top end of wind and surf is cut
+    put(bed, x / (np.sqrt(np.mean(x ** 2)) + 1e-9) * .025, t0, g, pan)
+WHOOSH, SWOOSH = 'whoosh/air_woosh_mixkit1489.mp3', 'whoosh/transition_windy_swoosh_mixkit1474.mp3'
+HIT, LOGO = 'impact/movie_impact_intro_presentation_mixkit2902.mp3', 'impact/movie_logo_intro_impact_mixkit2900.mp3'
+DESERT, RIVER, SEA, CITY = 'ambience/desert_ambience_mixkit2495.mp3', 'ambience/river_water_flowing_mixkit2454.mp3', 'ambience/sea_waves_ambience_mixkit1189.mp3', 'ambience/city_traffic_ambience_mixkit2931.mp3'
+first = lambda ty: next((e for e in EV if e['type'] == ty), None)
 for e in EV:
     t, ty = e['t'], e['type']
-    if ty == 'orbit': put(bed, X.lp(X.noise(e['dur']), 160) * .5 * np.minimum(1, tt(e['dur']) / 1.0) * np.minimum(1, (e['dur'] - tt(e['dur'])) / 1.2), t, .8)
-    elif ty == 'search': [put(fol, tick(.6), t + k * .22, .5, .2 * (-1) ** k) for k in range(6)]
-    elif ty == 'lock': put(fol, ping(1760), t, .9, 0); put(fol, ping(2640, .5), t + .09, .5, .2)
-    elif ty == 'scan': put(fol, scan(e['dur'] + .3, down=e['dir'] > 0), t - .1, .8, 0)
-    elif ty == 'glass': put(mus, S.note('vibraphone', 86, 2.5, vel=.55), t, .5, -.3)
-    elif ty == 'ticks': [put(fol, tick(), t + k * e['dur'] / 10, .55, .4 - .08 * k) for k in range(10)]
+    if ty == 'card': put(fol, clip(SWOOSH), t, .35, .1)
+    elif ty == 'title': put(fol, clip(LOGO, 4.0, 1.2), t, .5); put(mus, S.note('vibraphone', 86, 2.5, vel=.45), t + .3, .4, .2)
     elif ty == 'reading':
-        put(mus, S.note('timpani', 'D2', 1.5, vel=.8 if e['heavy'] else .55), t, 1.0 if e['heavy'] else .7, 0)
-        if e['heavy']: put(mus, S.note('trombone', 'D3', .5, vel=.75), t, .55, -.1); put(mus, S.note('tuba', 'D2', .5, vel=.7), t, .45, .1)
-        put(fol, ping(2200, .4), t, .5, .3)
-    elif ty == 'servo': put(fol, servo(e['dur']), t, .9, -.2)
-    elif ty == 'dive': put(fol, riser(e['dur']), t, .7, 0); put(fol, servo(e['dur'], up=False), t, .8, .2)
-    elif ty == 'suckout': pass
-    elif ty == 'ratchet': [put(fol, X.click(1.3, .5), t + k * e['dur'] / 9, .55, -.3 + .07 * k) for k in range(9)]
-    elif ty == 'climb': put(fol, X.whoosh(min(1.6, e['dur']), .7), t, .5, 0); put(fol, servo(e['dur'], up=True), t, .6, -.2)
-    elif ty == 'card': put(mus, S.hit('gran_cassa', None, .8), t, .9, 0); put(mus, S.note('sus_cymbal', None, 3.0, vel=.4) if False else S.hit('sus_cymbal', None, .45), t, .5, .2); put(fol, ping(1760), t + .3, .7, 0)
-    elif ty == 'end': pass
-# ambience: faint radio hiss under everything; wind over the desert section
-put(bed, X.hp(X.noise(DUR), 3000) * .015, 0, 1)
-d = cue['dive'] - cue['rain']; put(bed, X.bp(X.noise(d), 200, 900) * .12 * np.sin(np.pi * tt(d) / d), cue['rain'], 1, -.3)
+        if e['heavy']: put(fol, clip(HIT, 2.2, .8), t - .05, .42); put(mus, S.note('timpani', 'D2', 1.5, vel=.6), t, .6)
+        else: put(mus, S.note('timpani', 'D2', 1.2, vel=.4), t, .45)
+    elif ty in ('dive', 'climb'): put(fol, clip(WHOOSH), t + max(0, e['dur'] * .5 - .9), .3, -.1 if ty == 'dive' else .1)
+    elif ty == 'scan': put(fol, clip(WHOOSH, 1.8), t, .18, .3)
+    elif ty == 'glass': put(mus, S.note('vibraphone', 86, 2.5, vel=.45), t, .4, -.3)
+    elif ty == 'suckout': suck.append(t)
+    elif ty == 'flood': bed_from(RIVER, t - .5, t + e['dur'] + 2.5, 1.0, -.1, 1.2)
+dv = first('dive')
+if dv: bed_from(DESERT, dv['t'] + 1, 40.0, .8)
 mus = S.room(mus, size=.45, mix=.18)
+for s0 in suck: i0, i1 = int(s0 * SR), int((s0 + .4) * SR); mus[i0:i1] *= .06; fol[i0:i1] *= .06
 
 # ———— voice: compress, then a calm, close analyst ————
 for e in EV:
