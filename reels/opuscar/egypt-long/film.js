@@ -73,6 +73,7 @@ export function shaderState(t, ch) {
     s.uSwap2 = swapLat(PLATES.toshka, t, at('c5f')); s.uSwapOn2 = t > at('c5f') && t < at('c5f') + 1.8 ? 1 : 0; }
   if (ch === 6) { s.uNightA = 0; s.uNightB = 1; s.uScanLat = lerp(40, -50, pr(t, at('c6a'), at('c6a') + 3)); s.uScanOn = t > at('c6a') && t < at('c6a') + 3.2 ? 1 : 0;
     s.uDim = t > at('c6b', 1) ? pr(t, at('c6b', 1), at('c6b', 1) + .8) * .5 : 0; }
+  s.uDim = Math.max(s.uDim || 0, photoDim(t));
   return s;
 }
 
@@ -92,6 +93,7 @@ export function events(ch) {
     ev(at('c4g', .3), 'glass'); R('c4g', .5, 1); }
   if (ch === 5) { ev(.6, 'climb', { dur: 2.5 }); ev(at('c5b'), 'stamp'); ev(at('c5c'), 'scan', { dur: 1.6, dir: 1 }); ev(at('c5c'), 'stamp'); ev(at('c5c', .5), 'lock');
     ev(at('c5d', .1), 'climb', { dur: 3 }); ev(at('c5e', .2), 'stamp'); ev(at('c5f'), 'scan', { dur: 1.6, dir: 1 }); ev(at('c5f'), 'stamp'); R('c5f', .6); ev(at('c5g', .2), 'lock'); }
+  (PHOTOS[ch] || []).forEach(p => ev(at(...p.from), 'photo'));
   if (ch === 6) { ev(0, 'orbit', { dur: DUR }); ev(at('c6a'), 'scan', { dur: 3, dir: 1 }); ev(at('c6a'), 'glass'); ev(at('c6b', 1) + .2, 'title'); }
   return EV;
 }
@@ -136,6 +138,35 @@ function range(g, cam, A, B, km, t0, t1, t, label, note) {
 function card(g, t, title) {
   const k = pr(t, .1, .6), a = pr(t, .3, .8) * (1 - pr(t, C.card - .5, C.card)); brackets(g, W / 2, H / 2 - 20, 300 * (1 - .1 * (1 - k)), k * (1 - pr(t, C.card - .4, C.card)), CL.read);
   txt(g, title, W / 2, H / 2, '400 76px "IBM Plex Serif"', CL.mark, 'center', a);
+}
+
+
+// —— archive photos (public domain: NASA; Library of Congress "no known restrictions"), shown as prints over the dimmed map ——
+export const PHOTOS = {
+  0: [{ img: 'ph_cairo_night', from: ['c0c', 0], to: ['c0d', .55], cap: 'CAIRO AND THE NILE AT NIGHT · from the International Space Station', credit: 'NASA' }],
+  1: [{ img: 'ph_shaduf_1899', from: ['c1e', 0], to: ['c1f', .05], cap: '1899 · a shaduf lifting Nile water onto the fields', credit: 'Library of Congress' }],
+  2: [{ img: 'ph_inundation_1900', from: ['c2b', .25], to: ['c2c', 1], cap: '1900 · the Nile in flood, Giza', credit: 'Library of Congress' },
+      { img: 'ph_nasser_1968', from: ['c2f', .35], to: ['c2f2', 0], cap: 'OCTOBER 1968 · Lake Nasser filling, seen from Apollo 7', credit: 'NASA' },
+      { img: 'ph_nasser_2025', from: ['c2f2', 0], to: ['c2g', .15], cap: '2025 · the drowned valleys of Lake Nasser, from the ISS', credit: 'NASA' }],
+  4: [{ img: 'ph_cairo_street_1903', from: ['c4a', 0], to: ['c4b', .15], cap: '1903 · street life in Cairo', credit: 'Library of Congress' }],
+  5: [{ img: 'ph_toshka_2005', from: ['c5e', .5], to: ['c5f', .4], cap: '2005 · the Toshka lakes, from the ISS', credit: 'NASA' },
+      { img: 'ph_toshka_farms', from: ['c5g', .35], to: [null, 0], cap: '2025 · farms watered from the Toshka lakes, from the ISS', credit: 'NASA' }],
+};
+let PH = [];
+export function setPhotos(imgs) { PH = (PHOTOS[C.ch] || []).map(p => ({ ...p, im: imgs[p.img], t0: at(...p.from), t1: p.to[0] ? at(...p.to) : DUR - .3 })); }
+export const photoDim = t => Math.max(0, ...PH.map(p => win(t, p.t0, p.t1, .5))) * .45;
+function photos(g, t) {
+  PH.forEach((p, i) => {
+    const k = win(t, p.t0, p.t1, .45); if (k <= 0 || !p.im) return;
+    const u = pr(t, p.t0, p.t1), ar = p.im.width / p.im.height, bh = ar < 1.2 ? 600 : 560, bw = Math.min(1000, bh * ar), cx = 1290, cy = 450;
+    g.save(); g.globalAlpha = k; g.translate(cx + 60 * (1 - eo(pr(t, p.t0, p.t0 + .6))), cy); g.rotate((i % 2 ? 1 : -1) * .018);
+    g.shadowColor = 'rgba(0,0,0,.55)'; g.shadowBlur = 40; g.shadowOffsetY = 14; g.fillStyle = '#ece8df'; g.fillRect(-bw / 2 - 16, -bh / 2 - 16, bw + 32, bh + 32); g.shadowColor = 'transparent';
+    g.beginPath(); g.rect(-bw / 2, -bh / 2, bw, bh); g.clip();
+    const s = 1.02 + .06 * u, sw = bw * s, sh = sw / ar < bh * s ? bh * s : sw / ar, sw2 = sh * ar;   // cover the box, slow push-in
+    g.drawImage(p.im, -sw2 / 2, -sh / 2, sw2, sh); g.restore();
+    txt(g, p.cap, cx - bw / 2 - 10, cy + bh / 2 + 62, '400 24px "IBM Plex Mono"', CL.mark, 'left', k);
+    txt(g, p.credit, cx - bw / 2 - 10, cy + bh / 2 + 94, '400 22px "IBM Plex Mono"', CL.dim, 'left', k);
+  });
 }
 
 export function overlay(g, t, cam, ch) {
@@ -207,6 +238,7 @@ export function overlay(g, t, cam, ch) {
       txt(g, '100 million people.', W / 2, H / 2 + 80, '300 96px "Barlow Condensed"', CL.read, 'center', pr(t, at('c6b', 1) + .7, at('c6b', 1) + 1.2));
       if (t > at('c6c')) txt(g, 'Which country next?  Tell us in the comments.', W / 2, H / 2 + 190, '400 30px "IBM Plex Mono"', CL.mark, 'center', pr(t, at('c6c'), at('c6c') + .5)); }
   }
+  photos(g, t);
   // instruments: altitude, scale bar, credit; the transcript strip
   txt(g, `ALT ${Math.round(cam.alt).toLocaleString('en-US')} km`, 70, 110, '400 28px "IBM Plex Mono"', CL.dim);
   const c0 = unproject(cam, W - 400, 900), c1 = unproject(cam, W - 80, 900);

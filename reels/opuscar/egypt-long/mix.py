@@ -85,6 +85,7 @@ for e in EV:
     elif ty == 'scan': put(fol, clip(WHOOSH, 1.8), t, .18, .3)
     elif ty == 'glass': put(mus, S.note('vibraphone', 86, 2.5, vel=.45), t, .4, -.3)
     elif ty == 'suckout': suck.append(t)
+    elif ty == 'photo': put(fol, clip('paper/paper_slide_mixkit1530.mp3', 1.2, .3), t, .28, .35)
     elif ty == 'flood': bed_from(RIVER, t - .5, t + e['dur'] + 2.5, 1.0, -.1, 1.2)
 # places, quietly under the voice
 dv = first('dive'); cl = [e for e in EV if e['type'] == 'climb']

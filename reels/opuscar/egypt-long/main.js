@@ -13,6 +13,8 @@ for (const [i, [a, b, o]] of F.CH_PLATES[ch].entries()) { imgs[`t${i + 1}A`] = a
 const globe = makeGlobe(document.getElementById('gl'), imgs);
 const g = document.getElementById('ov').getContext('2d');
 F.setup(timing, ch, g);
+const ph = {}; for (const p of (F.PHOTOS[ch] || [])) ph[p.img] = await load(`assets/photos/${p.img}.jpg`);
+F.setPhotos(ph);
 window.DUR = F.dur(); window.EV = F.events(ch); window.SUBS = F.SUBS;
 window.render = t => { const cam = F.cameraAt(t); globe(cam, F.shaderState(t, ch)); F.overlay(g, t, cam, ch); };
 window.READY = true;
