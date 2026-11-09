@@ -1,54 +1,99 @@
-"""YouTube thumbnail: the ChatGPT-made illustration on the left (the dam is illustrative), REAL Landsat on the right
-(the same canyon, 9 Feb 2020 vs 8 Jan 2026; water = MNDWI > 0, tinted blue so it reads at phone size).
+"""YouTube thumbnail in the layout of the ChatGPT design (assets/thumb/chatgpt.png): its dam illustration on the left,
+headline in Roboto Condensed Black on a yellow brush stroke, and REAL Landsat on the right in place of its invented panels
+(the same window at the same scale, 9 Feb 2020 vs 8 Jan 2026; water = MNDWI > 0, grown 2 px and tinted blue to read at phone size).
 usage: python3 -I tools/thumb.py   → thumbnail.jpg (1280×720)"""
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont, ImageFilter
-W, H = 1600, 900
-src = Image.open('assets/thumb/chatgpt.png').convert('RGB')
-sw, sh = src.size
-# the illustration above its own text (y < 566 of 941), scaled to fill the top band
-TOP = 560
-ill = src.crop((0, 0, int(sw * .66), int(566 / 941 * sh)))
-ill = ill.resize((int(ill.width * TOP / ill.height), TOP), Image.LANCZOS)
-img = Image.new('RGB', (W, H), (10, 16, 30)); img.paste(ill, (0, 0))
+from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageChops
+T = 'assets/thumb/'
+img = Image.open(T + 'chatgpt.png').convert('RGB'); W, H = img.size        # 1672×941: work in the design's own pixels
+rng = np.random.default_rng(7)
+Y = (252, 204, 10)
 
-def landsat(year, box):
+# —— 1. cover the design's own headline (left of the panels): darkened, blurred mirror of the water above it
+cut = 584
+band = img.crop((0, 2 * cut - H, W, cut)).transpose(Image.FLIP_TOP_BOTTOM).filter(ImageFilter.GaussianBlur(14))
+g = np.linspace(.55, .12, H - cut)[:, None, None]
+band = Image.fromarray((np.array(band, np.float32) * g + np.array([8, 14, 28]) * (1 - g)).astype(np.uint8))
+img.paste(band, (0, cut))
+fade = Image.new('L', (W, 40)); fade.putdata([int(255 * y / 39) for y in range(40) for _ in range(W)])
+img.paste(band.crop((0, 0, W, 40)), (0, cut - 40), fade)
+
+# —— 2. real Landsat panels
+def landsat(year):
     z = np.load(f'assets/raw/res_{year}.npz'); b = z['bands'].astype(np.float32) * 2.75e-5 - .2
-    x0, y0, x1, y1 = box; b = b[:, y0:y1, x0:x1]
-    rgb = np.stack([b[0], b[1], b[2]], -1)
-    lo, hi = np.percentile(rgb, 1), np.percentile(rgb, 99.5)
+    rgb = np.stack([b[0], b[1], b[2]], -1); v = z['valid']
+    lo, hi = np.percentile(rgb[v], 1), np.percentile(rgb[v], 99.5)
     out = np.clip((rgb - lo) / (hi - lo), 0, 1) ** .85
     L = out.mean(-1, keepdims=True); out = np.clip(L + (out - L) * 1.1, 0, 1)
-    g, sw_ = b[1], b[4]; water = (g - sw_) / (g + sw_ + 1e-6) > 0
-    water = np.array(Image.fromarray((water * 255).astype(np.uint8)).filter(ImageFilter.MaxFilter(5))) > 0   # grown 2 px (both years alike) so the 2020 river survives the downscale
+    water = (b[1] - b[4]) / (b[1] + b[4] + 1e-6) > 0
+    water = np.array(Image.fromarray((water * 255).astype(np.uint8)).filter(ImageFilter.MaxFilter(5))) > 0   # both years alike
     m = np.array(Image.fromarray((water * 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(1.2))) / 255.
-    blue = np.array([.08, .38, .78]) * (.75 + .5 * L)
+    blue = np.array([.10, .42, .82]) * (.75 + .5 * L)
     out = out * (1 - m[..., None] * .9) + blue * m[..., None] * .9
-    return Image.fromarray((np.clip(out, 0, 1) * 255).astype(np.uint8))
-
-BOX = (170, 120, 1120, 1330)                    # px in the 0.0005°/px plate: the dam (top left) and the reservoir
-PW, PH = 480, TOP
-L1, L2 = (1060, 900), (1360, 1200)              # the two diagonals: x at y=0 and at y=TOP
-from PIL import ImageChops
+    return Image.fromarray((np.clip(out, 0, 1) * 255).astype(np.uint8)), water
+S, CX, CY, DX, DY = .78, 560, 640, 1240, 400       # display px per plate px; plate point (CX,CY) sits at display (DX,DY)
+def window(year):
+    p, wm = landsat(year)
+    x0, y0 = CX - DX / S, CY - DY / S
+    box = tuple(int(round(v)) for v in (x0, y0, x0 + W / S, y0 + H / S))
+    return p.crop(box).resize((W, H), Image.LANCZOS), wm, box
+SPLIT = 336
+def diag(y): return 1118 - (1118 - 925) * y / 570                           # the design's yellow diagonal
 for k, yr in enumerate((2020, 2026)):
-    p = landsat(yr, BOX).resize((PW, PH), Image.LANCZOS)
-    x0 = (L1[1] - 10) if k == 0 else (W - PW + 80)   # same window as the 2020 panel
-    mask = Image.new('L', (W, H)); md = ImageDraw.Draw(mask)
-    md.polygon([(L1[0], 0), (L2[0], 0), (L2[1], TOP), (L1[1], TOP)] if k == 0 else [(L2[0], 0), (W, 0), (W, TOP), (L2[1], TOP)], fill=255)
-    layer = Image.new('RGB', (W, H)); layer.paste(p, (x0, 0)); img.paste(layer, (0, 0), mask)
+    p, wm, box = window(yr)
+    m = Image.new('L', (W, H)); md = ImageDraw.Draw(m)
+    y0, y1 = (0, SPLIT) if k == 0 else (SPLIT, H)
+    md.polygon([(diag(y0), y0), (W, y0), (W, y1), (diag(y1), y1)], fill=255)
+    img.paste(p, (0, 0), m)
+    if k == 0: w20, b20 = wm, box
+    else: w26, b26 = wm, box
 d = ImageDraw.Draw(img)
-Y = (255, 204, 0)
-d.line([(L1[0], 0), (L1[1], TOP)], fill=Y, width=10); d.line([(L2[0], 0), (L2[1], TOP)], fill=(255, 255, 255), width=7)
-F = lambda s: ImageFont.truetype('assets/thumb/Anton.ttf', s)
-def tag(x, y, t, s=64):
-    f = F(s); w = d.textlength(t, font=f); d.rectangle((x - 14, y, x + w + 14, y + s * 1.18), fill=Y)
-    d.text((x, y - s * .16), t, font=f, fill=(0, 0, 0))
-tag(1100, 22, '2020'); tag(1410, 22, '2026')
-# headline on a dark band
-d.rectangle((0, TOP, W, H), fill=(10, 16, 30))
-f = F(128); t1 = "EGYPT’S WATER,"; t2 = "ETHIOPIA’S DAM"; w1, w2 = d.textlength(t1, font=f), d.textlength(t2, font=f)
-d.text(((W - w1) / 2, TOP - 2), t1, font=f, fill=(255, 255, 255))
-d.rectangle(((W - w2) / 2 - 28, TOP + 172, (W + w2) / 2 + 28, H - 12), fill=Y)
-d.text(((W - w2) / 2, TOP + 148), t2, font=f, fill=(0, 0, 0))
-img.resize((1280, 720), Image.LANCZOS).save('thumbnail.jpg', quality=90)
+d.line([(diag(0), 0), (diag(H), H)], fill=Y, width=9)
+d.line([(diag(SPLIT), SPLIT), (W, SPLIT - 8)], fill=(255, 255, 255), width=7)
+
+def water_near(wm, box, x, y):                    # the display point of the water pixel nearest (x, y)
+    ys, xs = np.nonzero(wm)
+    dx, dy = (xs - box[0]) * S, (ys - box[1]) * S; i = np.argmin((dx - x) ** 2 + (dy - y) ** 2); return float(dx[i]), float(dy[i])
+
+F = lambda s: (lambda f: (f.set_variation_by_name('Black'), f)[1])(ImageFont.truetype(T + 'RobotoCondensed.ttf', s))
+def tag(x, y, t, s, dot):
+    f = F(s); w = d.textlength(t, font=f); bb = (x, y, x + w + 36, y + s * .98)
+    d.line([dot, (bb[0], (bb[1] + bb[3]) / 2)], fill=(255, 255, 255), width=4)
+    d.ellipse((dot[0] - 9, dot[1] - 9, dot[0] + 9, dot[1] + 9), fill=(255, 255, 255))
+    d.rectangle(bb, fill=Y); d.text((x + 18, y + s * .49), t, font=f, fill=(0, 0, 0), anchor='lm')
+    return bb
+t1 = tag(1360, 92, '2020', 92, water_near(w20, b20, 1270, 180))
+t2 = tag(1385, 455, '2026', 92, water_near(w26, b26, 1300, 520))
+# curved arrow from the 2020 tag down to the 2026 tag
+a0, a1, c = (t1[2] - 70, t1[3] + 18), (t2[0] + 95, t2[1] - 22), (t1[2] + 40, (t1[3] + t2[1]) / 2 - 40)
+pts = [((1 - u) ** 2 * a0[0] + 2 * (1 - u) * u * c[0] + u * u * a1[0], (1 - u) ** 2 * a0[1] + 2 * (1 - u) * u * c[1] + u * u * a1[1]) for u in np.linspace(0, .86, 30)]
+d.line(pts, fill=Y, width=15, joint='curve')
+ex, ey = pts[-1]; tx, ty = a1[0] - ex, a1[1] - ey; n = (tx * tx + ty * ty) ** .5; tx, ty = tx / n, ty / n
+d.polygon([(a1[0] + tx * 10, a1[1] + ty * 10), (ex - ty * 30, ey + tx * 30), (ex + ty * 30, ey - tx * 30)], fill=Y)
+
+# —— 3. headline
+def word(t, size, width, fill, shadow):
+    f = F(size); w = int(d.textlength(t, font=f)); h = int(size * 1.25)
+    lay = Image.new('RGBA', (w + 40, h + 40)); ImageDraw.Draw(lay).text((20, 20), t, font=f, fill=fill)
+    lay = lay.resize((width + 40 * width // w, lay.height), Image.LANCZOS)
+    if shadow:
+        a = lay.split()[3]; sh = Image.new('RGBA', lay.size, (0, 0, 0, 0)); sh.putalpha(a.filter(ImageFilter.MaxFilter(5)).filter(ImageFilter.GaussianBlur(7)).point(lambda v: int(v * .85)))
+        out = Image.new('RGBA', (lay.width + 16, lay.height + 16)); out.alpha_composite(sh, (10, 12)); out.alpha_composite(lay, (0, 0)); return out
+    return lay
+# brush stroke: a bar with dry-brush ends and wobbly edges
+bx0, bx1, by0, by1 = 26, 1505, 716, 884
+brush = Image.new('L', (W, H)); bd = ImageDraw.Draw(brush)
+bd.rectangle((bx0 + 70, by0, bx1 - 60, by1), fill=255)
+for yy in range(by0 + 4, by1 - 2, 9):                   # dry-brush ends: chunky strokes of uneven length
+    w_ = int(rng.integers(7, 13))
+    bd.line([(bx0 + 70 - rng.integers(0, 70) ** 1.0, yy), (bx0 + 90, yy)], fill=255, width=w_)
+    bd.line([(bx1 - 80, yy), (bx1 - 60 + rng.integers(0, 60), yy)], fill=255, width=w_)
+brush = brush.filter(ImageFilter.GaussianBlur(.8))
+yl = Image.new('RGB', (W, H), Y)
+shadow = brush.filter(ImageFilter.GaussianBlur(10)).point(lambda v: int(v * .6))
+img.paste(Image.new('RGB', (W, H)), (6, 8), shadow); img.paste(yl, (0, 0), brush)
+L1 = word('EGYPT’S WATER,', 150, 1415, (255, 255, 255, 255), True)
+L2 = word('ETHIOPIA’S DAM', 186, 1305, (0, 0, 0, 255), False)
+rgba = img.convert('RGBA'); rgba.alpha_composite(L1, (75 - 20, 566)); rgba.alpha_composite(L2, (135 - 20, 696))
+rgba.convert('RGB').resize((1280, 720), Image.LANCZOS).save('thumbnail.jpg', quality=90)
 print('thumbnail.jpg')
