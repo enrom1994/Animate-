@@ -11,7 +11,14 @@
 
 In 2020 it was a river at the bottom of a canyon. Today it is a lake the size of London, behind Africa's largest hydropower dam. Ethiopia says the Grand Ethiopian Renaissance Dam will light up millions of homes. Egypt, which takes nearly all its fresh water from the Nile, calls it an existential threat. We follow the water from the Ethiopian highlands to Egypt, and measure the reservoir from orbit, year by year.
 
-CHAPTERS_PLACEHOLDER
+0:00 A river becomes a lake
+0:48 Where the water starts
+1:52 A treaty for two
+2:46 Power for the dark
+3:53 Five summers
+5:29 What Egypt fears
+6:44 The flood of 2025
+7:35 What happens next
 
 Every number on screen is sourced or measured on the satellite images shown. Reservoir areas: Landsat 8/9, dry season each year, open water (MNDWI) connected to the dam.
 
