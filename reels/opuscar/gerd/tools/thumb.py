@@ -80,15 +80,33 @@ def word(t, size, width, fill, shadow):
         a = lay.split()[3]; sh = Image.new('RGBA', lay.size, (0, 0, 0, 0)); sh.putalpha(a.filter(ImageFilter.MaxFilter(5)).filter(ImageFilter.GaussianBlur(7)).point(lambda v: int(v * .85)))
         out = Image.new('RGBA', (lay.width + 16, lay.height + 16)); out.alpha_composite(sh, (10, 12)); out.alpha_composite(lay, (0, 0)); return out
     return lay
-# brush stroke: a bar with dry-brush ends and wobbly edges
-bx0, bx1, by0, by1 = 26, 1505, 716, 884
-brush = Image.new('L', (W, H)); bd = ImageDraw.Draw(brush)
-bd.rectangle((bx0 + 70, by0, bx1 - 60, by1), fill=255)
-for yy in range(by0 + 4, by1 - 2, 9):                   # dry-brush ends: chunky strokes of uneven length
-    w_ = int(rng.integers(7, 13))
-    bd.line([(bx0 + 70 - rng.integers(0, 70) ** 1.0, yy), (bx0 + 90, yy)], fill=255, width=w_)
-    bd.line([(bx1 - 80, yy), (bx1 - 60 + rng.integers(0, 60), yy)], fill=255, width=w_)
-brush = brush.filter(ImageFilter.GaussianBlur(.8))
+# brush stroke: dry-brush ends like the design's — thin bristles of very uneven length, gaps near the end,
+# loose dashes past it, a slight slant, and rough top/bottom edges
+bx0, bx1, by0, by1 = 30, 1505, 716, 884
+M = np.zeros((H, W), np.float32)
+def smooth(n, k):
+    v = rng.normal(0, 1, n + 2 * k); return np.convolve(v, np.ones(k) / k, 'same')[k:k + n] * np.sqrt(k)
+rows = np.arange(by0 - 6, by1 + 7); n = len(rows)
+lo_end = bx0 + 40 + 22 * smooth(n, 9) + (rows - by0) * -.18      # left end: wavy, slanted
+hi_end = bx1 - 40 + 22 * smooth(n, 9) + (rows - by0) * .12
+y = 0
+while y < n:
+    h = int(rng.integers(1, 3)); yy = rows[y:y + h]                    # a bristle 1–3 px thick
+    edge = min(yy[0] - by0, by1 - yy[-1])                              # rows near the top/bottom are sparser
+    if edge < 0 and rng.random() < .55: y += h; continue
+    L = lo_end[y] - rng.exponential(9) + (rng.random() < .25) * rng.uniform(-10, 30)
+    R = hi_end[y] + rng.exponential(9) - (rng.random() < .25) * rng.uniform(-10, 30)
+    if edge < 6: L += rng.uniform(10, 120); R -= rng.uniform(10, 120)  # ragged top/bottom: short bristles there
+    M[yy[0]:yy[-1] + 1, max(int(L), 0):max(int(R), 0)] = 1
+    for side, end in ((-1, L), (1, R)):
+        for _ in range(int(rng.integers(0, 2))):                       # gaps just inside the end
+            g0 = end - side * rng.uniform(3, 26); gl = rng.uniform(3, 10)
+            a_, b_ = sorted((int(g0), int(g0 + side * gl))); M[yy[0]:yy[-1] + 1, max(a_, 0):max(b_, 0)] = 0
+        if rng.random() < .22:                                         # a loose dash past the end
+            d0 = end + side * rng.uniform(4, 16); dl = rng.uniform(4, 22)
+            a_, b_ = sorted((int(d0), int(d0 + side * dl))); M[yy[0]:yy[-1] + 1, max(a_, 0):max(b_, 0)] = 1
+    y += h
+brush = Image.fromarray((M * 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(1.0))
 yl = Image.new('RGB', (W, H), Y)
 shadow = brush.filter(ImageFilter.GaussianBlur(10)).point(lambda v: int(v * .6))
 img.paste(Image.new('RGB', (W, H)), (6, 8), shadow); img.paste(yl, (0, 0), brush)
