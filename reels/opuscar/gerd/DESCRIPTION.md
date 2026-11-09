@@ -1,9 +1,8 @@
 # YouTube upload — "Who Controls the Nile?"
 
-**Title (pick one):**
-1. Ethiopia Built Africa's Biggest Dam on the Nile. Egypt Calls It a Threat.
-2. Who Controls the Nile? The Dam Egypt Fears
-3. The Dam That Split the Nile: Ethiopia vs Egypt, Measured from Space
+**Title:** The Dam That Split the Nile: Ethiopia vs Egypt, Measured from Space
+
+(alternatives considered: "Ethiopia Built Africa's Biggest Dam on the Nile. Egypt Calls It a Threat." / "Who Controls the Nile? The Dam Egypt Fears")
 
 **Thumbnail:** `thumbnail.jpg` (left: AI illustration of a dam, not the GERD; right: real Landsat, same window, 2020 river / 2026 lake). Built by `tools/thumb.py` from `assets/thumb/chatgpt.png` (not in git).
 
