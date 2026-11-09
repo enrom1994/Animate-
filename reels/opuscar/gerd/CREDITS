@@ -1,0 +1,30 @@
+Who Controls the Nile? — the Grand Ethiopian Renaissance Dam
+
+Style: Satellite Briefing, from Lemo-Opuscar by Lemomo (github.com/lemomo-ai/lemo-opuscar). Camera maths (top of engine.js) from the
+  style's demo; the imagery shader, film, measurements and mix are this film's own. Code: MIT.
+  If published, the description should credit: "Style: Lemo-Opuscar by Lemomo (CC BY 4.0)".
+Imagery (public domain): NASA Blue Marble: Next Generation and VIIRS Black Marble 2016 via NASA GIBS; USGS Landsat Collection 2
+  (Landsat 8 and 9 OLI), courtesy of the U.S. Geological Survey, via the Microsoft Planetary Computer. Scene IDs in
+  assets/plates/plates.json and assets/measure.json; every request in assets/raw/manifest.jsonl. No borders are drawn.
+Elevation: NASADEM (NASA/JPL, public domain) via the Microsoft Planetary Computer. The 3D canyon is the 2000 terrain; the water
+  is a flat plane at the published level of each filling, shown only inside the shoreline measured on Landsat in January 2026.
+Rivers: Natural Earth 1:10m river centrelines (public domain, naturalearthdata.com).
+Voice: Kokoro-82M (Apache-2.0), voice bm_george.
+Music samples (CC0): VS Chamber Orchestra Community Edition and Versilian Community Sample Library (vibraphone, timpani) via the
+  library's sampler.py. Pad and pulse: in code. Ambience: Mixkit "river water flowing" (free licence for videos).
+Fonts (SIL OFL 1.1): Barlow, Barlow Condensed, IBM Plex Mono, IBM Plex Serif.
+
+NASA images (not copyrighted, US government work; no NASA endorsement implied):
+  ph_gerd_aster: Grand Ethiopian Renaissance Dam | https://images.nasa.gov/details/PIA24150 | ASTER image: NASA/METI/AIST/Japan Space Systems, and U.S./Japan ASTER Science Team
+  ph_iss_2020: iss064e004061 | https://images.nasa.gov/details/iss064e004061 | ISS crew photograph
+
+Photos via Openverse (CC0 / CC BY only; no share-alike), as used in the film:
+  File:Ethiopian Countryside (2207193302).jpg — A. Davey from Where I Live Now: Pacific Northwest — BY 2.0 — https://commons.wikimedia.org/w/index.php?curid=21919257
+  Blue Nile Falls, Ethiopia (51625800835) — Nina R from Africa — BY 2.0 — https://commons.wikimedia.org/w/index.php?curid=113287406
+  Rowing on the Nile - Cairo — Ibrahim.ID — BY 4.0 — https://commons.wikimedia.org/w/index.php?curid=162764841
+  Sudan. Khartoum. Shadouf Blue Nile — libraryofcongress — CC0 1.0 — https://www.rawpixel.com/image/6853154/sudan-khartoum-shadouf-the-blue-nile-the-matson-photo-service
+  ILRI, Stevie Mann - Ploughing with cattle in southwestern Ethiopia — Photo: ILRI/Stevie Mann — BY 2.0 — https://commons.wikimedia.org/w/index.php?curid=12194916
+  Oromia IMG 5213 Ethiopia (27855625829) — Ninara from Helsinki, Finland — BY 2.0 — https://commons.wikimedia.org/w/index.php?curid=74395737
+  File:Fishermen, Lake Tana (2260748777).jpg — A. Davey from Where I Live Now: Pacific Northwest — BY 2.0 — https://commons.wikimedia.org/w/index.php?curid=21919410
+  View of Lake Nasser from Aswan High Dam, Aswan, AG, EGY (48027083016) — Warren LeMay from Cullowhee, NC, United States — CC0 1.0 — https://commons.wikimedia.org/w/index.php?curid=83168256
+  Aswan High Dam, built to control the Nile floods, store water and produce 2,1 GW of electricity (14470862415) — Jorge Láscar from Melbourne, Australia — BY 2.0 — https://commons.wikimedia.org/w/index.php?curid=66261297

@@ -1,0 +1,402 @@
+[
+ {
+  "ch": 0,
+  "title": null,
+  "card": 0,
+  "dur": 48.406,
+  "lines": [
+   {
+    "id": "c0a",
+    "t": 1.2,
+    "d": 5.471,
+    "text": "In early 2020, this was a river, at the bottom of a canyon."
+   },
+   {
+    "id": "c0b",
+    "t": 8.721,
+    "d": 4.194,
+    "text": "Six years later, it's a lake more than 200 km long."
+   },
+   {
+    "id": "c0c",
+    "t": 14.365,
+    "d": 4.774,
+    "text": "It sits in Ethiopia, 14 km from the border with Sudan."
+   },
+   {
+    "id": "c0d",
+    "t": 19.589,
+    "d": 6.718,
+    "text": "2,500 km downstream, Egypt's leaders have called it an existential threat."
+   },
+   {
+    "id": "c0e",
+    "t": 27.557,
+    "d": 5.746,
+    "text": "Ethiopia's prime minister says it was built to light up homes, not to harm anyone."
+   },
+   {
+    "id": "c0f",
+    "t": 33.753,
+    "d": 9.803,
+    "text": "This is the Grand Ethiopian Renaissance Dam. To understand why it has two of Africa's biggest nations at odds, you have to follow the water."
+   }
+  ]
+ },
+ {
+  "ch": 1,
+  "title": "Where the water starts",
+  "card": 3.8,
+  "dur": 63.842,
+  "lines": [
+   {
+    "id": "c1a",
+    "t": 4.2,
+    "d": 5.541,
+    "text": "On a map, the Nile seems to begin at Lake Victoria, in the heart of East Africa."
+   },
+   {
+    "id": "c1a2",
+    "t": 10.191,
+    "d": 5.641,
+    "text": "From there, it runs north for more than 6,000 km, through eleven countries."
+   },
+   {
+    "id": "c1b",
+    "t": 16.282,
+    "d": 5.858,
+    "text": "That branch, the White Nile, is the longer one. But it's not where most of the water comes from."
+   },
+   {
+    "id": "c1c",
+    "t": 22.59,
+    "d": 6.609,
+    "text": "In Khartoum, it meets a second river, coming down from the Ethiopian highlands. The Blue Nile."
+   },
+   {
+    "id": "c1d",
+    "t": 30.249,
+    "d": 7.886,
+    "text": "In flood season you can see them meet: the White Nile, wide and pale, and the Blue Nile, brown with mud from the mountains."
+   },
+   {
+    "id": "c1e",
+    "t": 39.985,
+    "d": 6.129,
+    "text": "Every summer, monsoon rain falls on the highlands, and the Blue Nile swells into a torrent."
+   },
+   {
+    "id": "c1f",
+    "t": 46.564,
+    "d": 8.138,
+    "text": "Together with two smaller rivers from Ethiopia, it supplies about 85% of the water that reaches Egypt."
+   },
+   {
+    "id": "c1g",
+    "t": 56.752,
+    "d": 5.84,
+    "text": "And Egypt, which gets almost no rain, takes nearly all of its fresh water from the Nile."
+   }
+  ]
+ },
+ {
+  "ch": 2,
+  "title": "A treaty for two",
+  "card": 3.8,
+  "dur": 53.957,
+  "lines": [
+   {
+    "id": "c2a",
+    "t": 4.2,
+    "d": 5.646,
+    "text": "For most of the last century, the rules for this water were written without Ethiopia."
+   },
+   {
+    "id": "c2b",
+    "t": 10.296,
+    "d": 6.75,
+    "text": "In 1959, Egypt and Sudan signed an agreement dividing the river between themselves."
+   },
+   {
+    "id": "c2c",
+    "t": 17.496,
+    "d": 6.989,
+    "text": "Egypt would take 55.5 billion cubic metres a year. Sudan, 18.5."
+   },
+   {
+    "id": "c2d",
+    "t": 26.535,
+    "d": 5.585,
+    "text": "Ethiopia, where most of that water starts, had no share, and no seat at the table."
+   },
+   {
+    "id": "c2e",
+    "t": 32.57,
+    "d": 6.922,
+    "text": "Egypt still treats that treaty, and an older one from 1929, as the basis of its rights."
+   },
+   {
+    "id": "c2e2",
+    "t": 39.942,
+    "d": 7.527,
+    "text": "That older deal, signed under British colonial rule, even gave Egypt the right to object to projects upstream."
+   },
+   {
+    "id": "c2f",
+    "t": 47.919,
+    "d": 4.788,
+    "text": "Ethiopia rejects both, as deals made about its river, without it."
+   }
+  ]
+ },
+ {
+  "ch": 3,
+  "title": "Power for the dark",
+  "card": 3.8,
+  "dur": 66.969,
+  "lines": [
+   {
+    "id": "c3a",
+    "t": 4.2,
+    "d": 2.452,
+    "text": "Now look at the same region at night."
+   },
+   {
+    "id": "c3b",
+    "t": 7.102,
+    "d": 4.535,
+    "text": "Egypt's river glows. The Ethiopian highlands are almost dark."
+   },
+   {
+    "id": "c3c",
+    "t": 13.087,
+    "d": 7.466,
+    "text": "Ethiopia has more people than Egypt. But in 2023, nearly half of them still had no electricity."
+   },
+   {
+    "id": "c3d",
+    "t": 22.203,
+    "d": 7.089,
+    "text": "In 2011, Ethiopia began building its answer, on the Blue Nile, close to the Sudanese border."
+   },
+   {
+    "id": "c3e",
+    "t": 29.742,
+    "d": 7.611,
+    "text": "It paid for most of it itself. The government sold bonds to its own people, and workers gave part of their salaries."
+   },
+   {
+    "id": "c3f",
+    "t": 37.803,
+    "d": 7.975,
+    "text": "The result: a wall of concrete 145 metres high, and almost 2 km long, across the canyon."
+   },
+   {
+    "id": "c3g",
+    "t": 47.228,
+    "d": 10.253,
+    "text": "Its turbines can produce 5,150 megawatts. The largest hydropower plant in Africa, and more than twice the Aswan High Dam."
+   },
+   {
+    "id": "c3h",
+    "t": 59.131,
+    "d": 6.588,
+    "text": "For many Ethiopians, it's more than a power plant. It's a symbol of what the country can do on its own."
+   }
+  ]
+ },
+ {
+  "ch": 4,
+  "title": "Five summers",
+  "card": 3.8,
+  "dur": 96.424,
+  "lines": [
+   {
+    "id": "c4a",
+    "t": 4.2,
+    "d": 6.418,
+    "text": "A hydropower dam doesn't use up a river. The water runs through the turbines, and on downstream."
+   },
+   {
+    "id": "c4b",
+    "t": 11.068,
+    "d": 9.619,
+    "text": "The problem is filling it. To make a lake, you have to hold water back, and every cubic metre held back is water that doesn't reach Egypt that year."
+   },
+   {
+    "id": "c4c",
+    "t": 21.137,
+    "d": 6.658,
+    "text": "Ethiopia started filling in July 2020, without an agreement with Egypt or Sudan."
+   },
+   {
+    "id": "c4d",
+    "t": 28.245,
+    "d": 5.15,
+    "text": "This is the reservoir, photographed by Landsat every dry season since."
+   },
+   {
+    "id": "c4e",
+    "t": 34.445,
+    "d": 6.135,
+    "text": "Early 2021: about 175 square kilometres of water."
+   },
+   {
+    "id": "c4f",
+    "t": 42.03,
+    "d": 3.571,
+    "text": "By the end of 2022, almost 700."
+   },
+   {
+    "id": "c4g",
+    "t": 47.051,
+    "d": 7.688,
+    "text": "And by January 2026, more than 1,500 square kilometres. A lake about the size of London."
+   },
+   {
+    "id": "c4h",
+    "t": 56.789,
+    "d": 7.897,
+    "text": "Behind the dam, the water climbed 140 metres up the canyon walls, one rainy season at a time."
+   },
+   {
+    "id": "c4i",
+    "t": 67.336,
+    "d": 8.542,
+    "text": "Full, it holds 74 billion cubic metres. More than Egypt's entire yearly share under the 1959 treaty."
+   },
+   {
+    "id": "c4j",
+    "t": 77.728,
+    "d": 10.946,
+    "text": "All the while, the talks went nowhere. A declaration of principles in 2015. Talks in Washington in 2020. Debates at the UN Security Council."
+   },
+   {
+    "id": "c4k",
+    "t": 89.124,
+    "d": 5.05,
+    "text": "In December 2023, Egypt declared the negotiations over."
+   }
+  ]
+ },
+ {
+  "ch": 5,
+  "title": "What Egypt fears",
+  "card": 3.8,
+  "dur": 75.368,
+  "lines": [
+   {
+    "id": "c5a",
+    "t": 4.2,
+    "d": 10.376,
+    "text": "So far, Egypt has not run short. The filling years were mostly wet ones, and Egypt had its own reserve: Lake Nasser, behind the Aswan High Dam."
+   },
+   {
+    "id": "c5b",
+    "t": 15.026,
+    "d": 8.029,
+    "text": "Egypt's fear is the dry years. In the 1980s, a run of weak floods drained Lake Nasser close to its limit."
+   },
+   {
+    "id": "c5c",
+    "t": 24.505,
+    "d": 4.97,
+    "text": "If a drought like that comes again, who holds water back, and who lets it go?"
+   },
+   {
+    "id": "c5d",
+    "t": 30.925,
+    "d": 9.136,
+    "text": "Egypt wants the answer written into a binding agreement. Ethiopia says a dam on its own land shouldn't need permission from downstream."
+   },
+   {
+    "id": "c5d2",
+    "t": 40.511,
+    "d": 13.988,
+    "text": "Ethiopia also argues the dam helps downstream: a deep reservoir in the cool highlands loses less water to evaporation than a lake in the desert, and a steadier river means fewer floods in Sudan."
+   },
+   {
+    "id": "c5d3",
+    "t": 54.949,
+    "d": 10.709,
+    "text": "Sudan is caught in between. It could gain steadier water and fewer floods, but it lives closest to the dam, and it has raised concerns about the dam's safety."
+   },
+   {
+    "id": "c5e",
+    "t": 66.108,
+    "d": 8.01,
+    "text": "Underneath it all is a bigger shift. For the first time, the flow of the Blue Nile is controlled upstream, by Ethiopia."
+   }
+  ]
+ },
+ {
+  "ch": 6,
+  "title": "The flood of 2025",
+  "card": 3.8,
+  "dur": 50.796,
+  "lines": [
+   {
+    "id": "c6a",
+    "t": 4.2,
+    "d": 7.851,
+    "text": "That shift was tested in the autumn of 2025, just weeks after the dam was formally inaugurated."
+   },
+   {
+    "id": "c6b",
+    "t": 12.501,
+    "d": 8.954,
+    "text": "Heavy rain fell on the highlands, and downstream, the river rose. Near Khartoum, more than a thousand families were forced from their homes."
+   },
+   {
+    "id": "c6c",
+    "t": 22.705,
+    "d": 5.108,
+    "text": "Egypt called it a man-made flood, caused by sudden releases from the dam."
+   },
+   {
+    "id": "c6d",
+    "t": 28.263,
+    "d": 7.3,
+    "text": "Ethiopia said the opposite: that the dam had held water back, and without it, the damage would have been far worse."
+   },
+   {
+    "id": "c6e",
+    "t": 36.013,
+    "d": 6.34,
+    "text": "Sudanese officials also pointed to the White Nile, and to infrastructure damaged by war."
+   },
+   {
+    "id": "c6f",
+    "t": 42.803,
+    "d": 6.143,
+    "text": "Without an agreement to share data on how the dam is run, each country tells its own version."
+   }
+  ]
+ },
+ {
+  "ch": 7,
+  "title": null,
+  "card": 0,
+  "dur": 31.378,
+  "lines": [
+   {
+    "id": "c7a",
+    "t": 1.2,
+    "d": 10.402,
+    "text": "In November 2026, Egypt and Sudan again demanded a binding legal agreement. And Ethiopia is planning more dams on the Blue Nile."
+   },
+   {
+    "id": "c7b",
+    "t": 12.052,
+    "d": 7.39,
+    "text": "Remember that line of light across Egypt? It starts here, as rain, on the dark highlands of Ethiopia."
+   },
+   {
+    "id": "c7c",
+    "t": 20.892,
+    "d": 5.836,
+    "text": "One river. Two great dams. And still no agreement on who decides how much of it flows."
+   }
+  ]
+ }
+]
