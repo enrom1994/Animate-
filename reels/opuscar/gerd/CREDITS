@@ -13,6 +13,7 @@ Voice: Kokoro-82M (Apache-2.0), voice bm_george.
 Music samples (CC0): VS Chamber Orchestra Community Edition and Versilian Community Sample Library (vibraphone, timpani) via the
   library's sampler.py. Pad and pulse: in code. Ambience: Mixkit "river water flowing" (free licence for videos).
 Fonts (SIL OFL 1.1): Barlow, Barlow Condensed, IBM Plex Mono, IBM Plex Serif.
+Thumbnail: the dam on the left is an AI illustration (ChatGPT), not a photograph of the GERD; the right panels are Landsat 8 (USGS), 9 Feb 2020 and 8 Jan 2026, water (MNDWI > 0) tinted blue and grown 2 px for legibility. Headline font: Anton (SIL OFL 1.1).
 
 NASA images (not copyrighted, US government work; no NASA endorsement implied):
   ph_gerd_aster: Grand Ethiopian Renaissance Dam | https://images.nasa.gov/details/PIA24150 | ASTER image: NASA/METI/AIST/Japan Space Systems, and U.S./Japan ASTER Science Team

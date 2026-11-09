@@ -5,7 +5,7 @@
 2. Who Controls the Nile? The Dam Egypt Fears
 3. The Dam That Split the Nile: Ethiopia vs Egypt, Measured from Space
 
-**Thumbnail:** `thumbnail.jpg` (Landsat, same canyon: 2020 river / 2026 lake)
+**Thumbnail:** `thumbnail.jpg` (left: AI illustration of a dam, not the GERD; right: real Landsat, same window, 2020 river / 2026 lake). Built by `tools/thumb.py` from `assets/thumb/chatgpt.png` (not in git).
 
 **Description:**
 
