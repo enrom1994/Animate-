@@ -53,22 +53,54 @@ d.ellipse((sx - 36 * K, sy - 36 * K, sx + 36 * K, sy + 36 * K), fill=NAVY)
 d.ellipse((sx - 22 * K, sy - 22 * K, sx + 22 * K, sy + 22 * K), fill=WHITE)
 im = im.resize((800, 800), Image.LANCZOS); im.save('profile.png')
 
-# —— banner: real Landsat (the GERD reservoir, Jan 2026), darkened, with the wordmark in the safe area
+# —— banner: the same Earth, orbit and satellite as the profile, large on the right; wordmark in the safe area
 BW, BH = 2560, 1440
-z = np.load('../gerd/assets/raw/res_2026.npz'); b = z['bands'].astype(np.float32) * 2.75e-5 - .2
-rgb = np.stack([b[0], b[1], b[2]], -1); v = z['valid']; lo, hi = np.percentile(rgb[v], [1, 99.5])
-out = np.clip((rgb - lo) / (hi - lo), 0, 1) ** .9
-water = (b[1] - b[4]) / (b[1] + b[4] + 1e-6) > 0
-out[water] = out[water] * .2 + np.array([.10, .42, .82]) * .8
-plate = Image.fromarray((out * 255).astype(np.uint8)).crop((0, 80, 1700, 1036)).resize((BW, BH), Image.LANCZOS)
-dark = Image.new('RGB', (BW, BH), NAVY)
-g = np.clip((np.arange(BW) - 700) / 1500, 0, 1) ** 1.2 * .75                      # navy on the left, the lake shows on the right
-ban = Image.composite(plate, dark, Image.fromarray((np.tile(g, (BH, 1)) * 255).astype(np.uint8)))
+def globe(W_, H_, cx, cy, G, lon0, lat0):
+    yy, xx = np.mgrid[0:H_, 0:W_].astype(np.float32)
+    X = (xx - cx) / G; Yv = -(yy - cy) / G; rr = X * X + Yv * Yv; inside = rr <= 1
+    Z = np.sqrt(np.clip(1 - rr, 0, 1)); la0, lo0 = np.radians(lat0), np.radians(lon0)
+    lat = np.arcsin(np.clip(Yv * np.cos(la0) + Z * np.sin(la0), -1, 1))
+    lon = lo0 + np.arctan2(X, Z * np.cos(la0) - Yv * np.sin(la0))
+    u = ((lon / (2 * np.pi) + .5) % 1) * (world.shape[1] - 1); v = (.5 - lat / np.pi) * (world.shape[0] - 1)
+    col = world[v.astype(int), u.astype(int)]
+    lam = np.clip(X * L[0] + Yv * L[1] + Z * L[2], 0, 1)
+    col = col ** 1.1 * (.25 + .95 * lam[..., None]) * 1.08
+    oc = col[..., 2] > col[..., 0] * 1.05; col[oc] = col[oc] * np.array([.8, 1.0, 1.45]) + np.array([0, .02, .06])
+    col = col * (.55 + .45 * Z[..., None] ** .5)
+    rim = np.clip(1 - Z, 0, 1) ** 3
+    col = col * (1 - rim[..., None] * .5) + np.array([.35, .6, 1.0]) * rim[..., None] * .5 * (.3 + .7 * lam[..., None])
+    img_ = Image.fromarray((np.clip(col, 0, 1) * 255).astype(np.uint8))
+    m_ = Image.fromarray((inside * 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(1.2))
+    r_ = np.sqrt(rr); gl = Image.fromarray((np.clip(1 - (r_ - 1) / .07, 0, 1) * (r_ > .98) * 120).astype(np.uint8)).filter(ImageFilter.GaussianBlur(14))
+    return img_, m_, gl
+yy, xx = np.mgrid[0:BH, 0:BW].astype(np.float32)
+rd = np.hypot((xx - 1900) / BW, (yy - 760) / BH)
+ban = Image.fromarray(np.clip(np.array(NAVY, np.float32) * (1.35 - .9 * rd)[..., None], 0, 255).astype(np.uint8))
+st = np.random.default_rng(3); d = ImageDraw.Draw(ban)                            # a few faint stars
+for _ in range(220):
+    x, y, r = st.uniform(0, BW), st.uniform(0, BH), st.choice([1, 1, 1, 1.5, 2]); a_ = int(st.uniform(40, 150))
+    d.ellipse((x - r, y - r, x + r, y + r), fill=tuple(int(c_ + (255 - c_) * a_ / 255) for c_ in NAVY))
+GX, GY, GR = 2010, 720, 455
+gimg, gm, gglow = globe(BW, BH, GX, GY, GR, 30, 14)
+ban.paste(Image.new('RGB', (BW, BH), (70, 130, 230)), (0, 0), gglow)
+BA, BB, BT, BOW = 560, 165, np.radians(-20), 20
+def bring(front):
+    P = 600; cx_, cy_ = GX + P, GY + P                       # padded canvas so the rotation doesn't clip the ring
+    m = Image.new('L', (BW + 2 * P, BH + 2 * P)); ImageDraw.Draw(m).ellipse((cx_ - BA - BOW / 2, cy_ - BB - BOW / 2, cx_ + BA + BOW / 2, cy_ + BB + BOW / 2), outline=255, width=BOW)
+    h = Image.new('L', m.size); ImageDraw.Draw(h).rectangle((0, cy_, m.width, m.height) if front else (0, 0, m.width, cy_), fill=255)
+    return ImageChops.multiply(m, h).rotate(-np.degrees(BT), resample=Image.BICUBIC, center=(cx_, cy_)).crop((P, P, P + BW, P + BH))
+ban.paste(Image.new('RGB', (BW, BH), Y), (0, 0), bring(False))
+ban.paste(gimg, (0, 0), gm)
+ban.paste(Image.new('RGB', (BW, BH), Y), (0, 0), bring(True))
 d = ImageDraw.Draw(ban)
-x0, y0 = (BW - 1546) // 2, (BH - 423) // 2
-f1 = F(230); d.text((x0 + 10, y0 + 20), 'OVERPASS', font=f1, fill=WHITE)
+t = np.radians(58); ex, ey = BA * np.cos(t), BB * np.sin(t)
+sx, sy = GX + ex * np.cos(BT) - ey * np.sin(BT), GY + ex * np.sin(BT) + ey * np.cos(BT)
+d.ellipse((sx - 40, sy - 40, sx + 40, sy + 40), fill=NAVY); d.ellipse((sx - 24, sy - 24, sx + 24, sy + 24), fill=WHITE)
+# wordmark: left part of the 1546×423 safe area (x 507–2053, y 508–931)
+x0, y0 = 540, 528
+f1 = F(210); d.text((x0, y0), 'OVERPASS', font=f1, fill=WHITE)
 tw = d.textlength('OVERPASS', font=f1)
-d.rectangle((x0 + 14, y0 + 300, x0 + 14 + tw, y0 + 312), fill=Y)
-d.text((x0 + 14, y0 + 335), 'THE WORLD, MEASURED FROM ORBIT', font=F(62), fill=Y)
+d.rectangle((x0 + 4, y0 + 268, x0 + 4 + tw, y0 + 280), fill=Y)
+d.text((x0 + 4, y0 + 300), 'THE WORLD, MEASURED FROM ORBIT', font=F(56), fill=Y)
 ban.save('banner.jpg', quality=90)
 print('profile.png banner.jpg')
