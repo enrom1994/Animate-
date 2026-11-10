@@ -7,7 +7,7 @@
 Why the name: an "overpass" is the moment a satellite passes over a place and takes the picture. Every film is built on those pictures. It is short, easy to say, and leaves room for any country or topic.
 
 ## Files
-- `profile.png`: 800×800 profile picture. A yellow ring with a satellite on it; inside, a river that turns into a lake. It works as a circle, down to 24 px.
+- `profile.png`: 800×800 profile picture. The real Earth (NASA Blue Marble, public domain; no NASA endorsement implied) centred on the Nile, with a yellow orbit ring and a satellite. Reads as a circle down to 24 px.
 - `banner.jpg`: 2560×1440 banner (real Landsat 8, GERD reservoir, Jan 2026). The text sits inside the 1546×423 area every device shows.
 - `make.py`: rebuilds both.
 
