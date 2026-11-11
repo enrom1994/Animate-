@@ -63,3 +63,22 @@ style rulebook (§1.1) on top: character design, set-building, palette, script p
 captions), `real-sfx` (sound design), `lemo-opuscar` (data and archive films). Flat 2D characters standing in a toon-shaded
 3D set with ink outlines is those first two combined plus an outline pass; design our own characters, never copy a
 channel's.
+
+## 7. `motionmaxxing` (added November 2026)
+
+A third-party skill (Tejas Makwana, Apache 2.0; bundles GSAP under GreenSock's own no-charge licence and three.js under MIT)
+installed at `.claude/skills/motionmaxxing`, without its 20 MB of README media. Upstream: github.com/Tejashmakwana/motionmaxxing.
+
+**Use it for** anything that is a motion graphic in its own right: a channel intro sting or end card, a channel trailer, a
+promo or launch film, kinetic type, a product or UI demo, a call to action, and the animated pieces of a new "how to" or
+"did you know" channel. It brings a brand-capture step, measured timing curves, a GSAP runtime where every frame is a
+function of time, and two scripted checks: `scripts/look.py` (does the render exist, move, avoid empty frames, end without
+a long held card, carry sound) and `scripts/lint.mjs` (page-chrome and slide-layout patterns in an HTML film).
+
+**Do not apply it wholesale to the documentaries.** Its "never ship" list is written for brand films: it bans corner
+labels, source lines, stat slides and tracked-caps captions, which a sourced documentary needs. Take from it the laws that
+transfer (cut on motion, entries decelerate and exits accelerate, almost nothing fades, no dead frame, one focal point,
+end card under 1.4 s) and run `look.py` on every finished film as a second audit beside section 5.
+
+Voice, music and sound effects in its pipeline need an ElevenLabs key, and image plates need the Codex CLI; without them it
+builds silent films from code and captured assets. Our own voice and `real-sfx` tools still apply.
