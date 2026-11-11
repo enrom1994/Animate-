@@ -89,15 +89,20 @@ def bed_from(name, t0, t1, g, pan=0.0, fade=1.5):
     x = X.lp(x, 3500, 2)                                         # no hiss: the top end of wind and surf is cut
     put(bed, x / (np.sqrt(np.mean(x ** 2)) + 1e-9) * .025, t0, g, pan)
 WHOOSH, SWOOSH = 'whoosh/air_woosh_mixkit1489.mp3', 'whoosh/transition_windy_swoosh_mixkit1474.mp3'
+WHOOSHES = ['whoosh/quick_air_woosh_mixkit2605.mp3', 'whoosh/air_woosh_mixkit1489.mp3', 'whoosh/cinematic_whoosh_fast_transition_mixkit1492.mp3', 'whoosh/deep_air_woosh_mixkit2604.mp3']; THUD = 'impact/deep_heartbeat_impact_mixkit498.mp3'
 HIT, LOGO = 'impact/movie_impact_intro_presentation_mixkit2902.mp3', 'impact/movie_logo_intro_impact_mixkit2900.mp3'
 DESERT, RIVER, SEA, CITY = 'ambience/desert_ambience_mixkit2495.mp3', 'ambience/river_water_flowing_mixkit2454.mp3', 'ambience/sea_waves_ambience_mixkit1189.mp3', 'ambience/city_traffic_ambience_mixkit2931.mp3'
-# Documentary rule: cuts and camera moves are silent; music and voice carry the edit. Only two kinds of sound:
-#   a soft timpani note when a key number lands, and a place sound under the photo of that place (quiet, faded).
+# Cue list (EDITING.md §4): a timpani note when a key number lands, a place sound under the photo of that place, and in the
+# hook a whoosh on every cut, a riser into the reveal, a hit after it and a low drone under the threat.
 AMB = {'desert': DESERT, 'river': RIVER, 'sea': SEA, 'city': CITY}
 for e in EV:
     t, ty = e['t'], e['type']
     if ty == 'reading': put(mus, S.note('timpani', 'D2', 1.4, vel=.5 if e.get('heavy') else .35), t, .5 if e.get('heavy') else .35)
     elif ty == 'amb': bed_from(AMB[e['name']], t - .3, t + e['dur'] + .5, .6, 0, .8)
+    elif ty == 'whoosh': put(fol, clip(WHOOSHES[e.get('k', 0) % len(WHOOSHES)], 1.1, .5), t, .16, (-.25, .25)[e.get('k', 0) % 2])
+    elif ty == 'riser': put(fol, riser(e['dur']), t, .5)
+    elif ty == 'hit': put(fol, clip(HIT if e.get('heavy') else THUD, 2.2 if e.get('heavy') else 1.2, .8), t, .34 if e.get('heavy') else .22)
+    elif ty == 'drone': put(fol, X.lp(pad([26, 33], e['dur'], 1.0, 300), 400), t, .9)
     elif ty == 'title': put(mus, S.note('timpani', 'D2', 2.0, vel=.55), t, .55)
 mus = S.room(mus, size=.45, mix=.18)
 # ———— voice ————

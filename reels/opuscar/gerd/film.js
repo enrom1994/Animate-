@@ -11,7 +11,7 @@ const PL = { res: [34.95, 9.75, 35.95, 11.35], khartoum: [32.40, 15.52, 32.64, 1
 const DAM = [11.215, 35.093], KHT = [15.61, 32.53], CAIRO = [30.044, 31.236], ASWAN = [23.97, 32.88], VIC = [-1.0, 33.0], TANA = [12.0, 37.3], ADDIS = [9.03, 38.74];
 const LEVELS = [[2020, 540], [2021, 575], [2022, 600], [2023, 625], [2024, 640]];   // end of each filling (Wikipedia, GERD article)
 export const NEEDS = {
-  0: { photos: ['eth_countryside', 'photos/ph_gerd_aster'], terrain: true, slots: [] },
+  0: { photos: ['eth_countryside', 'photos/ph_gerd_aster', 'cairo_rowing'], terrain: true, slots: [] },
   1: { photos: ['bluenile_falls', 'cairo_rowing', 'plates/khartoum'], terrain: false, slots: [] },
   2: { photos: ['khartoum_shadouf', 'eth_plough'], terrain: false, slots: [] },
   3: { photos: ['oromia_village', 'eth_countryside', 'tana_fishermen'], terrain: true, slots: [] },
@@ -45,22 +45,26 @@ function key(g, t, t0, t1, big, small, x = 120, y = 150) {
 
 // ———— chapters ————
 const CHAPTERS = {
-  0() {
-    const a = at;
-    const f0 = a('c0b') - 1.3, fill = t => eio(pr((t - f0 + .25) / (a('c0c') - f0 + .5), 0, .7));
-    const stamp = (g, t) => { const k = fill(t); yearStamp(g, t, .15, a('c0c') - .1, Math.round(2020 + 6 * k), k < .02 ? 'a river in a canyon' : k > .9 ? 'a lake · 1,581 km² of open water' : 'filling'); };
-    terrain(0, f0, fly({ x: 46, y: 2, h: 8.5, tx: 24, ty: 34, th: 0 }, { x: 31, y: 14, h: 5.0, tx: 21, ty: 40 }), { lower: ['THE BLUE NILE GORGE · FEBRUARY 2020', '3D: NASADEM elevation ×1.6 · Landsat 8, 9 Feb 2020'], over: (g, t) => { if (t < f0) stamp(g, t); } });
-    terrain(f0, a('c0c'), fly({ x: 31, y: 14, h: 5.0, tx: 21, ty: 40 }, { x: 38, y: 8, h: 7.5, tx: 22, ty: 40 }, { level: LV(0, 640, 0, .7) }),
-      { lower: ['THE SAME CANYON · FULL', 'water at 640 m, the full-supply level · shoreline as measured in 2026'], over: (g, t) => { if (t >= f0) stamp(g, t); } });
-    globe(a('c0c'), a('c0d'), [[a('c0c') - .3, 12.2, 33.6, 3600], [a('c0d'), 11.5, 34.5, 2500]],
-      { over: (g, t, cam) => { border(g, t, cam, a('c0c') + .1, a('c0c') + 1.6); label(g, t, cam, [13.0, 32.6], 'SUDAN', a('c0c', .1), a('c0d')); label(g, t, cam, [9.6, 37.4], 'ETHIOPIA', a('c0c', .2), a('c0d')); pin(g, t, cam, DAM, 'THE DAM', '14 km from the Sudan border', a('c0c', .3), a('c0d')); } });
-    globe(a('c0d'), a('c0e'), [[a('c0d'), 11.5, 34.5, 2500], [a('c0d', .9), 22.0, 33.0, 7000]],
-      { over: (g, t, cam) => { rivers(g, t, cam, ['blue', 'nile'], a('c0d') + .2, a('c0d', .95)); pin(g, t, cam, CAIRO, 'EGYPT', '≈ 2,500 km downstream', a('c0d', .8), a('c0e'), 1); pin(g, t, cam, DAM, 'GERD', null, a('c0d'), a('c0e')); } });
-    photo(a('c0e'), a('c0f'), 'eth_countryside', [.5, .5, 1.12], [.45, .5, 1.0], { credit: 'Photo: A. Davey, CC BY 2.0',
-      over: (g, t) => quote(g, t, a('c0e', .3), a('c0f'), '"to light up our homes"', 'Abiy Ahmed, Prime Minister of Ethiopia · 9 Sep 2025 (Reuters)') });
-    photo(a('c0f'), a('c0f', .45), 'photos/ph_gerd_aster', [.5, .45, 1.25], [.5, .5, 1.05], { credit: 'Image: NASA/METI/AIST/Japan Space Systems · ASTER, 2020', over: (g, t) => key(g, t, a('c0f') + .2, a('c0f', .45) + .2, 'THE DAM FROM SPACE · FALSE COLOUR', 'plants show red · water shows blue') });
-    terrain(a('c0f', .45), DUR, fly({ x: 2, y: 64, h: 3.5, tx: 22, ty: 40, th: 0 }, { x: 4, y: 60, h: 4.5, tx: 26, ty: 36 }, { level: () => 640 }),
-      { over: (g, t, cam, S) => bigTitle(g, t, a('c0f', 1) + .2, DUR + 1, 'WHO CONTROLS THE NILE?', 'the Grand Ethiopian Renaissance Dam') });
+  0() {   // the hook, cut to the rulebook (EDITING.md): the impossible fact first, a new moving picture every 3–4 s, subject centre frame
+    const a = at, f0 = a('c0a', .4), f1 = a('c0b') - .1, fill = t => eio(pr((t - f0 + .25) / (f1 - f0 + .5), 0, .75));
+    const stamp = (g, t) => { const k = fill(t); yearStamp(g, t, .1, f1 - .1, Math.round(2020 + 6 * k), k < .02 ? 'a river in a canyon' : k > .9 ? 'a lake · 1,581 km² of open water' : 'filling'); };
+    terrain(0, f0, fly({ x: 46, y: 2, h: 8.5, tx: 24, ty: 34, th: 0 }, { x: 33, y: 12, h: 5.2, tx: 21, ty: 40 }), { over: (g, t) => { if (t < f0) stamp(g, t); } });
+    terrain(f0, f1, fly({ x: 33, y: 12, h: 5.2, tx: 21, ty: 40 }, { x: 40, y: 6, h: 8.0, tx: 22, ty: 40 }, { level: LV(0, 640, 0, .75) }),
+      { lower: ['THE BLUE NILE GORGE · 2020 TO 2026', '3D: NASADEM elevation ×1.6 · Landsat 8 · shoreline as measured'], over: (g, t) => { if (t >= f0) stamp(g, t); } });
+    photo(f1, a('c0b', .3), 'photos/ph_gerd_aster', [.5, .45, 1.0], [.5, .5, 1.3], { credit: 'Image: NASA/METI/AIST/Japan Space Systems · ASTER, 2020', over: (g, t) => key(g, t, f1 + .15, a('c0b', .3) + .1, 'THE DAM FROM SPACE · FALSE COLOUR', 'plants show red · water shows blue') });
+    globe(a('c0b', .3), a('c0b', .62), [[a('c0b', .3) - .3, 12.0, 34.0, 3300], [a('c0b', .62), 11.4, 34.6, 2400]],
+      { over: (g, t, cam) => { border(g, t, cam, a('c0b', .3), a('c0b', .3) + .9); label(g, t, cam, [13.0, 32.6], 'SUDAN', a('c0b', .3), a('c0b', .62)); label(g, t, cam, [9.6, 37.4], 'ETHIOPIA', a('c0b', .32), a('c0b', .62)); pin(g, t, cam, DAM, 'THE DAM', '14 km from Sudan', a('c0b', .34), a('c0b', .62)); } });
+    globe(a('c0b', .62), a('c0d', .5), [[a('c0b', .62), 11.4, 34.6, 2400], [a('c0d') - .2, 19.0, 33.2, 6800], [a('c0d', .5), 27.5, 31.6, 3000]],
+      { over: (g, t, cam) => { rivers(g, t, cam, ['blue', 'nile'], a('c0b', .64), a('c0d', .3), 1 - pr(t, a('c0d', .5) - .3, a('c0d', .5) - .05)); pin(g, t, cam, DAM, 'BLUE NILE', null, a('c0b', .66), a('c0d') - .2); G.counter(g, t, a('c0d') + .1, a('c0d', .5), { to: 2500, label: 'KILOMETRES DOWNSTREAM', sub: 'from the dam to Cairo, along the river' }); pin(g, t, cam, CAIRO, 'EGYPT', null, a('c0d', .2), a('c0d', .5) - .2); } });
+    photo(a('c0d', .5), a('c0e'), 'cairo_rowing', [.5, .5, 1.0], [.5, .45, 1.14], { amb: 'river', credit: 'Photo: Ibrahim.ID, CC BY 4.0', over: (g, t) => G.lower(g, t, a('c0d', .5) + .2, a('c0e') - .1, 'CAIRO · THE NILE', '≈ 2,500 km downstream of the dam') });
+    photo(a('c0e'), a('c0e', .55), 'eth_countryside', [.5, .5, 1.14], [.47, .5, 1.0], { credit: 'Photo: A. Davey, CC BY 2.0',
+      over: (g, t) => quote(g, t, a('c0e') + .15, a('c0e', .55), '"to light up our homes"', 'Abiy Ahmed, Prime Minister of Ethiopia · 9 Sep 2025 (Reuters)') });
+    globe(a('c0e', .55), a('c0f'), [[a('c0e', .55) - .3, 21, 33, 6800], [a('c0f'), 16, 35, 5200]], { state: () => ({ uNightA: 0, uNightB: 1, uScanLat: -90, uScanOn: 0 }),
+      over: (g, t, cam) => { label(g, t, cam, [29.5, 31.2], 'EGYPT', a('c0e', .57), a('c0f')); label(g, t, cam, [9.5, 38.5], 'ETHIOPIA', a('c0e', .6), a('c0f')); G.lower(g, t, a('c0e', .6), a('c0f') - .1, 'THE NILE BASIN AT NIGHT', 'NASA VIIRS Black Marble · 2016'); } });
+    terrain(a('c0f'), a('c0f', .46), fly({ x: 2, y: 64, h: 3.5, tx: 22, ty: 40, th: 0 }, { x: 6, y: 58, h: 4.8, tx: 26, ty: 36 }, { level: () => 640 }),
+      { lower: ['THE GRAND ETHIOPIAN RENAISSANCE DAM', 'the reservoir at full supply level, 640 m'] });
+    globe(a('c0f', .46), DUR, [[a('c0f', .46) - .3, 11.4, 35.0, 2600], [a('c0f', 1) + .6, 17.5, 33.0, 8200], [DUR, 18.5, 33.0, 9000]],
+      { over: (g, t, cam) => { rivers(g, t, cam, ['blue', 'nile'], a('c0f', .5), a('c0f', 1)); bigTitle(g, t, a('c0f', 1) + .2, DUR + 1, 'WHO CONTROLS THE NILE?', 'the Grand Ethiopian Renaissance Dam'); } });
   },
   1() {
     const a = at;
@@ -382,7 +386,10 @@ export function setup(timing, ch, g) {
   EV = C.lines.map(L => ({ t: L.t, type: 'voice', id: L.id }));
   SHOTS.forEach(S => { if (S.amb) EV.push({ t: S.t0, type: 'amb', name: S.amb, dur: S.t1 - S.t0 }); });
   const R = (id, f, heavy = 0) => EV.push({ t: at(id, f) + .2, type: 'reading', heavy });
-  ({ 0: () => { R('c0b', .3, 1); EV.push({ t: at('c0f', 1) + .4, type: 'title' }); },
+  ({ 0: () => {   // the hook's cue list: a whoosh on every cut, a riser into the fill, hits where the numbers and the title land
+       SHOTS.forEach((S, i) => { if (i) EV.push({ t: S.t0 - .25, type: 'whoosh', k: i }); });
+       const f0 = at('c0a', .4), f1 = at('c0b') - .1, full = f0 - .25 + .75 * (f1 - f0 + .5);
+       EV.push({ t: full - 2.2, type: 'riser', dur: 2.2 }, { t: full, type: 'hit', heavy: 1 }, { t: at('c0b', .36), type: 'hit' }, { t: at('c0d') + 1.0, type: 'hit' }, { t: at('c0d', .78), type: 'drone', dur: 2.4 }, { t: at('c0f', 1) + .25, type: 'hit', heavy: 1 }, { t: at('c0f', 1) + .4, type: 'title' }); },
      1: () => { R('c1a2', .4); R('c1f', .1, 1); R('c1g', .3); },
      2: () => { R('c2c', .05, 1); R('c2d', .1); },
      3: () => { R('c3c', .45, 1); R('c3g', .1); },

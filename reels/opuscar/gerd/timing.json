@@ -3,43 +3,37 @@
   "ch": 0,
   "title": null,
   "card": 0,
-  "dur": 48.406,
+  "dur": 38.17,
   "lines": [
    {
     "id": "c0a",
-    "t": 1.2,
-    "d": 5.471,
-    "text": "In early 2020, this was a river, at the bottom of a canyon."
+    "t": 0.5,
+    "d": 5.67,
+    "text": "In six years, Ethiopia turned a canyon into a lake 200 km long."
    },
    {
     "id": "c0b",
-    "t": 8.721,
-    "d": 4.194,
-    "text": "Six years later, it's a lake more than 200 km long."
-   },
-   {
-    "id": "c0c",
-    "t": 14.365,
-    "d": 4.774,
-    "text": "It sits in Ethiopia, 14 km from the border with Sudan."
+    "t": 6.62,
+    "d": 6.479,
+    "text": "It stands 14 km from Sudan, on the Blue Nile: the largest source of Egypt's water."
    },
    {
     "id": "c0d",
-    "t": 19.589,
-    "d": 6.718,
-    "text": "2,500 km downstream, Egypt's leaders have called it an existential threat."
+    "t": 13.549,
+    "d": 6.42,
+    "text": "2,500 km downstream, Egypt's leaders call it an existential threat."
    },
    {
     "id": "c0e",
-    "t": 27.557,
+    "t": 20.419,
     "d": 5.746,
     "text": "Ethiopia's prime minister says it was built to light up homes, not to harm anyone."
    },
    {
     "id": "c0f",
-    "t": 33.753,
-    "d": 9.803,
-    "text": "This is the Grand Ethiopian Renaissance Dam. To understand why it has two of Africa's biggest nations at odds, you have to follow the water."
+    "t": 26.565,
+    "d": 7.305,
+    "text": "This is the Grand Ethiopian Renaissance Dam. To understand the fight over it, you have to follow the water."
    }
   ]
  },
