@@ -47,12 +47,14 @@ function key(g, t, t0, t1, big, small, x = 120, y = 150) {
 const CHAPTERS = {
   0() {
     const a = at;
-    terrain(0, a('c0b'), fly({ x: 34, y: 8, h: 5.5, tx: 24, ty: 34, th: 0 }, { x: 31, y: 14, h: 5.0, tx: 21, ty: 40 }), { lower: ['THE BLUE NILE GORGE · FEBRUARY 2020', '3D: NASADEM elevation ×1.6 · Landsat 8, 9 Feb 2020'] });
-    terrain(a('c0b'), a('c0c'), fly({ x: 31, y: 14, h: 5.0, tx: 21, ty: 40 }, { x: 36, y: 10, h: 7.0, tx: 22, ty: 40 }, { level: LV(0, 640, 0, .7) }),
-      { lower: ['THE SAME CANYON · FULL', 'water at 640 m, the full-supply level · shoreline as measured in 2026'] });
-    globe(a('c0c'), a('c0d'), [[a('c0c') - .3, DAM[0], DAM[1], 900], [a('c0d'), 11.6, 34.6, 1600]],
-      { over: (g, t, cam) => pin(g, t, cam, DAM, 'THE DAM', '14 km from the Sudan border', a('c0c', .2), a('c0d')) });
-    globe(a('c0d'), a('c0e'), [[a('c0d'), 11.6, 34.6, 1500], [a('c0d', .9), 22.0, 33.0, 7000]],
+    const f0 = a('c0b') - 1.3, fill = t => eio(pr((t - f0 + .25) / (a('c0c') - f0 + .5), 0, .7));
+    const stamp = (g, t) => { const k = fill(t); yearStamp(g, t, .15, a('c0c') - .1, Math.round(2020 + 6 * k), k < .02 ? 'a river in a canyon' : k > .9 ? 'a lake · 1,581 km² of open water' : 'filling'); };
+    terrain(0, f0, fly({ x: 46, y: 2, h: 8.5, tx: 24, ty: 34, th: 0 }, { x: 31, y: 14, h: 5.0, tx: 21, ty: 40 }), { lower: ['THE BLUE NILE GORGE · FEBRUARY 2020', '3D: NASADEM elevation ×1.6 · Landsat 8, 9 Feb 2020'], over: (g, t) => { if (t < f0) stamp(g, t); } });
+    terrain(f0, a('c0c'), fly({ x: 31, y: 14, h: 5.0, tx: 21, ty: 40 }, { x: 38, y: 8, h: 7.5, tx: 22, ty: 40 }, { level: LV(0, 640, 0, .7) }),
+      { lower: ['THE SAME CANYON · FULL', 'water at 640 m, the full-supply level · shoreline as measured in 2026'], over: (g, t) => { if (t >= f0) stamp(g, t); } });
+    globe(a('c0c'), a('c0d'), [[a('c0c') - .3, 12.2, 33.6, 3600], [a('c0d'), 11.5, 34.5, 2500]],
+      { over: (g, t, cam) => { border(g, t, cam, a('c0c') + .1, a('c0c') + 1.6); label(g, t, cam, [13.0, 32.6], 'SUDAN', a('c0c', .1), a('c0d')); label(g, t, cam, [9.6, 37.4], 'ETHIOPIA', a('c0c', .2), a('c0d')); pin(g, t, cam, DAM, 'THE DAM', '14 km from the Sudan border', a('c0c', .3), a('c0d')); } });
+    globe(a('c0d'), a('c0e'), [[a('c0d'), 11.5, 34.5, 2500], [a('c0d', .9), 22.0, 33.0, 7000]],
       { over: (g, t, cam) => { rivers(g, t, cam, ['blue', 'nile'], a('c0d') + .2, a('c0d', .95)); pin(g, t, cam, CAIRO, 'EGYPT', '≈ 2,500 km downstream', a('c0d', .8), a('c0e'), 1); pin(g, t, cam, DAM, 'GERD', null, a('c0d'), a('c0e')); } });
     photo(a('c0e'), a('c0f'), 'eth_countryside', [.5, .5, 1.12], [.45, .5, 1.0], { credit: 'Photo: A. Davey, CC BY 2.0',
       over: (g, t) => quote(g, t, a('c0e', .3), a('c0f'), '"to light up our homes"', 'Abiy Ahmed, Prime Minister of Ethiopia · 9 Sep 2025 (Reuters)') });
@@ -97,8 +99,10 @@ const CHAPTERS = {
       over: (g, t, cam) => { G.lower(g, t, a('c3a') + .4, a('c3c') - .2, 'THE NILE BASIN AT NIGHT', 'NASA VIIRS Black Marble · 2016'); label(g, t, cam, [29.5, 31.2], 'EGYPT', a('c3b'), a('c3c')); label(g, t, cam, [9.5, 38.5], 'ETHIOPIA', a('c3b', .5), a('c3c')); label(g, t, cam, [9.03, 38.74], 'Addis Ababa', a('c3b', .7), a('c3c'), COL.dim, 24); } });
     photo(a('c3c'), a('c3d'), 'oromia_village', [.45, .5, 1.12], [.55, .5, 1.0], { credit: 'Photo: Ninara, CC BY 2.0',
       over: (g, t) => G.counter(g, t, a('c3c', .45), a('c3d'), { to: 45, fmt: v => '≈' + Math.round(v) + '%', label: 'OF ETHIOPIANS WITHOUT ELECTRICITY · 2023', sub: 'World Bank: 55.4% had access' }) });
-    globe(a('c3d'), a('c3e'), [[a('c3d') - .3, 11.0, 36.0, 2400], [a('c3d', .9), DAM[0], DAM[1] + .3, 520]],
-      { over: (g, t, cam) => { pin(g, t, cam, DAM, 'GUBA', 'construction from 2 April 2011', a('c3d', .5), a('c3e')); } });
+    globe(a('c3d'), a('c3d', .42), [[a('c3d') - .3, 12.4, 35.6, 4200], [a('c3d', .42), 11.5, 34.6, 2500]],
+      { over: (g, t, cam) => { border(g, t, cam, a('c3d') + .1, a('c3d') + 1.4); rivers(g, t, cam, ['blue'], -9, -8, pr(t, a('c3d'), a('c3d') + .5)); label(g, t, cam, [13.0, 32.6], 'SUDAN', a('c3d', .08), a('c3d', .42)); label(g, t, cam, [9.6, 37.4], 'ETHIOPIA', a('c3d', .12), a('c3d', .42)); pin(g, t, cam, DAM, 'GUBA', 'the dam site', a('c3d', .15), a('c3d', .42)); } });
+    terrain(a('c3d', .42), a('c3e'), fly({ x: 3, y: 68, h: 5.2, tx: 22, ty: 44, th: 0 }, { x: 9, y: 61, h: 3.6, tx: 25, ty: 40 }),
+      { lower: ['GUBA · WHERE THE DAM STANDS', 'construction began 2 April 2011 · the gorge before filling'] });
     photo(a('c3e'), a('c3f'), 'eth_countryside', [.6, .5, 1.15], [.5, .45, 1.0], { credit: 'Photo: A. Davey, CC BY 2.0',
       over: (g, t) => G.counter(g, t, a('c3e', .2), a('c3f'), { to: 5, fmt: v => '≈ US$' + Math.round(v) + ' bn', label: 'COST · MOSTLY RAISED INSIDE ETHIOPIA', sub: 'bonds + salary contributions · Chinese loan for turbines' }) });
     terrain(a('c3f'), a('c3g'), fly({ x: 30, y: 46, h: 4.2, tx: 18, ty: 58 }, { x: 24, y: 50, h: 3.6, tx: 16, ty: 58 }, { level: () => 640 }), { over: onShot(heightGraphic, .66) });
@@ -163,6 +167,20 @@ function pin(g, t, cam, ll, label, sub, t0, t1, side = 1) {
   g.strokeStyle = COL.text; g.lineWidth = 2; g.beginPath(); g.moveTo(x + side * r * .7, y - r * .7); g.lineTo(x + side * (r + 80 * k), y - r - 80 * k); g.lineTo(x + side * (r + 80 * k + 30), y - r - 80 * k); g.stroke(); g.restore();
   text(g, label, x + side * (r + 120), y - r - 72, `600 34px ${F.lab}`, COL.text, side > 0 ? 'left' : 'right', a * k, true, 3);
   if (sub) text(g, sub, x + side * (r + 120), y - r - 40, `400 26px ${F.mono}`, COL.dim, side > 0 ? 'left' : 'right', a * k);
+}
+const BORDER = [[9.461,34.078],[9.513,34.079],[9.73,34.12],[9.853,34.159],[9.919,34.185],[10.125,34.291],[10.191,34.311],[10.252,34.315],[10.528,34.276],[10.659,34.344],[10.728,34.828],[10.729,34.839],[10.746,34.851],[10.764,34.857],[10.776,34.857],[10.788,34.862],[10.805,34.88],[10.845,34.934],[10.869,34.951],[10.903,34.958],[10.918,34.953],[10.94,34.923],[10.953,34.914],[10.964,34.914],[11.155,34.98],[11.186,34.984],[11.207,34.971],[11.226,34.954],[11.253,34.944],[11.275,34.947],[11.549,35.073],[11.569,35.077],[11.587,35.074],[11.628,35.053],[11.649,35.046],[11.69,35.048],[11.727,35.041],[11.748,35.041],[11.771,35.048],[11.796,35.059],[11.819,35.073],[11.838,35.088],[11.863,35.127],[11.871,35.149],[11.897,35.216],[11.93,35.246],[11.94,35.248],[11.958,35.248],[11.962,35.249],[11.972,35.251],[11.98,35.26],[12.002,35.298],[12.024,35.317],[12.047,35.326],[12.102,35.336],[12.146,35.354],[12.157,35.361],[12.166,35.371],[12.177,35.393],[12.185,35.403],[12.199,35.413],[12.211,35.415],[12.239,35.418],[12.267,35.429],[12.575,35.617],[12.585,35.626],[12.589,35.634],[12.59,35.654],[12.594,35.662],[12.604,35.672],[12.615,35.676],[12.625,35.677],[12.651,35.684],[12.656,35.684],[12.659,35.688],[12.665,35.701],[12.666,35.703],[12.674,35.728],[12.717,36.03],[12.717,36.038],[12.805,36.135],[12.911,36.137],[13.093,36.16],[13.271,36.212],[13.406,36.274],[13.467,36.307],[13.526,36.346],[13.626,36.391],[13.842,36.447],[13.988,36.444],[14.257,36.524]];   // Sudan–Ethiopia boundary (Natural Earth, public domain)
+function border(g, t, cam, t0, t1) {
+  const k = eo(pr(t, t0, t1)); if (k <= 0) return; const n = Math.max(2, Math.round(BORDER.length * k));
+  g.save(); g.lineJoin = 'round'; g.setLineDash([14, 10]);
+  for (const [w, c] of [[7, 'rgba(0,0,0,.4)'], [3, 'rgba(244,242,238,.9)']]) { g.lineWidth = w; g.strokeStyle = c; g.beginPath(); let on = false;
+    for (let i = 0; i < n; i++) { const [x, y, vis] = project(cam, BORDER[i][0], BORDER[i][1]); if (!vis) { on = false; continue; } on ? g.lineTo(x, y) : g.moveTo(x, y); on = true; } g.stroke(); }
+  g.restore();
+}
+// the year, large, top left: the opening's clock
+function yearStamp(g, t, t0, t1, year, sub) {
+  const a = pr(t, t0, t0 + .5) * (1 - pr(t, t1 - .4, t1)); if (a <= 0) return;
+  g.save(); g.globalAlpha = a; const gr = g.createRadialGradient(330, 200, 20, 330, 200, 520); gr.addColorStop(0, 'rgba(8,11,14,.5)'); gr.addColorStop(1, 'rgba(8,11,14,0)'); g.fillStyle = gr; g.fillRect(0, 0, 900, 720); g.fillStyle = COL.amber; g.fillRect(120, 104, 90, 5); g.restore();
+  text(g, String(year), 114, 250, `500 170px ${F.num}`, COL.amber, 'left', a); text(g, sub, 120, 296, `400 28px ${F.mono}`, COL.text, 'left', a);
 }
 function label(g, t, cam, ll, s, t0, t1, col = COL.text, size = 30) {
   const a = win(t, t0, t1, .4); if (a <= 0) return; const [x, y, vis] = project(cam, ...ll); if (!vis) return;
