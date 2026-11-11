@@ -99,7 +99,7 @@ for e in EV:
     t, ty = e['t'], e['type']
     if ty == 'reading': put(mus, S.note('timpani', 'D2', 1.4, vel=.5 if e.get('heavy') else .35), t, .5 if e.get('heavy') else .35)
     elif ty == 'amb': bed_from(AMB[e['name']], t - .3, t + e['dur'] + .5, .6, 0, .8)
-    elif ty == 'whoosh': put(fol, clip(WHOOSHES[e.get('k', 0) % len(WHOOSHES)], 1.1, .5), t, .16, (-.25, .25)[e.get('k', 0) % 2])
+    elif ty == 'whoosh': put(fol, clip(WHOOSHES[e.get('k', 0) % len(WHOOSHES)], 1.1, .5), t, .16 * e.get('g', 1), (-.25, .25)[e.get('k', 0) % 2])
     elif ty == 'riser': put(fol, riser(e['dur']), t, .5)
     elif ty == 'hit': put(fol, clip(HIT if e.get('heavy') else THUD, 2.2 if e.get('heavy') else 1.2, .8), t, .34 if e.get('heavy') else .22)
     elif ty == 'drone': put(fol, X.lp(pad([26, 33], e['dur'], 1.0, 300), 400), t, .9)

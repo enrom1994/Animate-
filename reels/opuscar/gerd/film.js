@@ -12,12 +12,12 @@ const DAM = [11.215, 35.093], KHT = [15.61, 32.53], CAIRO = [30.044, 31.236], AS
 const LEVELS = [[2020, 540], [2021, 575], [2022, 600], [2023, 625], [2024, 640]];   // end of each filling (Wikipedia, GERD article)
 export const NEEDS = {
   0: { photos: ['eth_countryside', 'photos/ph_gerd_aster', 'cairo_rowing'], terrain: true, slots: [] },
-  1: { photos: ['bluenile_falls', 'cairo_rowing', 'plates/khartoum'], terrain: false, slots: [] },
-  2: { photos: ['khartoum_shadouf', 'eth_plough'], terrain: false, slots: [] },
-  3: { photos: ['oromia_village', 'eth_countryside', 'tana_fishermen'], terrain: true, slots: [] },
+  1: { photos: ['bluenile_falls', 'cairo_rowing', 'plates/khartoum', 'tana_fishermen', 'khartoum_bluenile'], terrain: false, slots: [] },
+  2: { photos: ['khartoum_shadouf', 'eth_plough'], terrain: true, slots: [] },
+  3: { photos: ['oromia_village', 'eth_countryside', 'tana_fishermen', 'bahirdar_street'], terrain: true, slots: [] },
   4: { photos: [], terrain: true, slots: [], timelapse: true },
-  5: { photos: ['nasser_view', 'aswan_lascar', 'photos/ph_iss_2020'], terrain: true, slots: [] },
-  6: { photos: ['bluenile_falls', 'photos/ph_iss_2020'], terrain: true, slots: [] },
+  5: { photos: ['nasser_view', 'aswan_lascar', 'photos/ph_iss_2020', 'cairo_rowing', 'khartoum_bluenile'], terrain: true, slots: [] },
+  6: { photos: ['bluenile_falls', 'photos/ph_iss_2020', 'cairo_rowing', 'nasser_view', 'plates/khartoum'], terrain: true, slots: [] },
   7: { photos: [], terrain: false, slots: [] },
 };
 let IMG = {}, DATA = {};
@@ -30,11 +30,21 @@ const terrain = (t0, t1, view, o = {}) => sh({ type: 'terrain', t0, t1, view, ..
 const photo = (t0, t1, img, from, to, o = {}) => sh({ type: 'photo', t0, t1, img, from, to, ...o });
 const archive = (t0, t1, img, cap, o = {}) => sh({ type: 'graphic', t0, t1, draw: (g, t, a0, a1) => archiveDraw(g, t, a0, a1, img, cap, o.credit ?? 'Library of Congress'), ...o });
 const graphic = (t0, t1, draw, o = {}) => sh({ type: 'graphic', t0, t1, draw, ...o });
+// the short forms the re-cut is written in (EDITING.md §3): every shot is a hard cut and travels
+const CRED = { aswan_lascar: 'Photo: Jorge Láscar, CC BY 2.0', bluenile_falls: 'Photo: Nina R, CC BY 2.0', cairo_rowing: 'Photo: Ibrahim.ID, CC BY 4.0', eth_countryside: 'Photo: A. Davey, CC BY 2.0', eth_plough: 'Photo: ILRI / Stevie Mann, CC BY 2.0',
+  nasser_view: 'Photo: Warren LeMay, CC0', oromia_village: 'Photo: Ninara, CC BY 2.0', tana_fishermen: 'Photo: A. Davey, CC BY 2.0', 'photos/ph_iss_2020': 'Photo: NASA / ISS crew', khartoum_bluenile: 'Photo: Francisco Anzola, CC BY 2.0',
+  bahirdar_street: 'Photo: Radosław Botev, CC BY 3.0', 'plates/khartoum': 'Landsat 8 · USGS · 13 Sept 2024' };
+const Gl = (t0, t1, A, B, o = {}) => globe(t0, t1, [[t0 - .3, ...A], [t1 + .1, ...B]], { cut: 1, ...o });
+const Tr = (t0, t1, A, B, o = {}, lv) => terrain(t0, t1, fly(A, B, lv ? { level: lv } : {}), { cut: 1, ...o });
+const P = (t0, t1, img, from, to, o = {}) => photo(t0, t1, img, from, to, { cut: 1, credit: CRED[img], ...o });
+const LAYERS = [];   // graphics that play across several shots: the picture keeps cutting underneath
+const layer = (t0, t1, fn, veil = .6) => LAYERS.push({ t0, t1, fn, veil });
+const lowerL = (t0, t1, title, meta) => layer(t0, t1, (g, t) => G.lower(g, t, t0 + .2, t1 - .1, title, meta), 0);
 // terrain moves in the gorge (km on the plate: x east from 34.95°E, y north from 10.70°N; the dam is at x 15.6, y 57.0)
 const fly = (a, b, o = {}) => u => { const k = eio(u); const v = {}; for (const key of Object.keys(a)) v[key] = typeof a[key] === 'number' ? lerp(a[key], b[key] ?? a[key], k) : a[key]; return { sunAz: 240, sunEl: 17, haze: 70, ...v, ...(o.level ? { level: o.level(u) } : {}) }; };
 const LV = (l0, l1, u0 = 0, u1 = 1) => u => lerp(l0, l1, eio(pr(u, u0, u1)));
 // a graphic laid over a moving shot: the slate card becomes a dark veil, so the map or terrain keeps moving behind it
-let VEIL = 0; const BG = g => VEIL ? (g.save(), g.fillStyle = `rgba(9,13,17,${VEIL})`, g.fillRect(0, 0, W, H), g.restore()) : G.bg(g);
+let VEIL = 0; const BG = g => VEIL < 0 ? 0 : VEIL ? (g.save(), g.fillStyle = `rgba(9,13,17,${VEIL})`, g.fillRect(0, 0, W, H), g.restore()) : G.bg(g);
 const onShot = (fn, veil = .62) => (g, t, cam, S) => { VEIL = veil; try { fn(g, t, S.t0, S.t1); } finally { VEIL = 0; } };
 // a readable key on a picture (dark chip, large type)
 function key(g, t, t0, t1, big, small, x = 120, y = 150) {
@@ -67,98 +77,176 @@ const CHAPTERS = {
       { over: (g, t, cam) => { rivers(g, t, cam, ['blue', 'nile'], a('c0f', .5), a('c0f', 1)); bigTitle(g, t, a('c0f', 1) + .2, DUR + 1, 'WHO CONTROLS THE NILE?', 'the Grand Ethiopian Renaissance Dam'); } });
   },
   1() {
-    const a = at;
+    const a = at, WN = (g, t, cam) => rivers(g, t, cam, ['white', 'nile'], -9, -8), draw = (g, t, cam) => rivers(g, t, cam, ['white', 'nile'], a('c1a2'), a('c1b') - .3);
     globe(0, a('c1a'), [[0, 14, 33, 9000], [a('c1a'), 10, 33, 8000]], { title: ['01', 'Where the water starts'] });
-    globe(a('c1a'), a('c1a2'), [[a('c1a'), 10, 33, 8000], [a('c1a', .8), VIC[0], VIC[1], 2400]], { over: (g, t, cam) => pin(g, t, cam, VIC, 'LAKE VICTORIA', null, a('c1a', .5), a('c1a2')) });
-    globe(a('c1a2'), a('c1b'), [[a('c1a2'), VIC[0], VIC[1], 2400], [a('c1b'), 14.0, 31.5, 9800]],
-      { over: (g, t, cam) => { rivers(g, t, cam, ['white', 'nile'], a('c1a2'), a('c1b') - .3); G.counter(g, t, a('c1a2', .4), a('c1b'), { to: 11, fmt: v => Math.round(v) + '', label: 'COUNTRIES IN THE NILE BASIN', sub: '> 6,000 km from Lake Victoria to the sea' }); } });
-    globe(a('c1b'), a('c1c'), [[a('c1b'), 14.0, 31.5, 9800], [a('c1c'), 9.0, 31.0, 3600]],
-      { over: (g, t, cam) => { rivers(g, t, cam, ['white', 'nile'], -9, -8); label(g, t, cam, [7.5, 30.6], 'WHITE NILE', a('c1b', .1), a('c1c')); } });
-    globe(a('c1c'), a('c1d'), [[a('c1c'), 9.0, 31.0, 3600], [a('c1c', .55), 12.6, 34.6, 2600], [a('c1d'), KHT[0], KHT[1], 700]],
-      { over: (g, t, cam) => { rivers(g, t, cam, ['white', 'nile'], -9, -8); rivers(g, t, cam, ['blue'], a('c1c', .3), a('c1c', .9), 1, COL.blue); label(g, t, cam, [11.2, 36.6], 'BLUE NILE', a('c1c', .5), a('c1d'), COL.blue); pin(g, t, cam, KHT, 'KHARTOUM', null, a('c1c', .8), a('c1d')); } });
+    Gl(a('c1a'), a('c1a', .55), [8, 33, 7000], [1, 33, 3600]);
+    Gl(a('c1a', .55), a('c1a2'), [-.3, 33, 2800], [VIC[0], VIC[1], 2000], { over: (g, t, cam) => pin(g, t, cam, VIC, 'LAKE VICTORIA', null, a('c1a', .55) + .1, a('c1a2')) });
+    Gl(a('c1a2'), a('c1a2', .5), [1, 32.6, 3000], [9, 31.8, 3800], { over: draw });
+    Gl(a('c1a2', .5), a('c1b'), [15, 32, 7500], [22, 31.5, 6200], { over: (g, t, cam) => { draw(g, t, cam); G.counter(g, t, a('c1a2', .5) + .1, a('c1b'), { to: 11, fmt: v => Math.round(v) + '', label: 'COUNTRIES IN THE NILE BASIN', sub: '> 6,000 km from Lake Victoria to the sea' }); } });
+    Gl(a('c1b'), a('c1b', .5), [12, 31.5, 9000], [10, 31.2, 7000], { over: (g, t, cam) => { WN(g, t, cam); label(g, t, cam, [7.5, 30.6], 'WHITE NILE', a('c1b', .1), a('c1b', .5)); } });
+    P(a('c1b', .5), a('c1c'), 'tana_fishermen', [.5, .5, 1.15], [.5, .58, 1.0], { amb: 'river', lower: ['LAKE TANA · ETHIOPIA', 'where the Blue Nile begins'] });
+    Gl(a('c1c'), a('c1c', .45), [9, 31, 3600], [12.6, 34, 2700], { over: (g, t, cam) => { WN(g, t, cam); rivers(g, t, cam, ['blue'], a('c1c', .05), a('c1c', .45), 1, COL.blue); label(g, t, cam, [11.2, 36.6], 'BLUE NILE', a('c1c', .25), a('c1c', .45), COL.blue); } });
+    Gl(a('c1c', .45), a('c1c', .8), [14.6, 33.2, 1900], [KHT[0], KHT[1], 800], { over: (g, t, cam) => { WN(g, t, cam); rivers(g, t, cam, ['blue'], -9, -8, 1, COL.blue); pin(g, t, cam, KHT, 'KHARTOUM', null, a('c1c', .47), a('c1c', .8)); } });
+    P(a('c1c', .8), a('c1d'), 'khartoum_bluenile', [.45, .45, 1.0], [.5, .5, 1.14], { lower: ['THE BLUE NILE', 'at Khartoum, Sudan'] });
     graphic(a('c1d'), a('c1e'), (g, t, t0, t1) => { G.photo(g, IMG['plates/khartoum'], t, t0 - .5, t1 + .5, [.5, .55, 1.0], [.47, .6, 1.12], 1);
       const P = (lat, lon) => { const [w, s, e, n] = [32.36, 15.50, 32.72, 15.72], u = eio(pr(t, t0 - .5, t1 + .5)), z = lerp(1, 1.12, u), im = IMG['plates/khartoum'], base = Math.max(W / im.width, H / im.height) * z, ww = im.width * base, hh = im.height * base;
         const x = G.clamp(W / 2 - lerp(.5, .47, u) * ww, W - ww, 0), y = G.clamp(H / 2 - lerp(.55, .6, u) * hh, H - hh, 0); return [x + (lon - w) / (e - w) * ww, y + (n - lat) / (n - s) * hh]; };
       const tag = (ll, s, col, tt) => { const [x, y0] = P(...ll), y = G.clamp(y0, 130, H - 330), a = pr(t, tt, tt + .4); text(g, s, x, y, `600 34px ${F.lab}`, col, 'center', a, true, 4); };
       tag([15.578, 32.468], 'WHITE NILE', COL.text, a('c1d', .25)); tag([15.60, 32.605], 'BLUE NILE', '#e8c08a', a('c1d', .55)); tag([15.68, 32.50], 'THE NILE', COL.text, a('c1d', .8));
-      G.lower(g, t, t0 + .3, t1 - .1, 'KHARTOUM · 13 SEPTEMBER 2024', 'Landsat 8 · flood season · USGS'); });
-    photo(a('c1e'), a('c1e', 1) + .4, 'bluenile_falls', [.5, .55, 1.15], [.5, .5, 1.0], { amb: 'river', lower: ['THE BLUE NILE FALLS', 'below Lake Tana, Ethiopia'], credit: 'Photo: Nina R, CC BY 2.0' });
-    graphic(a('c1e', 1) + .4, a('c1g'), shareGraphic);
-    photo(a('c1g'), DUR, 'cairo_rowing', [.5, .5, 1.12], [.5, .45, 1.0], { amb: 'river', credit: 'Photo: Ibrahim.ID, CC BY 4.0',
-      over: (g, t) => G.counter(g, t, a('c1g', .3), DUR + .4, { to: 97, fmt: v => '≈' + Math.round(v) + '%', label: "OF EGYPT'S RENEWABLE WATER", sub: 'from the Nile · Nile Basin Initiative', col: COL.teal }) });
+      G.lower(g, t, t0 + .3, t1 - .1, 'KHARTOUM · 13 SEPTEMBER 2024', 'Landsat 8 · flood season · USGS'); }, { cut: 1 });
+    P(a('c1e'), a('c1e', .55), 'bluenile_falls', [.5, .55, 1.0], [.5, .5, 1.12], { amb: 'river', lower: ['THE BLUE NILE FALLS', 'below Lake Tana, Ethiopia'] });
+    P(a('c1e', .55), a('c1e', 1) + .4, 'bluenile_falls', [.6, .42, 1.75], [.52, .46, 1.5]);
+    const RE = (g, t, cam) => rivers(g, t, cam, ['blue', 'atbara', 'sobat'], a('c1e', 1) + .4, a('c1f', .5), 1, COL.blue);
+    Gl(a('c1e', 1) + .4, a('c1f', .4), [11.5, 37.5, 2600], [12.5, 36, 3200], { over: RE });
+    Gl(a('c1f', .4), a('c1f', .75), [14, 35, 4500], [17, 33.5, 5600], { over: (g, t, cam) => { RE(g, t, cam); rivers(g, t, cam, ['nile'], a('c1f', .4), a('c1g')); } });
+    Gl(a('c1f', .75), a('c1g'), [22, 32.5, 5200], [27, 31.5, 3600], { over: (g, t, cam) => { RE(g, t, cam); rivers(g, t, cam, ['nile'], a('c1f', .4), a('c1g')); } });
+    layer(a('c1e', 1) + .4, a('c1g'), shareGraphic, .62);
+    const C97 = (g, t) => G.counter(g, t, a('c1g', .3), DUR + .4, { to: 97, fmt: v => '≈' + Math.round(v) + '%', label: "OF EGYPT'S RENEWABLE WATER", sub: 'from the Nile · Nile Basin Initiative', col: COL.teal });
+    P(a('c1g'), a('c1g', .6), 'cairo_rowing', [.5, .5, 1.12], [.5, .45, 1.0], { amb: 'river', over: C97 });
+    P(a('c1g', .6), DUR, 'cairo_rowing', [.72, .58, 1.7], [.66, .55, 1.5], { over: C97 });
   },
   2() {
-    const a = at;
+    const a = at, GR = { state: () => ({ uGrey: .6 }) }, RV = (g, t, cam) => rivers(g, t, cam, ['blue', 'nile'], -9, -8, .9);
     globe(0, a('c2a'), [[0, 20, 32, 6500], [a('c2a'), 19, 32.5, 5600]], { title: ['02', 'A treaty for two'], state: () => ({ uGrey: .85 }) });
-    archive(a('c2a'), a('c2b'), 'khartoum_shadouf', 'a shaduf lifting water from the Blue Nile · Khartoum · Matson collection');
-    graphic(a('c2b'), a('c2c'), treatyCard);
-    globe(a('c2c'), a('c2f'), [[a('c2c') - .3, 17, 31, 6200], [a('c2e'), 14, 33, 5200], [a('c2f'), 11, 35.5, 4200]], { state: () => ({ uGrey: .55 }),
-      over: (g, t, cam, S) => { rivers(g, t, cam, ['blue', 'nile'], a('c2c'), a('c2d', 1)); (t < a('c2e') + .25 ? onShot(splitGraphic, .6) : onShot(timeline1929, .62))(g, t, cam, { t0: t < a('c2e') + .25 ? a('c2c') : a('c2e'), t1: t < a('c2e') + .25 ? a('c2e') : a('c2f') }); } });
-    photo(a('c2f'), DUR, 'eth_plough', [.4, .5, 1.12], [.5, .5, 1.0], { credit: 'Photo: ILRI / Stevie Mann, CC BY 2.0', lower: ['THE ETHIOPIAN HIGHLANDS', 'where most of the water starts'] });
+    archive(a('c2a'), a('c2a', .55), 'khartoum_shadouf', 'a shaduf lifting water from the Blue Nile · Khartoum', { cut: 1 });
+    Gl(a('c2a', .55), a('c2b'), [22, 32, 5600], [13, 35.5, 4000], { ...GR, over: (g, t, cam) => { RV(g, t, cam); label(g, t, cam, [9.5, 38.5], 'ETHIOPIA', a('c2a', .7), a('c2b'), COL.red); } });
+    graphic(a('c2b'), a('c2b', .72), treatyCard, { cut: 1 });
+    Gl(a('c2b', .72), a('c2c'), [24, 31.5, 5200], [20, 32, 4400], { ...GR, over: (g, t, cam) => { RV(g, t, cam); label(g, t, cam, [26.5, 30.0], 'EGYPT', a('c2b', .74), a('c2c')); label(g, t, cam, [16.5, 30.5], 'SUDAN', a('c2b', .8), a('c2c')); } });
+    Gl(a('c2c'), a('c2c', .5), [27, 31, 4200], [25, 31.5, 3600], { ...GR, over: RV });
+    Gl(a('c2c', .5), a('c2d'), [17.5, 31.5, 4200], [15.5, 32.5, 3600], { ...GR, over: RV });
+    Gl(a('c2d'), a('c2d', .55), [11.5, 37, 4000], [10, 38.5, 3200], { ...GR, over: RV });
+    P(a('c2d', .55), a('c2e'), 'eth_plough', [.4, .5, 1.12], [.46, .5, 1.02]);
+    layer(a('c2c'), a('c2e'), splitGraphic, .62);
+    Gl(a('c2e'), a('c2e', .55), [27, 31, 5000], [23, 32, 5800], { ...GR, over: RV });
+    Gl(a('c2e', .55), a('c2e2'), [16, 32.5, 5000], [13.5, 33.5, 4400], { ...GR, over: RV });
+    Gl(a('c2e2'), a('c2e2', .5), [10, 36.5, 4200], [11, 35.5, 3500], { ...GR, over: RV });
+    Tr(a('c2e2', .5), a('c2f'), { x: 46, y: 2, h: 8.5, tx: 24, ty: 34, th: 0 }, { x: 36, y: 10, h: 5.6, tx: 21, ty: 40 });
+    layer(a('c2e'), a('c2f'), timeline1929, .64);
+    P(a('c2f'), a('c2f', .55), 'eth_plough', [.45, .5, 1.0], [.5, .5, 1.1], { lower: ['THE ETHIOPIAN HIGHLANDS', 'where most of the water starts'] });
+    P(a('c2f', .55), DUR, 'eth_plough', [.76, .34, 1.7], [.72, .38, 1.5]);
   },
   3() {
-    const a = at;
+    const a = at, N = { state: () => ({ uNightA: 1, uNightB: 1 }) }, FULL = () => 640;
     globe(0, a('c3a'), [[0, 15, 34, 7000], [a('c3a'), 15, 34, 6600]], { title: ['03', 'Power for the dark'] });
-    globe(a('c3a'), a('c3c'), [[a('c3a'), 15, 34, 6600], [a('c3c'), 17, 34.5, 6000]], { state: t => ({ uNightA: 0, uNightB: 1, uScanLat: lerp(40, -10, pr(t, a('c3a'), a('c3a') + 2.6)), uScanOn: t > a('c3a') && t < a('c3a') + 2.8 ? 1 : 0 }),
-      over: (g, t, cam) => { G.lower(g, t, a('c3a') + .4, a('c3c') - .2, 'THE NILE BASIN AT NIGHT', 'NASA VIIRS Black Marble · 2016'); label(g, t, cam, [29.5, 31.2], 'EGYPT', a('c3b'), a('c3c')); label(g, t, cam, [9.5, 38.5], 'ETHIOPIA', a('c3b', .5), a('c3c')); label(g, t, cam, [9.03, 38.74], 'Addis Ababa', a('c3b', .7), a('c3c'), COL.dim, 24); } });
-    photo(a('c3c'), a('c3d'), 'oromia_village', [.45, .5, 1.12], [.55, .5, 1.0], { credit: 'Photo: Ninara, CC BY 2.0',
-      over: (g, t) => G.counter(g, t, a('c3c', .45), a('c3d'), { to: 45, fmt: v => '≈' + Math.round(v) + '%', label: 'OF ETHIOPIANS WITHOUT ELECTRICITY · 2023', sub: 'World Bank: 55.4% had access' }) });
-    globe(a('c3d'), a('c3d', .42), [[a('c3d') - .3, 12.4, 35.6, 4200], [a('c3d', .42), 11.5, 34.6, 2500]],
-      { over: (g, t, cam) => { border(g, t, cam, a('c3d') + .1, a('c3d') + 1.4); rivers(g, t, cam, ['blue'], -9, -8, pr(t, a('c3d'), a('c3d') + .5)); label(g, t, cam, [13.0, 32.6], 'SUDAN', a('c3d', .08), a('c3d', .42)); label(g, t, cam, [9.6, 37.4], 'ETHIOPIA', a('c3d', .12), a('c3d', .42)); pin(g, t, cam, DAM, 'GUBA', 'the dam site', a('c3d', .15), a('c3d', .42)); } });
-    terrain(a('c3d', .42), a('c3e'), fly({ x: 3, y: 68, h: 5.2, tx: 22, ty: 44, th: 0 }, { x: 9, y: 61, h: 3.6, tx: 25, ty: 40 }),
-      { lower: ['GUBA · WHERE THE DAM STANDS', 'construction began 2 April 2011 · the gorge before filling'] });
-    photo(a('c3e'), a('c3f'), 'eth_countryside', [.6, .5, 1.15], [.5, .45, 1.0], { credit: 'Photo: A. Davey, CC BY 2.0',
-      over: (g, t) => G.counter(g, t, a('c3e', .2), a('c3f'), { to: 5, fmt: v => '≈ US$' + Math.round(v) + ' bn', label: 'COST · MOSTLY RAISED INSIDE ETHIOPIA', sub: 'bonds + salary contributions · Chinese loan for turbines' }) });
-    terrain(a('c3f'), a('c3g'), fly({ x: 30, y: 46, h: 4.2, tx: 18, ty: 58 }, { x: 24, y: 50, h: 3.6, tx: 16, ty: 58 }, { level: () => 640 }), { over: onShot(heightGraphic, .66) });
-    globe(a('c3g'), a('c3h'), [[a('c3g') - .3, 12, 37, 3400], [a('c3h'), 10, 38.5, 2600]], { state: () => ({ uNightA: 1, uNightB: 1 }), over: onShot(powerGraphic, .5) });
-    photo(a('c3h'), DUR, 'tana_fishermen', [.5, .55, 1.12], [.5, .5, 1.0], { amb: 'river', credit: 'Photo: A. Davey, CC BY 2.0', lower: ['LAKE TANA', 'the source of the Blue Nile'] });
+    globe(a('c3a'), a('c3b'), [[a('c3a'), 15, 34, 6600], [a('c3b'), 16, 34.2, 6300]], { cut: 1, state: t => ({ uNightA: 0, uNightB: 1, uScanLat: lerp(40, -10, pr(t, a('c3a'), a('c3a') + 2.4)), uScanOn: t > a('c3a') && t < a('c3a') + 2.6 ? 1 : 0 }),
+      over: (g, t) => G.lower(g, t, a('c3a') + .4, a('c3b') - .1, 'THE NILE BASIN AT NIGHT', 'NASA VIIRS Black Marble · 2016') });
+    Gl(a('c3b'), a('c3b', .5), [28.5, 31, 3800], [26.5, 31.5, 2800], { ...N, over: (g, t, cam) => label(g, t, cam, [29.6, 29.2], 'EGYPT', a('c3b'), a('c3b', .5)) });
+    Gl(a('c3b', .5), a('c3c'), [12, 37, 4400], [9.5, 38.5, 3000], { ...N, over: (g, t, cam) => { label(g, t, cam, [11.5, 38.5], 'ETHIOPIA', a('c3b', .5), a('c3c')); label(g, t, cam, [9.03, 38.74], 'Addis Ababa', a('c3b', .65), a('c3c'), COL.dim, 24); } });
+    P(a('c3c'), a('c3c', .45), 'bahirdar_street', [.5, .5, 1.14], [.5, .56, 1.0], { lower: ['BAHIR DAR · ETHIOPIA', 'a city on Lake Tana'] });
+    const C45 = (g, t) => G.counter(g, t, a('c3c', .47), a('c3d'), { to: 45, fmt: v => '≈' + Math.round(v) + '%', label: 'OF ETHIOPIANS WITHOUT ELECTRICITY · 2023', sub: 'World Bank: 55.4% had access' });
+    P(a('c3c', .45), a('c3c', .8), 'oromia_village', [.45, .5, 1.12], [.52, .5, 1.02], { over: C45 });
+    P(a('c3c', .8), a('c3d'), 'oromia_village', [.8, .62, 1.7], [.74, .6, 1.5], { over: C45 });
+    Gl(a('c3d'), a('c3d', .42), [12.4, 35.6, 4200], [11.5, 34.6, 2500], { over: (g, t, cam) => { border(g, t, cam, a('c3d') + .1, a('c3d') + 1.4); rivers(g, t, cam, ['blue'], -9, -8, pr(t, a('c3d'), a('c3d') + .3)); label(g, t, cam, [13.0, 32.6], 'SUDAN', a('c3d', .08), a('c3d', .42)); label(g, t, cam, [9.6, 37.4], 'ETHIOPIA', a('c3d', .12), a('c3d', .42)); pin(g, t, cam, DAM, 'GUBA', 'the dam site', a('c3d', .15), a('c3d', .42)); } });
+    Tr(a('c3d', .42), a('c3d', .72), { x: 3, y: 68, h: 5.2, tx: 22, ty: 44, th: 0 }, { x: 7, y: 63, h: 4.0, tx: 24, ty: 41 });
+    Tr(a('c3d', .72), a('c3e'), { x: 36, y: 10, h: 6.0, tx: 22, ty: 40 }, { x: 31, y: 15, h: 4.8, tx: 21, ty: 42 });
+    lowerL(a('c3d', .42), a('c3e'), 'GUBA · WHERE THE DAM STANDS', 'construction began 2 April 2011 · the gorge before filling');
+    const C5 = (g, t) => G.counter(g, t, a('c3e', .2), a('c3f'), { to: 5, fmt: v => '≈ US$' + Math.round(v) + ' bn', label: 'COST · MOSTLY RAISED INSIDE ETHIOPIA', sub: 'bonds + salary contributions · Chinese loan for turbines' });
+    P(a('c3e'), a('c3e', .4), 'eth_countryside', [.6, .5, 1.15], [.52, .47, 1.02], { over: C5 });
+    P(a('c3e', .4), a('c3e', .72), 'eth_countryside', [.6, .74, 1.8], [.66, .72, 1.6], { over: C5 });
+    P(a('c3e', .72), a('c3f'), 'bahirdar_street', [.3, .62, 1.7], [.36, .6, 1.5], { over: C5 });
+    Tr(a('c3f'), a('c3f', .5), { x: 30, y: 46, h: 4.2, tx: 18, ty: 58 }, { x: 27, y: 48, h: 3.9, tx: 17, ty: 58 }, {}, FULL);
+    Tr(a('c3f', .5), a('c3g'), { x: 2, y: 64, h: 3.5, tx: 22, ty: 40, th: 0 }, { x: 6, y: 58, h: 4.6, tx: 26, ty: 36 }, {}, FULL);
+    layer(a('c3f'), a('c3g'), heightGraphic, .66);
+    Gl(a('c3g'), a('c3g', .33), [12, 37, 3400], [11, 37.8, 2900], N);
+    Gl(a('c3g', .33), a('c3g', .66), [9.6, 39, 2800], [9.2, 38.6, 2200], N);
+    Gl(a('c3g', .66), a('c3h'), [17, 34, 5000], [21, 33, 6000], N);
+    layer(a('c3g'), a('c3h'), powerGraphic, .52);
+    P(a('c3h'), a('c3h', .5), 'tana_fishermen', [.5, .55, 1.12], [.5, .5, 1.0], { amb: 'river', lower: ['LAKE TANA', 'the source of the Blue Nile'] });
+    P(a('c3h', .5), DUR, 'tana_fishermen', [.32, .8, 1.8], [.4, .76, 1.55]);
   },
   4() {
-    const a = at;
+    const a = at, FULL = () => 640;
     terrain(0, a('c4a'), fly({ x: 44, y: 12, h: 6, tx: 26, ty: 36, sunAz: 120, sunEl: 24 }, { x: 40, y: 18, h: 6, tx: 22, ty: 42 }), { title: ['04', 'Five summers'] });
-    graphic(a('c4a'), a('c4b'), flowGraphic);
-    terrain(a('c4b'), a('c4d'), fly({ x: 38, y: 10, h: 6.0, tx: 22, ty: 40 }, { x: 33, y: 14, h: 5.0, tx: 21, ty: 42 }, { level: u => lerp(490, 540, eio(pr(u, .1, .95))) }),
-      { over: (g, t) => { G.lower(g, t, a('c4b') + .3, a('c4c') - .2, 'WHILE IT FILLS, LESS GOES ON', 'water held back is water that does not flow downstream'); G.lower(g, t, a('c4c') + .1, a('c4d') - .1, 'JULY 2020 · THE FIRST FILLING', 'no agreement with Egypt or Sudan · 3D model'); } });
-    graphic(a('c4d'), a('c4h'), timelapse);
-    terrain(a('c4h'), a('c4i'), fly({ x: 36, y: 14, h: 6.5, tx: 22, ty: 40 }, { x: 33, y: 18, h: 6.5, tx: 20, ty: 44 }, { level: u => levelAt(u) }),
-      { over: (g, t, cam, S) => levelGauge(g, t, S), lower: ['WATER LEVEL BEHIND THE DAM', 'end of each filling · 3D model'] });
-    terrain(a('c4i'), a('c4j'), fly({ x: 40, y: 20, h: 7, tx: 22, ty: 42 }, { x: 30, y: 28, h: 5.5, tx: 18, ty: 50 }, { level: () => 640 }), { over: onShot(volumeGraphic, .68) });
-    graphic(a('c4j'), DUR, talksGraphic);
+    Tr(a('c4a'), a('c4a', .55), { x: 2, y: 64, h: 3.5, tx: 22, ty: 40, th: 0 }, { x: 5, y: 60, h: 4.2, tx: 25, ty: 37 }, {}, FULL);
+    Tr(a('c4a', .55), a('c4b'), { x: 40, y: 20, h: 7, tx: 22, ty: 42 }, { x: 34, y: 25, h: 6, tx: 19, ty: 48 }, {}, FULL);
+    Tr(a('c4b'), a('c4b', .38), { x: 33, y: 12, h: 5.2, tx: 21, ty: 40 }, { x: 37, y: 9, h: 6.4, tx: 22, ty: 40 }, {}, u => lerp(490, 560, u));
+    Tr(a('c4b', .38), a('c4b', .72), { x: 30, y: 46, h: 4.2, tx: 18, ty: 58 }, { x: 26, y: 49, h: 3.8, tx: 16, ty: 58 }, {}, u => lerp(540, 600, u));
+    layer(a('c4a'), a('c4b', .72), flowGraphic, .74);
+    Tr(a('c4b', .72), a('c4c'), { x: 38, y: 10, h: 6.0, tx: 22, ty: 40 }, { x: 34, y: 13, h: 5.2, tx: 21, ty: 42 }, { lower: ['WHILE IT FILLS, LESS GOES ON', 'water held back is water that does not flow downstream'] }, u => lerp(490, 520, u));
+    Tr(a('c4c'), a('c4c', .5), { x: 5, y: 66, h: 5.0, tx: 22, ty: 44, th: 0 }, { x: 9, y: 61, h: 3.8, tx: 25, ty: 40 }, { lower: ['JULY 2020 · THE FIRST FILLING', 'water level raised to 540 m · 3D model'] }, u => lerp(490, 540, eio(u)));
+    Gl(a('c4c', .5), a('c4d'), [17, 33, 5200], [21, 32.5, 6400], { over: (g, t, cam) => { rivers(g, t, cam, ['blue', 'nile'], -9, -8); label(g, t, cam, [26.5, 30.0], 'EGYPT', a('c4c', .52), a('c4d')); label(g, t, cam, [16.5, 30.5], 'SUDAN', a('c4c', .58), a('c4d')); pin(g, t, cam, DAM, 'NO AGREEMENT', null, a('c4c', .62), a('c4d')); } });
+    const TL = (x, y, mode) => graphic(x, y, (g, t, t0, t1) => timelapse(g, t, t0, t1, mode), { cut: 1 });
+    TL(a('c4d'), a('c4e'), 0); TL(a('c4e'), a('c4f') - 1.5, 1); TL(a('c4f') - 1.5, a('c4g') - 1.4, 0); TL(a('c4g') - 1.4, a('c4g', .55), 1); TL(a('c4g', .55), a('c4h'), 0);
+    const GA = (g, t) => levelGauge(g, t, { t0: a('c4h'), t1: a('c4i') });
+    Tr(a('c4h'), a('c4h', .5), { x: 36, y: 14, h: 6.5, tx: 22, ty: 40 }, { x: 34, y: 16, h: 6.5, tx: 21, ty: 42 }, { over: GA }, u => levelAt(u * .5));
+    Tr(a('c4h', .5), a('c4i'), { x: 30, y: 46, h: 4.4, tx: 18, ty: 58 }, { x: 26, y: 49, h: 4.0, tx: 16, ty: 58 }, { over: GA }, u => levelAt(.5 + u * .5));
+    lowerL(a('c4h'), a('c4i'), 'WATER LEVEL BEHIND THE DAM', 'end of each filling · 3D model');
+    Tr(a('c4i'), a('c4i', .5), { x: 40, y: 20, h: 7, tx: 22, ty: 42 }, { x: 35, y: 24, h: 6.2, tx: 20, ty: 46 }, {}, FULL);
+    Tr(a('c4i', .5), a('c4j'), { x: 70, y: 30, h: 5.5, tx: 40, ty: 38 }, { x: 56, y: 38, h: 4.6, tx: 30, ty: 46 }, {}, FULL);
+    layer(a('c4i'), a('c4j'), volumeGraphic, .7);
+    const GR = { state: () => ({ uGrey: .35 }) };
+    Gl(a('c4j'), a('c4j', .4), [17, 33, 4200], [15.6, 32.6, 2600], GR);
+    Gl(a('c4j', .4), a('c4j', .72), [36, -70, 7000], [38.9, -77, 4200], GR);
+    Gl(a('c4j', .72), a('c4k'), [42, -70, 6500], [40.7, -74, 4200], GR);
+    Gl(a('c4k'), DUR, [27, 31.5, 4200], [30, 31.2, 2400], GR);
+    layer(a('c4j'), DUR + .5, talksGraphic, .5);
   },
   5() {
-    const a = at;
-    photo(0, a('c5a'), 'nasser_view', [.5, .55, 1.12], [.5, .5, 1.0], { title: ['05', 'What Egypt fears'], amb: 'river', credit: 'Photo: Warren LeMay, CC0' });
-    photo(a('c5a'), a('c5b'), 'aswan_lascar', [.4, .5, 1.12], [.55, .5, 1.0], { credit: 'Photo: Jorge Láscar, CC BY 2.0', lower: ['ASWAN HIGH DAM · LAKE NASSER', "Egypt's reserve, completed 1970"] });
-    globe(a('c5b'), a('c5c'), [[a('c5b') - .3, 23.0, 32.4, 1600], [a('c5c'), 22.6, 32.0, 900]], { state: () => ({ uGrey: .7, uKeep: 1 }),
-      over: (g, t, cam) => { G.lower(g, t, a('c5b', .2), a('c5c') - .1, 'LAKE NASSER', 'the drought of the 1980s'); pin(g, t, cam, ASWAN, 'ASWAN HIGH DAM', null, a('c5b', .4), a('c5c')); } });
-    graphic(a('c5c'), a('c5d2'), twoDams);
-    terrain(a('c5d2'), a('c5d3'), fly({ x: 70, y: 30, h: 5.5, tx: 40, ty: 38 }, { x: 46, y: 46, h: 3.8, tx: 22, ty: 52 }, { level: () => 640 }),
-      { over: (g, t) => { text(g, "ETHIOPIA'S CASE", 120, 170, `600 44px ${F.lab}`, COL.text, 'left', win(t, a('c5d2') + .2, a('c5d3') - .1), true, 4);
-        [['LESS EVAPORATION', 'cool highlands, not the desert', .12], ['A STEADIER RIVER', 'released through the year', .5], ['FEWER FLOODS IN SUDAN', 'the peak is held back', .78]].forEach(([b, sm, f], i) => key(g, t, a('c5d2', f), a('c5d3') - .1, b, sm, 120, 220 + i * 140)); } });
-    globe(a('c5d3'), a('c5d3', .6), [[a('c5d3') - .3, 13.5, 34.0, 2600], [a('c5d3', .6), 14.0, 33.6, 2200]],
-      { over: (g, t, cam) => { rivers(g, t, cam, ['blue', 'white', 'nile'], -9, -8); pin(g, t, cam, KHT, 'KHARTOUM', 'Sudan', a('c5d3') + .3, a('c5d3', .6), -1); pin(g, t, cam, DAM, 'GERD', null, a('c5d3', .2), a('c5d3', .6)); } });
-    photo(a('c5d3', .6), a('c5e'), 'photos/ph_iss_2020', [.5, .5, 1.2], [.5, .5, 1.05], { credit: 'Photo: NASA / ISS crew', lower: ['KHARTOUM AT NIGHT', 'where the Blue and White Nile meet · ISS, 2020'] });
-    globe(a('c5e'), DUR, [[a('c5e'), 12.5, 34.5, 2400], [DUR, 16, 33.5, 5200]],
-      { over: (g, t, cam) => { rivers(g, t, cam, ['blue'], a('c5e'), a('c5e', .8), 1, COL.blue); rivers(g, t, cam, ['nile'], a('c5e', .6), DUR); pin(g, t, cam, DAM, 'CONTROLLED HERE', null, a('c5e', .5), DUR); } });
+    const a = at, FULL = () => 640, GR = { state: () => ({ uGrey: .7, uKeep: 1 }) }, RV = (g, t, cam) => rivers(g, t, cam, ['blue', 'white', 'nile'], -9, -8);
+    photo(0, a('c5a'), 'nasser_view', [.5, .55, 1.12], [.5, .5, 1.0], { title: ['05', 'What Egypt fears'], amb: 'river', credit: CRED.nasser_view });
+    P(a('c5a'), a('c5a', .35), 'cairo_rowing', [.5, .5, 1.0], [.5, .46, 1.12], { amb: 'river' });
+    Tr(a('c5a', .35), a('c5a', .62), { x: 33, y: 12, h: 5.2, tx: 21, ty: 40 }, { x: 38, y: 8, h: 7.0, tx: 22, ty: 40 }, {}, u => lerp(600, 640, u));
+    P(a('c5a', .62), a('c5a', .82), 'aswan_lascar', [.4, .5, 1.12], [.5, .5, 1.0]);
+    P(a('c5a', .82), a('c5b'), 'aswan_lascar', [.3, .42, 1.75], [.37, .42, 1.5]);
+    lowerL(a('c5a', .62), a('c5b'), 'ASWAN HIGH DAM · LAKE NASSER', "Egypt's reserve, completed 1970");
+    Gl(a('c5b'), a('c5b', .45), [25, 32.6, 3400], [23.4, 32.5, 1900], GR);
+    Gl(a('c5b', .45), a('c5c'), [23, 32.4, 1600], [22.6, 32.0, 950], { ...GR, over: (g, t, cam) => pin(g, t, cam, ASWAN, 'ASWAN HIGH DAM', null, a('c5b', .47), a('c5c')) });
+    lowerL(a('c5b') + .1, a('c5c'), 'LAKE NASSER', 'the drought of the 1980s');
+    Gl(a('c5c'), a('c5c', 1) + .6, [21, 33, 7000], [18, 33.5, 6000], { over: RV });
+    Gl(a('c5c', 1) + .6, a('c5d', .45), [25.5, 32.6, 3400], [24, 32.9, 2500], { over: RV });
+    Gl(a('c5d', .45), a('c5d', .75), [12.4, 35.2, 3200], [11.4, 35, 2500], { over: RV });
+    Tr(a('c5d', .75), a('c5d2'), { x: 2, y: 64, h: 3.5, tx: 22, ty: 40, th: 0 }, { x: 5, y: 60, h: 4.2, tx: 25, ty: 37 }, {}, FULL);
+    layer(a('c5c'), a('c5d2'), twoDams, .72);
+    Tr(a('c5d2'), a('c5d2', .25), { x: 70, y: 30, h: 5.5, tx: 40, ty: 38 }, { x: 58, y: 37, h: 4.6, tx: 31, ty: 45 }, {}, FULL);
+    Tr(a('c5d2', .25), a('c5d2', .45), { x: 40, y: 20, h: 7, tx: 22, ty: 42 }, { x: 35, y: 24, h: 6.2, tx: 20, ty: 46 }, {}, FULL);
+    Gl(a('c5d2', .45), a('c5d2', .64), [23.6, 32.6, 2600], [22.9, 32.3, 1800]);
+    Tr(a('c5d2', .64), a('c5d2', .82), { x: 30, y: 46, h: 4.2, tx: 18, ty: 58 }, { x: 26, y: 49, h: 3.8, tx: 16, ty: 58 }, {}, FULL);
+    Gl(a('c5d2', .82), a('c5d3'), [14.6, 33.4, 2600], [15.5, 32.7, 1800], { over: RV });
+    layer(a('c5d2'), a('c5d3'), caseChips, 0);
+    Gl(a('c5d3'), a('c5d3', .3), [13.5, 34.0, 2800], [14.0, 33.6, 2300], { over: (g, t, cam) => { RV(g, t, cam); pin(g, t, cam, KHT, 'KHARTOUM', 'Sudan', a('c5d3') + .2, a('c5d3', .3), -1); pin(g, t, cam, DAM, 'GERD', null, a('c5d3', .08), a('c5d3', .3)); } });
+    P(a('c5d3', .3), a('c5d3', .55), 'photos/ph_iss_2020', [.5, .5, 1.2], [.5, .5, 1.05], { lower: ['KHARTOUM AT NIGHT', 'where the Blue and White Nile meet · ISS, 2020'] });
+    P(a('c5d3', .55), a('c5d3', .78), 'khartoum_bluenile', [.5, .5, 1.12], [.45, .48, 1.0], { lower: ['THE BLUE NILE AT KHARTOUM', '≈ 500 km downstream of the dam'] });
+    Tr(a('c5d3', .78), a('c5e'), { x: 5, y: 66, h: 5.0, tx: 22, ty: 44, th: 0 }, { x: 9, y: 61, h: 3.8, tx: 25, ty: 40 }, { lower: ['THE DAM, FROM DOWNSTREAM', 'Sudan has raised concerns about its safety'] }, FULL);
+    Gl(a('c5e'), a('c5e', .5), [12.5, 34.5, 2400], [14, 34, 3600], { over: (g, t, cam) => { rivers(g, t, cam, ['blue'], a('c5e'), a('c5e', .5), 1, COL.blue); pin(g, t, cam, DAM, 'CONTROLLED HERE', null, a('c5e', .25), a('c5e', .5)); } });
+    Gl(a('c5e', .5), DUR, [16, 33.5, 5200], [21, 32.8, 7000], { over: (g, t, cam) => { rivers(g, t, cam, ['blue'], -9, -8, 1, COL.blue); rivers(g, t, cam, ['nile'], a('c5e', .5), DUR - .5); pin(g, t, cam, DAM, 'CONTROLLED HERE', null, a('c5e', .5), DUR + 1); } });
   },
   6() {
-    const a = at;
-    terrain(0, a('c6a', 1) + .3, fly({ x: 2, y: 66, h: 4, tx: 20, ty: 44 }, { x: 6, y: 62, h: 5, tx: 24, ty: 40 }, { level: () => 640 }),
-      { title: ['06', 'The flood of 2025'], over: (g, t) => G.lower(g, t, a('c6a', .3), a('c6a', 1) + .2, '9 SEPTEMBER 2025', 'the dam is formally inaugurated') });
-    photo(a('c6a', 1) + .3, a('c6b', .55), 'bluenile_falls', [.5, .5, 1.2], [.5, .55, 1.05], { amb: 'river', credit: 'Photo: Nina R, CC BY 2.0' });
-    photo(a('c6b', .55), a('c6c'), 'photos/ph_iss_2020', [.45, .5, 1.15], [.5, .5, 1.02], { credit: 'Photo: NASA / ISS crew',
-      over: (g, t) => G.counter(g, t, a('c6b', .6), a('c6c'), { to: 1200, fmt: v => '> ' + Math.round(v).toLocaleString('en-US'), label: 'FAMILIES DISPLACED · BAHRI, KHARTOUM', sub: 'autumn 2025 · Sudanese authorities, via press reports' }) });
-    graphic(a('c6c'), a('c6f'), versionsGraphic);
-    globe(a('c6f'), DUR, [[a('c6f') - .3, 13, 34, 3200], [DUR, 14, 33, 4200]], { over: (g, t, cam) => { rivers(g, t, cam, ['blue', 'white', 'nile'], -9, -8); pin(g, t, cam, DAM, 'NO SHARED DATA', 'on how the dam is run', a('c6f', .2), DUR + 1); } });
+    const a = at, FULL = () => 640, RV = (g, t, cam) => rivers(g, t, cam, ['blue', 'white', 'nile'], -9, -8);
+    terrain(0, a('c6a'), fly({ x: 2, y: 66, h: 4, tx: 20, ty: 44 }, { x: 5, y: 63, h: 4.6, tx: 23, ty: 41 }, { level: FULL }), { title: ['06', 'The flood of 2025'] });
+    Tr(a('c6a'), a('c6a', .5), { x: 40, y: 20, h: 7, tx: 22, ty: 42 }, { x: 35, y: 24, h: 6.2, tx: 20, ty: 46 }, {}, FULL);
+    Tr(a('c6a', .5), a('c6a', 1) + .3, { x: 30, y: 46, h: 4.2, tx: 18, ty: 58 }, { x: 26, y: 49, h: 3.8, tx: 16, ty: 58 }, {}, FULL);
+    lowerL(a('c6a', .3), a('c6a', 1) + .3, '9 SEPTEMBER 2025', 'the dam is formally inaugurated');
+    P(a('c6a', 1) + .3, a('c6b', .3), 'bluenile_falls', [.5, .5, 1.2], [.5, .55, 1.05], { amb: 'river' });
+    P(a('c6b', .3), a('c6b', .55), 'bluenile_falls', [.6, .42, 1.8], [.54, .46, 1.55]);
+    const CF = (g, t) => G.counter(g, t, a('c6b', .6), a('c6c'), { to: 1200, fmt: v => '> ' + Math.round(v).toLocaleString('en-US'), label: 'FAMILIES DISPLACED · BAHRI, KHARTOUM', sub: 'autumn 2025 · Sudanese authorities, via press reports' });
+    P(a('c6b', .55), a('c6b', .8), 'photos/ph_iss_2020', [.45, .5, 1.15], [.5, .5, 1.02], { over: CF });
+    P(a('c6b', .8), a('c6c'), 'photos/ph_iss_2020', [.6, .55, 1.8], [.55, .52, 1.55], { over: CF });
+    P(a('c6c'), a('c6c', .55), 'cairo_rowing', [.5, .5, 1.12], [.5, .46, 1.0]);
+    P(a('c6c', .55), a('c6d'), 'nasser_view', [.5, .55, 1.0], [.5, .5, 1.12]);
+    layer(a('c6c'), a('c6d'), (g, t, t0, t1) => version(g, t, t0, t1, 'EGYPT', COL.amber, '"a man-made flood"', 'caused by sudden releases from the dam'), 0);
+    Tr(a('c6d'), a('c6d', .5), { x: 33, y: 12, h: 5.2, tx: 21, ty: 40 }, { x: 38, y: 8, h: 7.0, tx: 22, ty: 40 }, {}, FULL);
+    Tr(a('c6d', .5), a('c6e'), { x: 70, y: 30, h: 5.5, tx: 40, ty: 38 }, { x: 58, y: 37, h: 4.6, tx: 31, ty: 45 }, {}, FULL);
+    layer(a('c6d'), a('c6e'), (g, t, t0, t1) => version(g, t, t0, t1, 'ETHIOPIA', '#7fb3ff', 'the dam held water back', 'without it, the damage would have been far worse'), 0);
+    Gl(a('c6e'), a('c6e', .5), [13.5, 32.6, 2800], [15.2, 32.5, 1700], { over: (g, t, cam) => rivers(g, t, cam, ['white'], -9, -8) });
+    P(a('c6e', .5), a('c6f'), 'plates/khartoum', [.5, .55, 1.0], [.47, .6, 1.12]);
+    layer(a('c6e'), a('c6f'), (g, t, t0, t1) => version(g, t, t0, t1, 'SUDAN', COL.teal, 'also the White Nile', 'and infrastructure damaged by war'), 0);
+    Gl(a('c6f'), a('c6f', .5), [13, 34, 3200], [14, 33.4, 3900], { over: (g, t, cam) => { RV(g, t, cam); pin(g, t, cam, DAM, 'NO SHARED DATA', 'on how the dam is run', a('c6f', .1), a('c6f', .5)); } });
+    Gl(a('c6f', .5), DUR, [17, 33, 6200], [20, 33, 7600], { over: (g, t, cam) => { RV(g, t, cam);
+      [['EGYPT', '"a man-made flood"'], ['ETHIOPIA', 'the dam held water back'], ['SUDAN', 'also the White Nile, and war damage']].forEach(([b, sm], i) => key(g, t, a('c6f', .5) + .15 + i * .35, DUR + 1, b, sm, 120, 200 + i * 140)); } });
   },
   7() {
-    const a = at;
-    globe(0, a('c7b'), [[0, 24, 32, 6000], [a('c7b'), 18, 34, 5200]], { state: () => ({ uNightA: 1, uNightB: 1 }), over: (g, t, cam, S) => { rivers(g, t, cam, ['blue', 'nile'], -9, -8, .8); onShot(headlineCard, .55)(g, t, cam, S); } });
-    globe(a('c7b'), a('c7c'), [[a('c7b') - .3, 26, 31.5, 3800], [a('c7b', .55), 18, 33, 6500], [a('c7c'), 11, 37, 3600]], { state: () => ({ uNightA: 1, uNightB: 1 }),
-      over: (g, t, cam) => label(g, t, cam, [11.2, 38.0], 'THE ETHIOPIAN HIGHLANDS', a('c7b', .6), a('c7c')) });
-    globe(a('c7c'), DUR, [[a('c7c'), 11, 37, 3600], [DUR, 17, 33, 9000]], { state: () => ({ uNightA: 1, uNightB: 1 }),
-      over: (g, t, cam, S) => { rivers(g, t, cam, ['blue', 'nile'], a('c7c'), a('c7c', .9), 1, COL.amber); bigTitle(g, t, a('c7c', .5), DUR + 1, 'One river.', 'Two great dams. No agreement.');
-        if (t > a('c7c', 1) + .6) text(g, 'Which river should we follow next?  Tell us in the comments.', W / 2, H / 2 + 210, `400 30px ${F.mono}`, COL.text, 'center', pr(t, a('c7c', 1) + .6, a('c7c', 1) + 1.1)); } });
+    const a = at, N = { state: () => ({ uNightA: 1, uNightB: 1 }) }, RV = (g, t, cam) => rivers(g, t, cam, ['blue', 'nile'], -9, -8, .8);
+    globe(0, a('c7a', .3), [[0, 24, 32, 6000], [a('c7a', .3), 22, 32.6, 5500]], { ...N, over: RV });
+    Gl(a('c7a', .3), a('c7a', .55), [30.5, 31.2, 2900], [29.6, 31.2, 2100], N);
+    Gl(a('c7a', .55), a('c7a', .8), [11.8, 36, 3800], [10.6, 37, 3100], { ...N, over: RV });
+    Gl(a('c7a', .8), a('c7b'), [13, 37.5, 2800], [12, 37.4, 2300], { ...N, over: RV });
+    layer(-1, a('c7b'), headlineCard, .55);
+    Gl(a('c7b'), a('c7b', .5), [26, 31.5, 3800], [22, 32.2, 5200], N);
+    Gl(a('c7b', .5), a('c7c'), [14, 35, 4800], [11, 37, 3600], { ...N, over: (g, t, cam) => label(g, t, cam, [11.2, 38.0], 'THE ETHIOPIAN HIGHLANDS', a('c7b', .55), a('c7c')) });
+    const END = (g, t, cam) => { rivers(g, t, cam, ['blue', 'nile'], a('c7c'), a('c7c', .9), 1, COL.amber); bigTitle(g, t, a('c7c', .5), DUR + 1, 'One river.', 'Two great dams. No agreement.');
+      if (t > a('c7c', 1) + .6) text(g, 'Which river should we follow next?  Tell us in the comments.', W / 2, H / 2 + 210, `400 30px ${F.mono}`, COL.text, 'center', pr(t, a('c7c', 1) + .6, a('c7c', 1) + 1.1)); };
+    Gl(a('c7c'), a('c7c', .6), [11, 37, 3600], [14, 35, 6000], { ...N, over: END });
+    Gl(a('c7c', .6), DUR, [15.5, 34, 7200], [17, 33, 9000], { ...N, over: END });
   },
 };
 
@@ -297,18 +385,32 @@ function powerGraphic(g, t, t0, t1) {   // 13 turbines switch on one by one (2 �
   text(g, "AFRICA'S LARGEST HYDROPOWER PLANT · MORE THAN TWICE ASWAN", 220, 880, `600 30px ${F.lab}`, COL.amber, 'left', pr(t, kc + 1.2, kc + 1.7), true, 3);
   text(g, 'installed capacity · GERD: 2 × 375 MW + 11 × 400 MW · Aswan High Dam: 2,100 MW', W - 120, 52, `400 23px ${F.mono}`, COL.dim, 'right', 1, false);
 }
-function flowGraphic(g, t, t0, t1) {   // a dam passes water on; filling holds it back
-  BG(g); const y = 560, xd = W / 2, kf = pr(t, at('c4b', .35), at('c4b', .35) + 2.5), ph = t * 1.6;
-  const arrow = (x0, x1, w, col, a) => { if (a <= 0) return; g.save(); g.globalAlpha = a; g.fillStyle = col; g.fillRect(x0, y - w / 2, x1 - x0 - 40, w); g.beginPath(); g.moveTo(x1 - 40, y - w / 2 - 26); g.lineTo(x1, y); g.lineTo(x1 - 40, y + w / 2 + 26); g.closePath(); g.fill();
-    g.globalAlpha = a * .35; g.fillStyle = '#fff'; for (let i = 0; i < 6; i++) { const xx = x0 + ((ph * 120 + i * 150) % (x1 - x0 - 60)); g.fillRect(xx, y - w / 2 + 6, 40, 4); } g.restore(); };
-  arrow(200, xd - 70, 90, '#7fb3ff', 1); arrow(xd + 70, W - 200, lerp(90, 30, kf), '#7fb3ff', 1);
-  g.save(); g.fillStyle = '#c9ccc8'; g.fillRect(xd - 40, y - 230, 80, 460); g.restore();
-  if (kf > 0) { g.save(); g.globalAlpha = .55; g.fillStyle = '#3f78b8'; const hh = 200 * eo(kf); g.fillRect(xd - 420, y - hh, 380, hh + 60); g.restore(); text(g, 'HELD BACK TO FILL THE LAKE', xd - 230, y - 220 * eo(kf) - 24, `600 28px ${F.lab}`, COL.text, 'center', kf, true, 2); }
-  text(g, 'IN', 260, y - 80, `600 34px ${F.lab}`, COL.text, 'left', 1, true, 3); text(g, 'OUT, DOWNSTREAM', W - 260, y - 80, `600 34px ${F.lab}`, COL.text, 'right', 1, true, 3);
-  text(g, kf > .05 ? 'WHILE FILLING: LESS GOES ON' : 'RUNNING: THE WATER PASSES THROUGH', W / 2, 250, `600 40px ${F.lab}`, kf > .05 ? COL.amber : COL.text, 'center', 1, true, 3);
-  text(g, 'schematic', W - 120, 52, `400 23px ${F.mono}`, COL.dim, 'right', 1, false);
+function rotor(g, x, y, r, ang, col) {
+  g.save(); g.translate(x, y); g.strokeStyle = col; g.lineWidth = 3; g.beginPath(); g.arc(0, 0, r, 0, Math.PI * 2); g.stroke(); g.rotate(ang); g.fillStyle = col; const q = r / 46;
+  for (let j = 0; j < 5; j++) { g.rotate(Math.PI * 2 / 5); g.beginPath(); g.moveTo(0, -8 * q); g.quadraticCurveTo(22 * q, -30 * q, 6 * q, -r + 8 * q); g.quadraticCurveTo(2 * q, -24 * q, 0, -8 * q); g.fill(); }
+  g.beginPath(); g.arc(0, 0, 9 * q, 0, Math.PI * 2); g.fill(); g.restore();
 }
-function timelapse(g, t, t0, t1) {   // the reservoir every dry season, same stretch, same frame (Landsat path 171)
+function flowGraphic(g, t, t0, t1) {   // a cross-section: running, the river passes through the turbine; filling, part of it stays behind
+  BG(g); const kf = eio(pr(t, at('c4b', .12), at('c4b', .12) + 3.4)), yg = 800, xd = 980, top = 400, x0 = 180, x1 = W - 180, surf = lerp(700, 470, kf), out = lerp(66, 22, kf);
+  const wave = (xa, xb, y, ph) => { for (let i = 0; i <= 40; i++) { const x = lerp(xa, xb, i / 40); g.lineTo(x, y + Math.sin(i * .6 + t * 2.6 + ph) * 3); } };
+  g.save(); g.fillStyle = '#3f78b8'; g.globalAlpha = .92; g.beginPath(); g.moveTo(x0, yg); wave(x0, xd - 30, surf, 0); g.lineTo(xd - 30, yg); g.closePath(); g.fill();
+  g.beginPath(); g.moveTo(xd + 100, yg); wave(xd + 100, x1, yg - out, 2); g.lineTo(x1, yg); g.closePath(); g.fill();
+  g.globalAlpha = 1; g.fillStyle = '#2a241d'; g.fillRect(x0, yg, x1 - x0, 22);
+  g.fillStyle = '#c9ccc8'; g.beginPath(); g.moveTo(xd - 64, yg); g.lineTo(xd - 22, top); g.lineTo(xd + 40, top); g.lineTo(xd + 112, yg); g.closePath(); g.fill();
+  g.strokeStyle = '#0d1317'; g.lineWidth = 26; g.beginPath(); g.moveTo(xd - 58, yg - 34); g.lineTo(xd + 104, yg - 24); g.stroke(); g.restore();
+  rotor(g, xd + 30, yg - 30, 30, t * lerp(7, 2.6, kf), COL.amber);
+  g.save(); g.fillStyle = 'rgba(255,255,255,.75)';   // the water, as moving marks: fewer leave than arrive while it fills
+  for (let i = 0; i < 12; i++) { const u = ((t * .16 + i / 12) % 1), x = lerp(x0 + 20, xd - 70, u); g.fillRect(x, yg - 44 + (i % 3) * 10, 26, 4); }
+  const n = Math.round(lerp(12, 4, kf)); for (let i = 0; i < n; i++) { const u = ((t * .2 + i / n) % 1), x = lerp(xd + 120, x1 - 30, u); g.fillRect(x, yg - out / 2 - 2, 26, 4); } g.restore();
+  const meter = (x, w, frac, lab, right) => { g.save(); g.fillStyle = 'rgba(244,242,238,.16)'; g.fillRect(x, 300, w, 20); g.fillStyle = '#7fb3ff'; g.fillRect(right ? x + w * (1 - frac) : x, 300, w * frac, 20); g.restore(); text(g, lab, right ? x + w : x, 280, `600 32px ${F.lab}`, COL.text, right ? 'right' : 'left', 1, true, 3); };
+  meter(x0 + 40, 440, 1, 'RIVER IN', 0); meter(x1 - 480, 440, lerp(1, .34, kf), 'RIVER OUT, DOWNSTREAM', 1);
+  text(g, 'less, while the lake fills', x1 - 40, 356, `400 26px ${F.mono}`, COL.amber, 'right', kf, false);
+  text(g, 'TURBINE', xd + 30, yg + 62, `600 26px ${F.lab}`, COL.amber, 'center', 1, true, 3); text(g, 'DAM', xd + 8, top - 22, `600 30px ${F.lab}`, COL.text, 'center', 1, true, 3);
+  if (kf > 0) { text(g, 'HELD BACK', (x0 + xd) / 2 - 40, surf + 70, `600 40px ${F.lab}`, COL.text, 'center', kf, true, 4); g.save(); g.globalAlpha = kf; g.strokeStyle = COL.text; g.lineWidth = 3; const ax = x0 + 110; g.beginPath(); g.moveTo(ax, 700); g.lineTo(ax, surf + 24); g.moveTo(ax - 12, surf + 40); g.lineTo(ax, surf + 24); g.lineTo(ax + 12, surf + 40); g.stroke(); g.restore(); }
+  text(g, kf > .05 ? 'FILLING: PART OF THE RIVER STAYS BEHIND' : 'RUNNING: WHAT COMES IN GOES OUT', W / 2, 190, `600 42px ${F.lab}`, kf > .05 ? COL.amber : COL.text, 'center', 1, true, 3);
+  text(g, 'schematic · not to scale', W - 120, 52, `400 23px ${F.mono}`, COL.dim, 'right', 1, false);
+}
+function timelapse(g, t, t0, t1, mode = 0) {   // the reservoir every dry season, same stretch, same frame (Landsat path 171)
   const yrs = [2020, 2021, 2022, 2023, 2024, 2025, 2026], M = DATA.measure;
   const key = [[at('c4d') - 1, 0], [at('c4e') - .7, 0], [at('c4e'), 1], [at('c4f') - 1.4, 1], [at('c4f') - .7, 2], [at('c4f'), 3], [at('c4g') - 1.3, 3], [at('c4g') - .8, 4], [at('c4g') - .3, 5], [at('c4g') + .3, 6]];
   let f = 0; for (let i = 0; i < key.length - 1; i++) if (t >= key[i][0]) f = lerp(key[i][1], key[i + 1][1], eio(pr(t, key[i][0], key[i + 1][0])));
@@ -319,8 +421,16 @@ function timelapse(g, t, t0, t1) {   // the reservoir every dry season, same str
   const [w, s, e, n] = PL.res, la0 = 10.1, la1 = 11.32, lo0 = 34.98, lo1 = 35.76;
   const sx = (lo0 - w) / (e - w) * im0.width, sy = (n - la1) / (n - s) * im0.height, sw = (lo1 - lo0) / (e - w) * im0.width, shh = (la1 - la0) / (n - s) * im0.height;
   const dh = H, dw = dh * sw / shh * (Math.cos(10.7 * Math.PI / 180)), dx = W - 140 - dw;
-  g.fillStyle = '#0b0f12'; g.fillRect(0, 0, W, H); BG(g);
-  g.save(); g.drawImage(im0, sx, sy, sw, shh, dx, 0, dw, dh); if (u > 0) { g.globalAlpha = u; g.drawImage(im1, sx, sy, sw, shh, dx, 0, dw, dh); } g.restore();
+  g.fillStyle = '#0b0f12'; g.fillRect(0, 0, W, H);
+  let dxm, dym;
+  if (mode) {   // the punch-in: the main body of the lake fills the frame and drifts south
+    const hh = (lo1 - lo0) * Math.cos(10.9 * Math.PI / 180) * 9 / 16, c = lerp(11.02, 10.9, pr(t, t0 - .3, t1 + .3)), ya = (n - (c + hh / 2)) / (n - s) * im0.height, yh = hh / (n - s) * im0.height;
+    g.save(); g.drawImage(im0, sx, ya, sw, yh, 0, 0, W, H); if (u > 0) { g.globalAlpha = u; g.drawImage(im1, sx, ya, sw, yh, 0, 0, W, H); } g.restore();
+    g.save(); const gr = g.createLinearGradient(0, 0, 1000, 0); gr.addColorStop(0, 'rgba(8,11,14,.82)'); gr.addColorStop(1, 'rgba(8,11,14,0)'); g.fillStyle = gr; g.fillRect(0, 0, 1000, H); g.restore();
+    dxm = (DAM[1] - lo0) / (lo1 - lo0) * W; dym = ((c + hh / 2) - DAM[0]) / hh * H;
+  } else { BG(g);
+    g.save(); g.drawImage(im0, sx, sy, sw, shh, dx, 0, dw, dh); if (u > 0) { g.globalAlpha = u; g.drawImage(im1, sx, sy, sw, shh, dx, 0, dw, dh); } g.restore();
+    dxm = dx + (DAM[1] - lo0) / (lo1 - lo0) * dw; dym = (la1 - DAM[0]) / (la1 - la0) * dh; }
   const yr = yrs[Math.round(f)], m = M[yr], area = lerp(M[yrs[i0]].km2, M[yrs[i1]].km2, u);
   text(g, m.date.slice(0, 7).replace('-', ' · '), 200, 330, `500 120px ${F.num}`, COL.text, 'left', 1);
   text(g, 'LANDSAT · ' + m.date, 200, 380, `400 24px ${F.mono}`, COL.dim, 'left', 1, false);
@@ -329,7 +439,6 @@ function timelapse(g, t, t0, t1) {   // the reservoir every dry season, same str
   text(g, 'measured on these images · MNDWI > 0', 200, 712, `400 26px ${F.mono}`, COL.dim, 'left', 1, false);
   const kl = pr(t, at('c4g', .6), at('c4g', .6) + .6); text(g, '≈ the size of Greater London (1,572 km²)', 200, 800, `500 32px ${F.lab}`, COL.amber, 'left', kl, true);
   // the dam marker on the image
-  const dxm = dx + (DAM[1] - lo0) / (lo1 - lo0) * dw, dym = (la1 - DAM[0]) / (la1 - la0) * dh;
   g.save(); g.strokeStyle = COL.amber; g.lineWidth = 3; g.beginPath(); g.arc(dxm, dym, 22, 0, Math.PI * 2); g.stroke(); g.restore(); text(g, 'DAM', dxm - 34, dym + 10, `600 26px ${F.lab}`, COL.amber, 'right', 1, true, 3);
   G.credit(g, 'Landsat 8/9 · USGS · path 171, dry season', 1);
 }
@@ -369,24 +478,41 @@ function talksGraphic(g, t, t0, t1) {
     text(g, yr, x, y - 50, `500 72px ${F.num}`, last ? COL.red : COL.amber, 'center', a); text(g, a1, x, y + 70, `600 30px ${F.lab}`, COL.text, 'center', a, true, 2); text(g, a2, x, y + 108, `400 26px ${F.mono}`, COL.dim, 'center', a); });
   text(g, 'NO BINDING AGREEMENT', W / 2, 250, `600 44px ${F.lab}`, COL.text, 'center', pr(t, at('c4k', .5), at('c4k', .5) + .5), true, 5);
 }
-function twoDams(g, t, t0, t1) {   // the question: who holds back, who lets go
-  BG(g); const y = 560, xg = 520, xa = W - 520, k = eo(pr(t, t0 - .3, t0 + .7));
-  g.save(); g.strokeStyle = '#7fb3ff'; g.lineWidth = 14; g.lineCap = 'round'; g.beginPath(); g.moveTo(200, y); g.lineTo(lerp(200, W - 200, k), y); g.stroke(); g.restore();
-  for (const [x, n, sub, tt] of [[xg, 'GERD', 'Ethiopia · 74 billion m³', t0 - .1], [xa, 'ASWAN HIGH DAM', 'Egypt · Lake Nasser', t0 + .2]]) { const a = pr(t, tt, tt + .4);
-    g.save(); g.globalAlpha = a; g.fillStyle = '#c9ccc8'; g.fillRect(x - 18, y - 110, 36, 220); g.restore(); text(g, n, x, y - 150, `600 40px ${F.lab}`, COL.text, 'center', a, true, 3); text(g, sub, x, y + 160, `400 24px ${F.mono}`, COL.dim, 'center', a); }
-  text(g, '→ flow →', W / 2, y - 30, `400 28px ${F.mono}`, COL.dim, 'center', k, false);
-  const kq = pr(t, at('c5c', .2), at('c5c', .2) + .5); text(g, 'IN A DROUGHT, WHO RELEASES WHAT?', W / 2, 250, `600 46px ${F.lab}`, COL.amber, 'center', kq, true, 4);
+function twoDams(g, t, t0, t1) {   // the river in profile, highlands to sea, with both dams: in a drought, who releases what?
+  BG(g); const xa0 = 160, xb0 = W - 160, yP = x => lerp(470, 770, Math.pow(G.clamp((x - xa0) / (xb0 - xa0)), .8)), xg = 600, xa = 1320, k = eo(pr(t, t0 - .2, t0 + .9));
+  const dry = eio(pr(t, at('c5c', .2), at('c5c', .2) + 1.6)), sG = yP(xg) - 92, sA = yP(xa) - 70, back = (xd, sy) => { let x = xd; while (x > xa0 && yP(x) > sy) x -= 4; return x; };
+  g.save(); g.globalAlpha = k;
+  g.fillStyle = '#2a241d'; g.beginPath(); g.moveTo(xa0, yP(xa0)); for (let x = xa0; x <= xb0; x += 20) g.lineTo(x, yP(x)); g.lineTo(xb0, 830); g.lineTo(xa0, 830); g.closePath(); g.fill();
+  for (const [xd, sy] of [[xg, sG], [xa, sA]]) { const xs = back(xd, sy); g.fillStyle = '#3f78b8'; g.beginPath(); g.moveTo(xs, sy); g.lineTo(xd, sy); g.lineTo(xd, yP(xd)); for (let x = xd; x >= xs; x -= 8) g.lineTo(x, yP(x)); g.closePath(); g.fill(); g.fillStyle = '#c9ccc8'; g.fillRect(xd - 4, sy - 22, 26, yP(xd) - sy + 26); }
+  g.fillStyle = '#3f78b8'; g.fillRect(xb0 - 70, yP(xb0) - 16, 70, 76);
+  g.strokeStyle = '#7fb3ff'; g.lineCap = 'round';
+  for (const [x0, x1, w] of [[xa0, back(xg, sG), lerp(12, 4, dry)], [xg + 22, back(xa, sA), 10], [xa + 22, xb0 - 70, 10]]) { g.lineWidth = w; g.setLineDash([]); g.beginPath(); for (let x = x0; x <= x1; x += 10) x === x0 ? g.moveTo(x, yP(x) - w / 2) : g.lineTo(x, yP(x) - w / 2); g.stroke();
+    g.strokeStyle = 'rgba(255,255,255,.7)'; g.lineWidth = 3; g.setLineDash([22, 60]); g.lineDashOffset = -t * 90; g.stroke(); g.strokeStyle = '#7fb3ff'; }
+  g.restore();
+  const a1 = pr(t, t0, t0 + .4) , a2 = pr(t, t0 + .3, t0 + .7);
+  text(g, 'GERD', xg + 9, sG - 92, `600 40px ${F.lab}`, COL.text, 'center', a1, true, 3); text(g, '74 billion m³', xg + 9, sG - 54, `400 26px ${F.mono}`, COL.dim, 'center', a1);
+  text(g, 'ASWAN HIGH DAM', xa + 9, sA - 92, `600 40px ${F.lab}`, COL.text, 'center', a2, true, 3); text(g, 'Lake Nasser', xa + 9, sA - 54, `400 26px ${F.mono}`, COL.dim, 'center', a2);
+  text(g, 'ETHIOPIA', 330, 400, `600 30px ${F.lab}`, COL.dim, 'center', k, true, 5); text(g, 'SUDAN', 960, yP(960) - 60, `600 30px ${F.lab}`, COL.dim, 'center', k, true, 5); text(g, 'EGYPT', 1560, yP(1560) - 60, `600 30px ${F.lab}`, COL.dim, 'center', k, true, 5);
+  text(g, 'less rain', 250, yP(250) - 50, `400 26px ${F.mono}`, COL.red, 'center', dry, false);
+  const kq = pr(t, at('c5c', .2), at('c5c', .2) + .5); text(g, 'IN A DROUGHT, WHO RELEASES WHAT?', W / 2, 220, `600 46px ${F.lab}`, COL.amber, 'center', kq, true, 4);
+  const q = pr(t, at('c5c', .55), at('c5c', .55) + .4) * (1 - pr(t, at('c5d') - .3, at('c5d'))), pu = 1 + .12 * Math.sin(t * 5);
+  for (const xd of [xg, xa]) text(g, '?', xd + 9, (xd === xg ? sG : sA) - 150, `500 ${Math.round(90 * pu)}px ${F.num}`, COL.amber, 'center', q);
   const kd = pr(t, at('c5d'), at('c5d') + .5), kd2 = pr(t, at('c5d', .45), at('c5d', .45) + .5);
-  text(g, 'EGYPT: a binding agreement', 200, 850, `600 34px ${F.lab}`, COL.amber, 'left', kd, true, 2); text(g, 'ETHIOPIA: its own dam, its own decision', W - 200, 850, `600 34px ${F.lab}`, '#7fb3ff', 'right', kd2, true, 2);
+  text(g, 'EGYPT', xa + 9, yP(xa) + 78, `600 34px ${F.lab}`, COL.amber, 'center', kd, true, 3); text(g, 'a binding agreement', xa + 9, yP(xa) + 116, `400 28px ${F.mono}`, COL.text, 'center', kd, false);
+  text(g, 'ETHIOPIA', xg + 9, yP(xg) + 78, `600 34px ${F.lab}`, '#7fb3ff', 'center', kd2, true, 3); text(g, 'its own dam, its own decision', xg + 9, yP(xg) + 116, `400 28px ${F.mono}`, COL.text, 'center', kd2, false);
   text(g, 'schematic · not to scale', W - 120, 52, `400 23px ${F.mono}`, COL.dim, 'right', 1, false);
 }
-function versionsGraphic(g, t, t0, t1) {
-  BG(g); const cards = [['EGYPT', '"a man-made flood"', 'sudden releases from the dam', COL.amber, at('c6c')], ['ETHIOPIA', 'the dam held water back', 'without it, worse damage', '#7fb3ff', at('c6d')], ['SUDAN', 'also the White Nile', 'and war-damaged infrastructure', COL.teal, at('c6e')]];
-  text(g, 'THE FLOOD OF 2025 · THREE VERSIONS', W / 2, 220, `600 42px ${F.lab}`, COL.text, 'center', pr(t, t0, t0 + .4), true, 4);
-  cards.forEach(([n, q, s, col, tt], i) => { const a = eo(pr(t, tt, tt + .6)), x = 220 + i * 520, y = 360 + 30 * (1 - a); if (a <= 0) return;
-    g.save(); g.globalAlpha = a; g.fillStyle = 'rgba(255,255,255,.05)'; g.fillRect(x, y, 440, 420); g.fillStyle = col; g.fillRect(x, y, 440, 8); g.restore();
-    text(g, n, x + 30, y + 80, `600 40px ${F.lab}`, col, 'left', a, true, 4); text(g, q, x + 30, y + 190, `400 34px ${F.serif}`, COL.text, 'left', a, false); text(g, s, x + 30, y + 250, `400 24px ${F.mono}`, COL.dim, 'left', a, false); });
-  text(g, 'statements as reported by Ahram Online, Sudan Tribune, The New Arab, Fanack · Sept–Oct 2025', W - 120, 52, `400 23px ${F.mono}`, COL.dim, 'right', 1, false);
+function caseChips(g, t, t0, t1) {
+  text(g, "ETHIOPIA'S CASE", 120, 170, `600 44px ${F.lab}`, COL.text, 'left', win(t, t0 + .2, t1 - .1), true, 4);
+  [['LESS EVAPORATION', 'cool highlands, not the desert', .12], ['A STEADIER RIVER', 'released through the year', .5], ['FEWER FLOODS IN SUDAN', 'the peak is held back', .78]].forEach(([b, sm, f], i) => key(g, t, at('c5d2', f), t1 - .1, b, sm, 120, 220 + i * 140));
+}
+function version(g, t, t0, t1, who, col, q, sub) {   // one country's account of the flood, full frame over its own picture
+  const a = win(t, t0, t1, .25); if (a <= 0) return; const k = eo(pr(t, t0, t0 + .6));
+  g.save(); g.globalAlpha = a; const gr = g.createLinearGradient(0, 0, 1500, 0); gr.addColorStop(0, 'rgba(8,11,14,.86)'); gr.addColorStop(.6, 'rgba(8,11,14,.55)'); gr.addColorStop(1, 'rgba(8,11,14,0)'); g.fillStyle = gr; g.fillRect(0, 0, 1500, H);
+  g.fillStyle = col; g.fillRect(120, 330, 8, 330 * k); g.restore();
+  text(g, 'THE FLOOD OF 2025 · THREE VERSIONS', 160, 300, `400 26px ${F.mono}`, COL.dim, 'left', a, false);
+  text(g, who, 156, 450, `500 130px ${F.num}`, col, 'left', a * k); text(g, q, 160, 560 + 20 * (1 - k), `400 66px ${F.serif}`, COL.text, 'left', a * k, true); text(g, sub, 160, 630, `400 30px ${F.mono}`, COL.text, 'left', a * pr(t, t0 + .4, t0 + .9), false);
+  text(g, 'as reported by Ahram Online, Sudan Tribune, The New Arab, Fanack · Sept–Oct 2025', W - 120, 52, `400 23px ${F.mono}`, COL.dim, 'right', a, false);
 }
 function headlineCard(g, t, t0, t1) {
   BG(g); const k1 = eo(pr(t, t0 + .2, t0 + 1)), k2 = eo(pr(t, at('c7a', .55), at('c7a', .55) + .8));
@@ -398,7 +524,7 @@ function headlineCard(g, t, t0, t1) {
 
 // ———— setup, state, events ————
 export function setup(timing, ch, g) {
-  CH = ch; C = timing[ch]; DUR = C.dur; S_.length = 0;
+  CH = ch; C = timing[ch]; DUR = C.dur; S_.length = 0; LAYERS.length = 0;
   at = (id, f = 0) => { const L = C.lines.find(l => l.id === id); if (!L) throw new Error('no line ' + id); return L.t + L.d * f; };
   CHAPTERS[ch](); SHOTS = S_.slice();
   for (const S of SHOTS) if (S.keys) { const K = S.keys.map(([t, la, lo, d, tilt = 0]) => [t, [la, lo, Math.log10(d), tilt]]); const tr = track(K); S.cam = t => { const [la, lo, ld, tl] = tr(t); return makeCamera({ lat: la, lon: lo, d: Math.pow(10, ld), tilt: tl, fov: 32 }, W, H); }; }
@@ -406,7 +532,7 @@ export function setup(timing, ch, g) {
   EV = C.lines.map(L => ({ t: L.t, type: 'voice', id: L.id }));
   SHOTS.forEach(S => { if (S.amb) EV.push({ t: S.t0, type: 'amb', name: S.amb, dur: S.t1 - S.t0 }); });
   const R = (id, f, heavy = 0) => { EV.push({ t: at(id, f) + .2, type: 'reading', heavy }); if (heavy && ch) EV.push({ t: at(id, f) + .2, type: 'hit' }); };
-  if (ch) SHOTS.forEach((S, i) => { if (i) EV.push({ t: S.t0 - .25, type: 'whoosh', k: i + ch }); });
+  if (ch) SHOTS.forEach((S, i) => { if (i) EV.push({ t: S.t0 - .2, type: 'whoosh', k: i + ch, g: S.cut ? .55 : 1 }); });
   ({ 0: () => {   // the hook's cue list: a whoosh on every cut, a riser into the fill, hits where the numbers and the title land
        SHOTS.forEach((S, i) => { if (i) EV.push({ t: S.t0 - .25, type: 'whoosh', k: i }); });
        const f0 = at('c0a', .4), f1 = at('c0b') - .1, full = f0 - .25 + .75 * (f1 - f0 + .5);
@@ -423,7 +549,8 @@ export const dur = () => DUR, events = () => EV;
 const XF = .5;
 export function frame(t) {
   const out = [];
-  SHOTS.forEach((S, i) => { const fin = i === 0 ? 1 : pr(t, S.t0 - XF / 2, S.t0 + XF / 2), fout = i === SHOTS.length - 1 ? 1 : 1 - pr(t, S.t1 - XF / 2, S.t1 + XF / 2), a = Math.min(fin, fout); if (a > 0) out.push({ S, a }); });
+  const xf = S => S && S.cut ? .1 : XF;   // a cut is three frames; a dissolve is half a second
+  SHOTS.forEach((S, i) => { const xi = xf(S), xo = xf(SHOTS[i + 1]), fin = i === 0 ? 1 : pr(t, S.t0 - xi / 2, S.t0 + xi / 2), fout = i === SHOTS.length - 1 ? 1 : 1 - pr(t, S.t1 - xo / 2, S.t1 + xo / 2), a = Math.min(fin, fout); if (a > 0) out.push({ S, a }); });
   return out;
 }
 // detail plates only show once they can fill the frame (altitude, km)
@@ -452,6 +579,8 @@ export function overlay(g, t, layers, cams) {
     if (S.title) G.chapter(g, t, S.t0, Math.min(S.t1 + .2, S.t0 + 5.5), ...S.title);
     g.restore();
   }
+  const top = layers.length ? cams[SHOTS.indexOf(layers[layers.length - 1].S)] : null;
+  for (const L of LAYERS) { const a = win(t, L.t0, L.t1, .3); if (a <= 0) continue; g.save(); g.globalAlpha = a; VEIL = L.veil || -1; try { L.fn(g, t, L.t0, L.t1, top); } finally { VEIL = 0; } g.restore(); }
   const s = SUBS.find(x => t >= x.t0 && t < x.t1); if (s) G.subtitle(g, s.text, pr(t, s.t0, s.t0 + .15) * (1 - pr(t, s.t1 - .12, s.t1)));
 }
 export { SHOTS };

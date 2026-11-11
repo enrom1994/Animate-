@@ -10,7 +10,7 @@ export const eio = x => { x = clamp(x); return x < .5 ? 4 * x * x * x : 1 - Math
 export const lerp = (a, b, t) => a + (b - a) * t;
 export const win = (t, a, b, f = .35) => pr(t, a, a + f) * (1 - pr(t, b - f, b));
 export function text(g, s, x, y, font, col = COL.text, align = 'left', a = 1, shadow = true, track = 0) {
-  if (a <= 0 || !s) return; g.save(); g.globalAlpha = Math.min(1, a); g.font = font; g.textAlign = align; g.textBaseline = 'alphabetic';
+  if (a <= 0 || !s) return; g.save(); g.globalAlpha *= Math.min(1, a); g.font = font; g.textAlign = align; g.textBaseline = 'alphabetic';
   if (track) g.letterSpacing = track + 'px';
   if (shadow) { g.shadowColor = 'rgba(0,0,0,.55)'; g.shadowBlur = 18; g.shadowOffsetY = 2; }
   g.fillStyle = col; g.fillText(s, x, y); g.restore();
