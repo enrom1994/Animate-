@@ -122,7 +122,7 @@ const CHAPTERS = {
     graphic(a('c4d'), a('c4h'), timelapse);
     terrain(a('c4h'), a('c4i'), fly({ x: 36, y: 14, h: 6.5, tx: 22, ty: 40 }, { x: 33, y: 18, h: 6.5, tx: 20, ty: 44 }, { level: u => levelAt(u) }),
       { over: (g, t, cam, S) => levelGauge(g, t, S), lower: ['WATER LEVEL BEHIND THE DAM', 'end of each filling · 3D model'] });
-    graphic(a('c4i'), a('c4j'), volumeGraphic);
+    terrain(a('c4i'), a('c4j'), fly({ x: 40, y: 20, h: 7, tx: 22, ty: 42 }, { x: 30, y: 28, h: 5.5, tx: 18, ty: 50 }, { level: () => 640 }), { over: onShot(volumeGraphic, .68) });
     graphic(a('c4j'), DUR, talksGraphic);
   },
   5() {
@@ -277,14 +277,25 @@ function heightGraphic(g, t, t0, t1) {   // 145 m main dam vs the Great Pyramid 
   text(g, '1,780 m long →', xd + wd - 20, yb - hd - 24, `400 26px ${F.mono}`, COL.dim, 'right', k, false);
   text(g, 'heights to scale · length not to scale · plus a 5 km saddle dam', W - 120, 52, `400 23px ${F.mono}`, COL.dim, 'right', 1, false);
 }
-function powerGraphic(g, t, t0, t1) {
-  BG(g); const x0 = 620, sc = .2, rows = [['GERD', 5150, COL.amber, t0 + .3], ['ASWAN HIGH DAM', 2100, COL.teal, t0 + 1.2]];
-  text(g, 'INSTALLED POWER · MEGAWATTS', 220, 260, `600 40px ${F.lab}`, COL.text, 'left', pr(t, t0, t0 + .4), true, 3);
-  rows.forEach(([n, v, col, tt], i) => { const k = eo(pr(t, tt, tt + 1.1)), y = 400 + i * 230; if (k <= 0) return;
-    text(g, n, x0 - 40, y + 76, `600 40px ${F.lab}`, COL.text, 'right', k, true, 3); g.save(); g.globalAlpha = k; g.fillStyle = col; g.fillRect(x0, y, v * sc * k, 110); g.restore();
-    text(g, Math.round(v * k).toLocaleString('en-US'), x0 + v * sc * k + 30, y + 86, `500 96px ${F.num}`, col, 'left', k); });
-  text(g, 'THE LARGEST HYDROPOWER PLANT IN AFRICA', 220, 860, `600 34px ${F.lab}`, COL.amber, 'left', pr(t, at('c3g', .45), at('c3g', .45) + .5), true, 3);
-  text(g, 'GERD: 13 turbines · Aswan High Dam: 2.1 GW', W - 120, 52, `400 23px ${F.mono}`, COL.dim, 'right', 1, false);
+function powerGraphic(g, t, t0, t1) {   // 13 turbines switch on one by one (2 × 375 MW + 11 × 400 MW = 5,150 MW), then the comparison with Aswan
+  BG(g); const N = 13, MW = i => i < 2 ? 375 : 400, on = G.clamp((t - t0 - .3) / 2.6) * N, x0 = 250, dx = (W - 500) / (N - 1), yT = 360;
+  text(g, 'THIRTEEN TURBINES', 220, 210, `600 40px ${F.lab}`, COL.text, 'left', pr(t, t0, t0 + .4), true, 3);
+  let sum = 0;
+  for (let i = 0; i < N; i++) { const k = G.clamp(on - i), x = x0 + i * dx, r = 46; sum += MW(i) * k;
+    g.save(); g.translate(x, yT); g.globalAlpha = pr(t, t0 + .1, t0 + .5);
+    g.strokeStyle = k > 0 ? COL.amber : 'rgba(244,242,238,.35)'; g.lineWidth = 3; g.beginPath(); g.arc(0, 0, r, 0, Math.PI * 2); g.stroke();
+    if (k > 0) { g.globalAlpha *= .25 * k; g.fillStyle = COL.amber; g.beginPath(); g.arc(0, 0, r + 14, 0, Math.PI * 2); g.fill(); g.globalAlpha = 1; }
+    g.rotate(k > 0 ? (t - t0) * 5 + i : i); g.fillStyle = k > 0 ? COL.amber : 'rgba(244,242,238,.45)';
+    for (let j = 0; j < 5; j++) { g.rotate(Math.PI * 2 / 5); g.beginPath(); g.moveTo(0, -8); g.quadraticCurveTo(22, -30, 6, -r + 8); g.quadraticCurveTo(2, -24, 0, -8); g.fill(); }
+    g.beginPath(); g.arc(0, 0, 9, 0, Math.PI * 2); g.fill(); g.restore(); }
+  text(g, Math.round(sum).toLocaleString('en-US'), 220, 580, `500 150px ${F.num}`, COL.amber, 'left', pr(t, t0 + .2, t0 + .6)); g.save(); g.font = `500 150px ${F.num}`; const wn = g.measureText('5,150').width; g.restore();
+  text(g, 'MEGAWATTS', 220 + wn + 30, 580, `600 40px ${F.lab}`, COL.text, 'left', pr(t, t0 + .2, t0 + .6), true, 3);
+  const kc = at('c3g', .45), sc = .2, rows = [['GERD', 5150, COL.amber, kc], ['ASWAN HIGH DAM', 2100, COL.teal, kc + .5]];
+  rows.forEach(([n, v, col, tt], i) => { const k = eo(pr(t, tt, tt + .9)), y = 650 + i * 84; if (k <= 0) return;
+    text(g, n, 560, y + 44, `600 32px ${F.lab}`, COL.text, 'right', k, true, 3); g.save(); g.globalAlpha = k; g.fillStyle = col; g.fillRect(590, y, v * sc * k, 60); g.restore();
+    text(g, Math.round(v * k).toLocaleString('en-US') + ' MW', 590 + v * sc * k + 24, y + 48, `500 54px ${F.num}`, col, 'left', k); });
+  text(g, "AFRICA'S LARGEST HYDROPOWER PLANT · MORE THAN TWICE ASWAN", 220, 880, `600 30px ${F.lab}`, COL.amber, 'left', pr(t, kc + 1.2, kc + 1.7), true, 3);
+  text(g, 'installed capacity · GERD: 2 × 375 MW + 11 × 400 MW · Aswan High Dam: 2,100 MW', W - 120, 52, `400 23px ${F.mono}`, COL.dim, 'right', 1, false);
 }
 function flowGraphic(g, t, t0, t1) {   // a dam passes water on; filling holds it back
   BG(g); const y = 560, xd = W / 2, kf = pr(t, at('c4b', .35), at('c4b', .35) + 2.5), ph = t * 1.6;
@@ -313,7 +324,7 @@ function timelapse(g, t, t0, t1) {   // the reservoir every dry season, same str
   const yr = yrs[Math.round(f)], m = M[yr], area = lerp(M[yrs[i0]].km2, M[yrs[i1]].km2, u);
   text(g, m.date.slice(0, 7).replace('-', ' · '), 200, 330, `500 120px ${F.num}`, COL.text, 'left', 1);
   text(g, 'LANDSAT · ' + m.date, 200, 380, `400 24px ${F.mono}`, COL.dim, 'left', 1, false);
-  text(g, 'OPEN WATER BEHIND THE DAM', 200, 540, `600 32px ${F.lab}`, COL.text, 'left', 1, true, 3);
+  text(g, 'OPEN WATER BEHIND THE DAM', 200, 516, `600 32px ${F.lab}`, COL.text, 'left', 1, true, 3);
   text(g, area < 5 ? 'a river' : Math.round(area).toLocaleString('en-US') + ' km²', 196, 660, `500 130px ${F.num}`, COL.teal, 'left', 1);
   text(g, 'measured on these images · MNDWI > 0', 200, 712, `400 26px ${F.mono}`, COL.dim, 'left', 1, false);
   const kl = pr(t, at('c4g', .6), at('c4g', .6) + .6); text(g, '≈ the size of Greater London (1,572 km²)', 200, 800, `500 32px ${F.lab}`, COL.amber, 'left', kl, true);
@@ -330,15 +341,24 @@ function levelGauge(g, t, S) {
   for (const [yr, m] of LEVELS) { const a = lv >= m - 1 ? 1 : .35; text(g, yr + '', x + 30, Y(m) + 8, `400 24px ${F.mono}`, COL.text, 'left', a, false); text(g, m + ' m', x - 24, Y(m) + 8, `500 26px ${F.num}`, a === 1 ? COL.amber : COL.dim, 'right', 1, false); }
   text(g, Math.round(lv) + ' m', x + 70, y1 - 30, `500 56px ${F.num}`, COL.text, 'center', 1); text(g, 'above sea level', x + 70, y0 + 46, `400 23px ${F.mono}`, COL.dim, 'center', 1, false);
 }
-function volumeGraphic(g, t, t0, t1) {   // cubes with volume ∝ value
-  BG(g); const cube = (cx, v, col, k, lab, val) => { const s = Math.cbrt(v) * 84 * k, d = s * .35; if (k <= 0) return; const x = cx - s / 2, y = 820 - s;
-    g.save(); g.globalAlpha = k; g.fillStyle = col; g.fillRect(x, y, s, s); g.globalAlpha = k * .7; g.beginPath(); g.moveTo(x, y); g.lineTo(x + d, y - d); g.lineTo(x + s + d, y - d); g.lineTo(x + s, y); g.closePath(); g.fill();
-    g.globalAlpha = k * .5; g.beginPath(); g.moveTo(x + s, y); g.lineTo(x + s + d, y - d); g.lineTo(x + s + d, y + s - d); g.lineTo(x + s, y + s); g.closePath(); g.fill(); g.restore();
-    text(g, lab, cx, 880, `600 32px ${F.lab}`, COL.text, 'center', k, true, 3); text(g, val, cx + d / 2, y - d - 30, `500 70px ${F.num}`, col, 'center', k); };
-  cube(620, 74, '#5ea0dc', eo(pr(t, t0 + .2, t0 + 1.2)), 'THE RESERVOIR, FULL', '74');
-  cube(1300, 55.5, COL.amber, eo(pr(t, at('c4i', .45), at('c4i', .45) + 1.0)), "EGYPT'S YEARLY SHARE, 1959", '55.5');
-  text(g, 'BILLION CUBIC METRES', W / 2, 170, `600 38px ${F.lab}`, COL.text, 'center', pr(t, t0, t0 + .4), true, 4);
-  text(g, 'cube volumes to scale · total storage; about 59 is active', W - 120, 52, `400 23px ${F.mono}`, COL.dim, 'right', 1, false);
+function volumeGraphic(g, t, t0, t1) {   // two tanks, same base, one scale: height ∝ volume. 74 = 55.5 + 18.5, the whole 1959 allocation
+  BG(g); const yb = 800, sc = 6.4, tw = 360, xl = 520, xr = 1160, k1 = eo(pr(t, t0 + .2, t0 + 1.6)), tE = at('c4i', .45), k2 = eo(pr(t, tE, tE + 1.1)), k3 = eo(pr(t, tE + 1.3, tE + 2.2));
+  text(g, 'BILLION CUBIC METRES', xl, 170, `600 38px ${F.lab}`, COL.text, 'left', pr(t, t0, t0 + .4), true, 4);
+  const tank = (x, a) => { g.save(); g.globalAlpha = a; g.fillStyle = 'rgba(244,242,238,.05)'; g.fillRect(x, yb - 80 * sc, tw, 80 * sc); g.strokeStyle = 'rgba(244,242,238,.6)'; g.lineWidth = 3; g.beginPath(); g.moveTo(x, yb - 80 * sc - 14); g.lineTo(x, yb); g.lineTo(x + tw, yb); g.lineTo(x + tw, yb - 80 * sc - 14); g.stroke();
+    g.lineWidth = 1.5; for (let v = 20; v <= 80; v += 20) { g.beginPath(); g.moveTo(x, yb - v * sc); g.lineTo(x + 18, yb - v * sc); g.stroke(); } g.restore();
+    for (let v = 20; v <= 80; v += 20) text(g, v + '', x - 14, yb - v * sc + 8, `400 22px ${F.mono}`, COL.dim, 'right', a, false); };
+  const water = (x, v0, v1, col, a) => { if (v1 <= v0) return; const yt = yb - v1 * sc, y0 = yb - v0 * sc; g.save(); g.globalAlpha = a; g.fillStyle = col; g.beginPath(); g.moveTo(x + 2, y0);
+    for (let i = 0; i <= 36; i++) { const xx = x + 2 + (tw - 4) * i / 36; g.lineTo(xx, yt + Math.sin(i * .7 + t * 3 + x) * 3); } g.lineTo(x + tw - 2, y0); g.closePath(); g.fill(); g.restore(); };
+  tank(xl, pr(t, t0, t0 + .4)); water(xl, 0, 74 * k1, '#5ea0dc', .92);
+  text(g, (74 * k1).toFixed(k1 < 1 ? 1 : 0), xl + tw / 2, yb - 74 * sc * k1 - 26, `500 96px ${F.num}`, '#8fc0ee', 'center', pr(t, t0 + .2, t0 + .6));
+  text(g, 'THE RESERVOIR, FULL', xl + tw / 2, yb + 54, `600 30px ${F.lab}`, COL.text, 'center', pr(t, t0 + .2, t0 + .6), true, 3);
+  const aR = pr(t, tE - .3, tE + .1); tank(xr, aR); water(xr, 0, 55.5 * k2, COL.amber, .92); water(xr, 55.5, 55.5 + 18.5 * k3, COL.teal, .92);
+  text(g, (55.5 * k2).toFixed(1), xr + tw + 30, yb - 55.5 * sc * k2 / 2 + 30, `500 96px ${F.num}`, COL.amber, 'left', k2); text(g, "EGYPT'S YEARLY SHARE", xr + tw + 34, yb - 55.5 * sc * k2 / 2 + 72, `600 26px ${F.lab}`, COL.text, 'left', k2, true, 2);
+  text(g, (18.5 * k3).toFixed(1), xr + tw + 30, yb - (55.5 + 9.25) * sc + 30, `500 80px ${F.num}`, COL.teal, 'left', k3); text(g, "SUDAN'S", xr + tw + 34, yb - (55.5 + 9.25) * sc + 66, `600 26px ${F.lab}`, COL.text, 'left', k3, true, 2);
+  text(g, 'THE 1959 TREATY SHARES', xr + tw / 2, yb + 54, `600 30px ${F.lab}`, COL.text, 'center', aR, true, 3);
+  if (k3 > 0) { g.save(); g.globalAlpha = k3; g.strokeStyle = COL.text; g.setLineDash([10, 8]); g.lineWidth = 2; g.beginPath(); g.moveTo(xl + tw, yb - 74 * sc); g.lineTo(xr, yb - 74 * sc); g.stroke(); g.restore();
+    text(g, 'THE SAME', (xl + tw + xr) / 2, yb - 74 * sc - 16, `600 28px ${F.lab}`, COL.text, 'center', k3, true, 3); }
+  text(g, 'same tank, same scale · total storage 74, about 59 active · 55.5 + 18.5 = 74', W - 120, 52, `400 23px ${F.mono}`, COL.dim, 'right', 1, false);
 }
 function talksGraphic(g, t, t0, t1) {
   BG(g); const ev = [['2015', 'Declaration of Principles', 'Khartoum', at('c4j', .18)], ['2020', 'Talks in Washington', 'US Treasury, World Bank', at('c4j', .5)], ['2021', 'UN Security Council', 'session on the dam, 8 July', at('c4j', .78)], ['DEC 2023', 'Egypt: talks are over', 'after the last round', at('c4k', .1)]];
@@ -385,7 +405,8 @@ export function setup(timing, ch, g) {
   SUBS = C.lines.map((L, i) => ({ t0: L.t - .05, t1: Math.min((C.lines[i + 1]?.t ?? DUR) - .1, Math.max(L.t + 1.8, L.t + L.d + .5)), text: L.text }));
   EV = C.lines.map(L => ({ t: L.t, type: 'voice', id: L.id }));
   SHOTS.forEach(S => { if (S.amb) EV.push({ t: S.t0, type: 'amb', name: S.amb, dur: S.t1 - S.t0 }); });
-  const R = (id, f, heavy = 0) => EV.push({ t: at(id, f) + .2, type: 'reading', heavy });
+  const R = (id, f, heavy = 0) => { EV.push({ t: at(id, f) + .2, type: 'reading', heavy }); if (heavy && ch) EV.push({ t: at(id, f) + .2, type: 'hit' }); };
+  if (ch) SHOTS.forEach((S, i) => { if (i) EV.push({ t: S.t0 - .25, type: 'whoosh', k: i + ch }); });
   ({ 0: () => {   // the hook's cue list: a whoosh on every cut, a riser into the fill, hits where the numbers and the title land
        SHOTS.forEach((S, i) => { if (i) EV.push({ t: S.t0 - .25, type: 'whoosh', k: i }); });
        const f0 = at('c0a', .4), f1 = at('c0b') - .1, full = f0 - .25 + .75 * (f1 - f0 + .5);

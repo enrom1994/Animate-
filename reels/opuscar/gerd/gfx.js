@@ -22,8 +22,9 @@ export function counter(g, t, t0, t1, { to, from = 0, fmt = v => Math.round(v).t
   const a = win(t, t0, t1, .4); if (a <= 0) return;
   panel(g, a);
   const k = eo(pr(t, t0 + .1, t0 + 1.0)), v = lerp(from, to, k), dy = 30 * (1 - eo(pr(t, t0, t0 + .5)));
-  text(g, label, x, y - size * .72 + dy, `600 34px ${F.lab}`, COL.text, 'left', a, true, 3);
-  g.save(); g.fillStyle = col; g.globalAlpha = a; g.fillRect(x, y - size * .72 + 18 + dy, 90 * eo(pr(t, t0 + .1, t0 + .6)), 5); g.restore();
+  const top = y - size * .72 + dy;   // the top of the digits: the label and its bar sit clear above it
+  text(g, label, x, top - 44, `600 34px ${F.lab}`, COL.text, 'left', a, true, 3);
+  g.save(); g.fillStyle = col; g.globalAlpha = a; g.fillRect(x, top - 28, 90 * eo(pr(t, t0 + .1, t0 + .6)), 5); g.restore();
   text(g, fmt(v), x - 6, y + dy, `500 ${size}px ${F.num}`, col, 'left', a);
   if (sub) text(g, sub, x, y + 54 + dy, `400 26px ${F.mono}`, COL.dim, 'left', a);
 }
