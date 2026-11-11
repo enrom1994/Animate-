@@ -8,7 +8,7 @@ Imagery (public domain): NASA Blue Marble: Next Generation and VIIRS Black Marbl
   assets/plates/plates.json and assets/measure.json; every request in assets/raw/manifest.jsonl. No borders are drawn.
 Elevation: NASADEM (NASA/JPL, public domain) via the Microsoft Planetary Computer. The 3D canyon is the 2000 terrain; the water
   is a flat plane at the published level of each filling, shown only inside the shoreline measured on Landsat in January 2026.
-Rivers: Natural Earth 1:10m river centrelines (public domain, naturalearthdata.com).
+Rivers: Natural Earth 1:10m river centrelines (public domain, naturalearthdata.com). Sudan–Ethiopia boundary line: Natural Earth admin-0 boundary lines (public domain).
 Voice: Kokoro-82M (Apache-2.0), voice bm_george.
 Music samples (CC0): VS Chamber Orchestra Community Edition and Versilian Community Sample Library (vibraphone, timpani) via the
   library's sampler.py. Pad and pulse: in code. Ambience: Mixkit "river water flowing" (free licence for videos).
