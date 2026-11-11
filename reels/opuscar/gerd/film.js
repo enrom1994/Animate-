@@ -246,7 +246,7 @@ const CHAPTERS = {
     const END = (g, t, cam) => { rivers(g, t, cam, ['blue', 'nile'], a('c7c'), a('c7c', .9), 1, COL.amber); bigTitle(g, t, a('c7c', .5), DUR + 1, 'One river.', 'Two great dams. No agreement.');
       if (t > a('c7c', 1) + .6) text(g, 'Which river should we follow next?  Tell us in the comments.', W / 2, H / 2 + 210, `400 30px ${F.mono}`, COL.text, 'center', pr(t, a('c7c', 1) + .6, a('c7c', 1) + 1.1)); };
     Gl(a('c7c'), a('c7c', .6), [11, 37, 3600], [14, 35, 6000], { ...N, over: END });
-    Gl(a('c7c', .6), DUR, [15.5, 34, 7200], [17, 33, 9000], { ...N, over: END });
+    globe(a('c7c', .6), DUR, [[a('c7c', .6) - .3, 15.5, 34, 7200], [DUR, 18, 31.5, 9200], [DUR + 3, 19.5, 30, 9800]], { cut: 1, ...N, over: END });
   },
 };
 
@@ -326,14 +326,16 @@ function shareGraphic(g, t, t0, t1) {   // where the water that reaches Egypt co
   text(g, 'Molden et al. 2010; Eastern Nile studies: Ethiopian share ≈ 85–86% of the natural flow at Aswan', W - 120, 52, `400 23px ${F.mono}`, COL.dim, 'right', 1, false);
 }
 function treatyCard(g, t, t0, t1) {
-  BG(g); const k = eo(pr(t, t0 + .1, t0 + 1.0)), pw = 1160, ph = 640, x = W / 2 - pw / 2, y = H / 2 - ph / 2 + 30 * (1 - k);
+  BG(g); const zc = 1 + .07 * eio(pr(t, t0, t1)); g.save(); g.translate(W / 2, H / 2); g.rotate(-.012 + .02 * pr(t, t0, t1)); g.scale(zc, zc); g.translate(-W / 2, -H / 2);
+  const k = eo(pr(t, t0 + .1, t0 + 1.0)), pw = 1160, ph = 640, x = W / 2 - pw / 2, y = H / 2 - ph / 2 + 30 * (1 - k);
   g.save(); g.globalAlpha = k; g.fillStyle = '#ece4d2'; g.shadowColor = 'rgba(0,0,0,.6)'; g.shadowBlur = 40; g.fillRect(x, y, pw, ph); g.restore();
   const ink = '#2a2520';
   text(g, '8 NOVEMBER 1959 · CAIRO', W / 2, y + 90, `400 26px ${F.mono}`, ink, 'center', k, false, 4);
   ['Agreement between the Republic of the Sudan', 'and the United Arab Republic', 'for the Full Utilization of the Nile Waters'].forEach((s, i) => text(g, s, W / 2, y + 200 + i * 56, `400 40px ${F.serif}`, ink, 'center', k, false));
   g.save(); g.globalAlpha = k; g.fillStyle = ink; g.fillRect(W / 2 - 120, y + 400, 240, 2); g.restore();
   text(g, 'two parties: Egypt (then the U.A.R.) and Sudan', W / 2, y + 460, `400 26px ${F.mono}`, '#6b5f52', 'center', pr(t, t0 + 1, t0 + 1.5), false);
-  const ks = eo(pr(t, t0 + 1.6, t0 + 2.1)); if (ks > 0) { g.save(); g.translate(x + pw - 190, y + ph - 70); g.rotate(-.18); g.globalAlpha = ks * .85; g.strokeStyle = '#a3322a'; g.lineWidth = 5; g.strokeRect(-130, -44, 260, 88); g.restore(); text(g, 'ETHIOPIA: NOT A PARTY', 0, 0, '', COL.red, 'center', 0); g.save(); g.translate(x + pw - 190, y + ph - 70); g.rotate(-.18); g.globalAlpha = ks * .85; g.fillStyle = '#a3322a'; g.font = `600 30px ${F.lab}`; g.textAlign = 'center'; g.fillText('ETHIOPIA: NOT', 0, -6); g.fillText('A PARTY', 0, 28); g.restore(); }
+  const ks = eo(pr(t, at('c2b', .42), at('c2b', .42) + .35)); if (ks > 0) { g.save(); g.translate(x + pw - 190, y + ph - 70); g.rotate(-.18); g.globalAlpha = ks * .85; g.strokeStyle = '#a3322a'; g.lineWidth = 5; g.strokeRect(-130, -44, 260, 88); g.restore(); text(g, 'ETHIOPIA: NOT A PARTY', 0, 0, '', COL.red, 'center', 0); g.save(); g.translate(x + pw - 190, y + ph - 70); g.rotate(-.18); g.globalAlpha = ks * .85; g.fillStyle = '#a3322a'; g.font = `600 30px ${F.lab}`; g.textAlign = 'center'; g.fillText('ETHIOPIA: NOT', 0, -6); g.fillText('A PARTY', 0, 28); g.restore(); }
+  g.restore();
 }
 function splitGraphic(g, t, t0, t1) {   // the 1959 allocation, billion m³ per year
   BG(g); const rows = [['EGYPT', 55.5, COL.amber], ['SUDAN', 18.5, COL.teal], ['ETHIOPIA', 0, COL.red]], x0 = 520, sc = 20, y0 = 360;
@@ -356,7 +358,7 @@ function timeline1929(g, t, t0, t1) {
   text(g, 'ETHIOPIA SIGNED NEITHER', W / 2, 260, `600 40px ${F.lab}`, COL.red, 'center', pr(t, at('c2e2', .7), at('c2e2', .7) + .5), true, 4);
 }
 function heightGraphic(g, t, t0, t1) {   // 145 m main dam vs the Great Pyramid (≈ 139 m today)
-  BG(g); const yb = 800, sc = 4.0, k = eo(pr(t, t0 + .1, t0 + 1.1)), k2 = eo(pr(t, at('c3f', .55), at('c3f', .55) + 1.0));
+  BG(g); const yb = 800, sc = 4.0, k = eo(pr(t, t0 + .1, t0 + 1.1)), k2 = eo(pr(t, t0 + 1.0, t0 + 2.0));
   g.save(); g.strokeStyle = 'rgba(244,242,238,.5)'; g.lineWidth = 2; g.beginPath(); g.moveTo(160, yb); g.lineTo(W - 160, yb); g.stroke(); g.restore();
   const hp = 139 * sc * k2; g.save(); g.fillStyle = COL.sand; g.globalAlpha = k2; g.beginPath(); g.moveTo(360, yb); g.lineTo(360 + 230 * sc * .5 * k2 * .5, yb - hp); g.lineTo(360 + 230 * sc * .5 * k2, yb); g.closePath(); g.fill(); g.restore();
   text(g, 'GREAT PYRAMID', 360 + 115 * sc * .5 * k2, yb + 50, `600 30px ${F.lab}`, COL.sand, 'center', k2, true, 3); text(g, '≈ 139 m', 360 + 115 * sc * .5 * k2, yb - hp - 20, `500 50px ${F.num}`, COL.sand, 'center', k2);
@@ -429,8 +431,9 @@ function timelapse(g, t, t0, t1, mode = 0) {   // the reservoir every dry season
     g.save(); const gr = g.createLinearGradient(0, 0, 1000, 0); gr.addColorStop(0, 'rgba(8,11,14,.82)'); gr.addColorStop(1, 'rgba(8,11,14,0)'); g.fillStyle = gr; g.fillRect(0, 0, 1000, H); g.restore();
     dxm = (DAM[1] - lo0) / (lo1 - lo0) * W; dym = ((c + hh / 2) - DAM[0]) / hh * H;
   } else { BG(g);
-    g.save(); g.drawImage(im0, sx, sy, sw, shh, dx, 0, dw, dh); if (u > 0) { g.globalAlpha = u; g.drawImage(im1, sx, sy, sw, shh, dx, 0, dw, dh); } g.restore();
-    dxm = dx + (DAM[1] - lo0) / (lo1 - lo0) * dw; dym = (la1 - DAM[0]) / (la1 - la0) * dh; }
+    const zt = 1 + .1 * pr(t, t0 - .3, t1 + .3), ox = dx - dw * (zt - 1) * .3, oy = -dh * (zt - 1) * .45, w2 = dw * zt, h2 = dh * zt;
+    g.save(); g.beginPath(); g.rect(dx, 0, dw, dh); g.clip(); g.drawImage(im0, sx, sy, sw, shh, ox, oy, w2, h2); if (u > 0) { g.globalAlpha = u; g.drawImage(im1, sx, sy, sw, shh, ox, oy, w2, h2); } g.restore();
+    dxm = ox + (DAM[1] - lo0) / (lo1 - lo0) * w2; dym = oy + (la1 - DAM[0]) / (la1 - la0) * h2; }
   const yr = yrs[Math.round(f)], m = M[yr], area = lerp(M[yrs[i0]].km2, M[yrs[i1]].km2, u);
   text(g, m.date.slice(0, 7).replace('-', ' · '), 200, 330, `500 120px ${F.num}`, COL.text, 'left', 1);
   text(g, 'LANDSAT · ' + m.date, 200, 380, `400 24px ${F.mono}`, COL.dim, 'left', 1, false);
@@ -580,7 +583,7 @@ export function overlay(g, t, layers, cams) {
     g.restore();
   }
   const top = layers.length ? cams[SHOTS.indexOf(layers[layers.length - 1].S)] : null;
-  for (const L of LAYERS) { const a = win(t, L.t0, L.t1, .3); if (a <= 0) continue; g.save(); g.globalAlpha = a; VEIL = L.veil || -1; try { L.fn(g, t, L.t0, L.t1, top); } finally { VEIL = 0; } g.restore(); }
+  for (const L of LAYERS) { const a = win(t, L.t0, L.t1, .3); if (a <= 0) continue; g.save(); g.globalAlpha = a; const z = 1 + .03 * pr(t, L.t0, L.t1); g.translate(W / 2, H / 2); g.scale(z, z); g.translate(-W / 2, -H / 2); VEIL = L.veil || -1; try { L.fn(g, t, L.t0, L.t1, top); } finally { VEIL = 0; } g.restore(); }
   const s = SUBS.find(x => t >= x.t0 && t < x.t1); if (s) G.subtitle(g, s.text, pr(t, s.t0, s.t0 + .15) * (1 - pr(t, s.t1 - .12, s.t1)));
 }
 export { SHOTS };
