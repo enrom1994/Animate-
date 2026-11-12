@@ -80,5 +80,11 @@ labels, source lines, stat slides and tracked-caps captions, which a sourced doc
 transfer (cut on motion, entries decelerate and exits accelerate, almost nothing fades, no dead frame, one focal point,
 end card under 1.4 s) and run `look.py` on every finished film as a second audit beside section 5.
 
+Reading `look.py` on a documentary: its "end hold" and "static-ish" counts treat any change under 0.35/255 per frame as
+held, so a slow push or a pull-out on a dark globe registers as frozen even when it is plainly moving. When it flags a
+stretch, measure the change across 2 s (mean absolute luma difference); about 5/255 or more is a visible move, and the
+flag can be ignored. Long-form YouTube films keep a moving, resolved end of 5–20 s on purpose, because end-screen
+elements need it, so G3 fails by design there. The rule for them is that the end keeps moving, not that it is under 1.4 s.
+
 Voice, music and sound effects in its pipeline need an ElevenLabs key, and image plates need the Codex CLI; without them it
 builds silent films from code and captured assets. Our own voice and `real-sfx` tools still apply.
