@@ -246,7 +246,7 @@ const CHAPTERS = {
     const END = (g, t, cam) => { rivers(g, t, cam, ['blue', 'nile'], a('c7c'), a('c7c', .9), 1, COL.amber); bigTitle(g, t, a('c7c', .5), DUR + 1, 'One river.', 'Two great dams. No agreement.');
       if (t > a('c7c', 1) + .6) text(g, 'Which river should we follow next?  Tell us in the comments.', W / 2, H / 2 + 210, `400 30px ${F.mono}`, COL.text, 'center', pr(t, a('c7c', 1) + .6, a('c7c', 1) + 1.1)); };
     Gl(a('c7c'), a('c7c', .6), [11, 37, 3600], [14, 35, 6000], { ...N, over: END });
-    globe(a('c7c', .6), DUR, [[a('c7c', .6) - .3, 15.5, 34, 7200], [DUR, 18, 31.5, 9200], [DUR + 3, 19.5, 30, 9800]], { cut: 1, ...N, over: END });
+    globe(a('c7c', .6), DUR, [[a('c7c', .6) - .3, 15.5, 34, 7200], [DUR, 21, 28.5, 12500], [DUR + 3, 22.5, 27, 13500]], { cut: 1, ...N, over: END });
   },
 };
 
@@ -431,7 +431,7 @@ function timelapse(g, t, t0, t1, mode = 0) {   // the reservoir every dry season
     g.save(); const gr = g.createLinearGradient(0, 0, 1000, 0); gr.addColorStop(0, 'rgba(8,11,14,.82)'); gr.addColorStop(1, 'rgba(8,11,14,0)'); g.fillStyle = gr; g.fillRect(0, 0, 1000, H); g.restore();
     dxm = (DAM[1] - lo0) / (lo1 - lo0) * W; dym = ((c + hh / 2) - DAM[0]) / hh * H;
   } else { BG(g);
-    const zt = 1 + .1 * pr(t, t0 - .3, t1 + .3), ox = dx - dw * (zt - 1) * .3, oy = -dh * (zt - 1) * .45, w2 = dw * zt, h2 = dh * zt;
+    const zt = 1 + .32 * eio(pr(t, t0 - .3, t1 + .3)), ox = dx - dw * (zt - 1) * .3, oy = -dh * (zt - 1) * .45, w2 = dw * zt, h2 = dh * zt;
     g.save(); g.beginPath(); g.rect(dx, 0, dw, dh); g.clip(); g.drawImage(im0, sx, sy, sw, shh, ox, oy, w2, h2); if (u > 0) { g.globalAlpha = u; g.drawImage(im1, sx, sy, sw, shh, ox, oy, w2, h2); } g.restore();
     dxm = ox + (DAM[1] - lo0) / (lo1 - lo0) * w2; dym = oy + (la1 - DAM[0]) / (la1 - la0) * h2; }
   const yr = yrs[Math.round(f)], m = M[yr], area = lerp(M[yrs[i0]].km2, M[yrs[i1]].km2, u);
