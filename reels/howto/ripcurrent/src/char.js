@@ -68,6 +68,7 @@ export function makeChar(lookName = 'sam', height = 1.75) {
   const mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: tex, transparent: true, alphaTest: .5 }));
   mesh.userData.nmat = new THREE.MeshBasicMaterial({ map: tex, alphaTest: .5, color: 0x8080ff });
   mesh.customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: tex, alphaTest: .5 }); mesh.castShadow = true;
-  const group = new THREE.Group(); group.add(mesh);
-  return { group, set(p, camera) { drawChar(g, look, { ...POSE, ...p }); tex.needsUpdate = true; mesh.position.y = p.sink ? -(p.sink * CH - 40) / CH * hH : 0; if (camera) group.rotation.y = Math.atan2(camera.position.x - group.position.x, camera.position.z - group.position.z); } };
+  const blob = new THREE.Mesh(new THREE.CircleGeometry(.42, 24), new THREE.MeshBasicMaterial({ color: 0x7a5a2a, transparent: true, opacity: .45, depthWrite: false })); blob.rotation.x = -Math.PI / 2; blob.position.y = .02; blob.scale.y = .55; blob.userData.noInk = true;
+  const group = new THREE.Group(); group.add(mesh, blob);
+  return { group, set(p, camera) { drawChar(g, look, { ...POSE, ...p }); tex.needsUpdate = true; mesh.position.y = p.sink ? -(p.sink * CH - 40) / CH * hH : 0; blob.visible = !p.sink; if (camera) group.rotation.y = Math.atan2(camera.position.x - group.position.x, camera.position.z - group.position.z); } };
 }
