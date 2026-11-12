@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>how-to: rip current</title>
+<style>
+  @font-face { font-family: 'Cap'; src: url('node_modules/@fontsource/montserrat/files/montserrat-latin-800-normal.woff2') format('woff2'); font-weight: 800; }
+  html, body { margin: 0; background: #000; overflow: hidden; }
+  #stage { position: relative; width: 720px; height: 1280px; }
+  canvas { display: block; }
+  #cap { position: absolute; left: 0; right: 0; top: 1030px; text-align: center; font: 800 54px/1.1 'Cap', sans-serif; color: #fff;
+    -webkit-text-stroke: 9px #1d1a26; paint-order: stroke fill; letter-spacing: -0.5px; }
+  #cap b { color: #ffd23f; font-weight: 800; }
+</style>
+<script type="importmap">
+{ "imports": { "three": "./node_modules/three/build/three.module.js", "three/addons/": "./node_modules/three/examples/jsm/" } }
+</script>
+</head>
+<body>
+<div id="stage"><div id="cap"></div></div>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>
