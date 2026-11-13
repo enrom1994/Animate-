@@ -1,0 +1,13 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#f4efe6}</style>
+<script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js" } }</script></head>
+<body><canvas id="c" width="2400" height="1560"></canvas>
+<script type="module">
+// The model sheet: every view of every character, drawn by the rig itself (node engine/sheet/make.mjs).
+import { drawChar, LOOKS, POSE } from '/engine/char.js';
+const g = document.getElementById('c').getContext('2d'), VIEWS = [['front', 1, 'front'], ['q', 1, 'three-quarter'], ['side', 1, 'side'], ['back', 1, 'rear'], ['q', -1, 'three-quarter, left'], ['side', -1, 'side, left']];
+g.fillStyle = '#f4efe6'; g.fillRect(0, 0, 2400, 1560); g.font = '600 30px sans-serif'; g.fillStyle = '#1d1a26'; g.textAlign = 'center';
+['sam', 'guard'].forEach((name, r) => VIEWS.forEach(([view, face, label], i) => { const c = document.createElement('canvas'); c.width = 640; c.height = 960;
+  drawChar(c.getContext('2d'), LOOKS[name], { ...POSE, view, face, mouth: i === 2 || i === 5 ? 'o' : 'smile', eyes: [view === 'front' ? 0 : .4, 0], armL: view === 'side' ? [-.5, -.3] : POSE.armL, armR: view === 'side' ? [.5, .4] : POSE.armR, legL: view === 'side' ? -.25 : POSE.legL, legR: view === 'side' ? .25 : POSE.legR });
+  g.drawImage(c, i * 400 + 10, r * 760 + 20, 380, 570 * 1.2); if (!r) g.fillText(label, i * 400 + 200, 1540); }));
+window.done = true;
+</script></body></html>

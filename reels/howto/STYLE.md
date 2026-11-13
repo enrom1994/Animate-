@@ -10,6 +10,15 @@ films, `ripcurrent` and `greasefire`, and from the notes given on them.
 - **Palette:** sun yellow `#ffd23f`, ink `#1d1a26`, alarm red `#e6232e`, sea blue `#1b8fd0`, teal `#2bb6a8`, cream. One accent word per caption in yellow.
 - **Marks:** the red cross for "do not", yellow arrows and dashed paths for "do this", painted on a surface in the scene where possible.
 
+## Views
+Every character has four views, each usable facing left or right: front, three-quarter, side and rear
+(`view: 'front' | 'q' | 'side' | 'back'`, `face: 1 | -1` in the pose, or `toward: [x, z]` to let the camera position pick).
+The model sheet is `engine/sheet/turnaround.png` (`node engine/sheet/make.mjs` redraws it).
+- Working at something (a stove, a door, a tap): side view, facing it.
+- Reacting to something beside them: three-quarter, turned toward it.
+- Speaking to the viewer, or the reaction is the point of the shot: front.
+- Walking or looking away from the camera: rear.
+
 ## Rules that came from review
 1. **A hand always has a body.** Never show an arm or hand on its own. A character reaches with its own arm
    (`reach: [x, y, z]` in the pose) and the whole character is in the frame.
