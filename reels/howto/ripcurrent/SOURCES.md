@@ -5,4 +5,4 @@
 - Width: NWS, same page ("typically range in width from 5 to 100 yards").
 - Do not fight it, swim parallel, return at an angle; fatigue is the danger: NOAA, same page.
 - The calm, darker gap between breaking waves: NWS, same page.
-- **Not yet verified from a page we could read:** "float, and wave for help" (line 7). Standard lifeguard advice, but confirm it before the voice is recorded.
+- Line 7: "If you feel you can't reach shore, relax, face the shore, and call or wave for help": NWS, weather.gov/safety/ripcurrent-surviving. The same page: "Relax. Rip currents don't pull you under" and "Swim along the shoreline until you escape the current's pull".
