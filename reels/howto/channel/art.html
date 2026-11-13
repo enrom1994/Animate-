@@ -1,0 +1,37 @@
+<!doctype html><html><head><meta charset="utf-8">
+<style>@font-face { font-family: 'Cap'; src: url('/node_modules/@fontsource/montserrat/files/montserrat-latin-800-normal.woff2') format('woff2'); font-weight: 800; } body { margin: 0; background: #222; }</style>
+<script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js" } }</script></head>
+<body><canvas id="avatar" width="800" height="800"></canvas><canvas id="banner" width="2560" height="1440"></canvas>
+<script type="module">
+// Channel art for "Now What, Sam?", drawn with the same character code as the films (../ripcurrent/src/char.js).
+import { drawChar, LOOKS, POSE } from '/ripcurrent/src/char.js';
+const INK = '#1d1a26', TAU = Math.PI * 2;
+const person = (look, pose) => { const c = document.createElement('canvas'); c.width = 640; c.height = 960; drawChar(c.getContext('2d'), LOOKS[look], { ...POSE, ...pose }); return c; };
+const label = (g, text, x, y, size, fill, lw) => { g.font = `800 ${size}px Cap, sans-serif`; g.lineJoin = 'round'; g.lineWidth = lw; g.strokeStyle = INK; g.strokeText(text, x, y); g.fillStyle = fill; g.fillText(text, x, y); };
+await document.fonts.load('800 100px Cap');
+{ // profile picture: read at 48 px, so one face, one question mark, two colours
+  const g = document.getElementById('avatar').getContext('2d'), s = person('sam', { eyes: [.5, -.6], brow: .9, mouth: 'o', sweat: 1 });
+  g.fillStyle = '#ffd23f'; g.fillRect(0, 0, 800, 800);
+  g.fillStyle = '#ffe27a'; g.beginPath(); g.arc(400, 400, 330, 0, TAU); g.fill();
+  g.textAlign = 'center'; label(g, '?', 560, 300, 250, '#ffffff', 28);
+  g.drawImage(s, 70, 90, 500, 520, 90, 190, 520, 541);
+}
+{ // banner: everything that matters sits in the centre strip that every device shows (1546 x 423)
+  const g = document.getElementById('banner').getContext('2d'), W = 2560, H = 1440;
+  const sky = g.createLinearGradient(0, 0, 0, H * .52); sky.addColorStop(0, '#4fb2ee'); sky.addColorStop(1, '#8fd6fb'); g.fillStyle = sky; g.fillRect(0, 0, W, H);
+  g.fillStyle = '#fff'; for (const [x, y, r] of [[300, 240, 70], [2150, 190, 85], [1250, 150, 55], [760, 330, 45], [1820, 360, 50]]) for (const [dx, dy, k] of [[0, 0, 1], [1.1, .15, .75], [-1.1, .2, .7], [.35, -.5, .7]]) { g.beginPath(); g.arc(x + dx * r, y + dy * r, r * k, 0, TAU); g.fill(); }
+  const sea = g.createLinearGradient(0, H * .52, 0, H * .86); sea.addColorStop(0, '#1668b8'); sea.addColorStop(.5, '#1b8fd0'); sea.addColorStop(1, '#5fe0d8'); g.fillStyle = sea; g.fillRect(0, H * .52, W, H * .34);
+  g.fillStyle = '#0e5c96'; g.beginPath(); g.moveTo(W / 2 - 330, H * .52); g.lineTo(W / 2 + 330, H * .52); g.lineTo(W / 2 + 150, H * .86); g.lineTo(W / 2 - 150, H * .86); g.fill();   // the calm dark gap
+  g.strokeStyle = '#fff'; g.lineCap = 'round'; for (let k = 0; k < 4; k++) { const y = H * (.585 + k * .075), gap = 300 - k * 35; g.lineWidth = 10 + k * 5; for (const [a, b] of [[60, W / 2 - gap], [W / 2 + gap, W - 60]]) { g.beginPath(); for (let x = a; x <= b; x += 20) { const yy = y + Math.sin(x * .012 + k) * 9; x === a ? g.moveTo(x, yy) : g.lineTo(x, yy); } g.stroke(); } }
+  g.fillStyle = '#fff'; g.fillRect(0, H * .855, W, 16); g.fillStyle = '#d9b76a'; g.fillRect(0, H * .866, W, 60); g.fillStyle = '#f7d98b'; g.fillRect(0, H * .9, W, H * .1);
+  g.strokeStyle = INK; g.lineWidth = 6; g.beginPath(); g.moveTo(0, H * .52); g.lineTo(W, H * .52); g.stroke();
+  g.textAlign = 'center';
+  // title: one line between the two characters, measured so the yellow word follows the white ones exactly
+  g.font = '800 98px Cap, sans-serif'; const a = 'NOW WHAT, ', b = 'SAM?', wa = g.measureText(a).width, wb = g.measureText(b).width, x0 = 1280 - (wa + wb) / 2;
+  g.textAlign = 'left'; label(g, a, x0, 700, 98, '#ffffff', 26); label(g, b, x0 + wa, 700, 98, '#ffd23f', 26);
+  g.textAlign = 'center'; label(g, 'Quick cartoon guides to getting out of trouble', 1280, 800, 43, '#ffffff', 14);
+  g.drawImage(person('sam', { eyes: [.7, -.2], brow: .9, mouth: 'o', sweat: 1, armL: [-.4, -.4], armR: [.4, .4] }), 30, 60, 580, 640, 515, 625, 270, 298);
+  g.drawImage(person('guard', { eyes: [-.7, -.2], mouth: 'smile', armL: [-.3, .2], armR: [.3, -.2] }), 30, 60, 580, 640, 2560 - 515 - 270, 625, 270, 298);
+}
+window.done = true;
+</script></body></html>
