@@ -31,7 +31,7 @@ Sound effects: Mixkit (Mixkit Sound Effects Free License). Narration: synthetic 
 - Pinned comment: What should Sam get stuck in next?
 
 ## Cover frame
-`cover.png`, the "RIP" reveal near the end. On a phone, pick this moment with the cover selector when uploading.
+`cover.png`, the swimmer under the red cross at about 0:02. On a phone, pick this moment with the cover selector when uploading.
 
 ## Before pressing publish
 1. The handle `@nowwhatsam` is claimed and the profile picture, banner and About text from `../channel/` are in place.
