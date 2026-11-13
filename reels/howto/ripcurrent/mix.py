@@ -30,11 +30,15 @@ CUES += [(.80, 'whoosh/deep_air_woosh_mixkit2604.mp3', .5, 0, 1.6),            #
          (25.9, 'foley/impact_of_a_blow_thud_mixkit2150.mp3', .35, 0, 1),      # the lifeguard jumps
          (32.5, 'impact/movie_impact_intro_presentation_mixkit2902.mp3', .4, 0, 1.5)]  # "the rip"
 ins, f, lab = ['-i', os.path.join(HERE, 'audio/vo.wav')], ['[0:a]aresample=48000,volume=1.0[v]'], ['[v]']
+SFX = float(os.environ.get('SFX', .4))   # every effect sits well under the voice; SFX=0 or VOICE=0 gives one stem alone, to measure
+VOICE = float(os.environ.get('VOICE', 1))
+f[0] = f'[0:a]aresample=48000,volume={VOICE}[v]'
 for i, (t, fn, g, ss, ln) in enumerate(CUES, 1):
+    g = g * SFX * (.75 if 'ambience/sea' in fn else 1)
     t = T(t) - ATT.get(fn, 0)
     ins += ['-ss', str(ss), '-t', str(ln), '-i', os.path.join(LIB, fn)]
     fade = f'afade=t=in:d=0.4,afade=t=out:st={DUR - 1.2:.2f}:d=1.2' if ln > 5 else f'afade=t=out:st={max(0, ln - .3):.2f}:d=0.3'
     f.append(f'[{i}:a]aresample=48000,aformat=channel_layouts=stereo,{fade},volume={g},adelay={int(max(0, t) * 1000)}:all=1[c{i}]'); lab.append(f'[c{i}]')
 f.append(''.join(lab) + f'amix=inputs={len(lab)}:normalize=0:duration=longest,atrim=0:{DUR},alimiter=limit=.9[o]')
-subprocess.run(['ffmpeg', '-v', 'error', '-y', *ins, '-filter_complex', ';'.join(f), '-map', '[o]', '-ar', '48000', '-ac', '2', os.path.join(HERE, 'audio/mix.wav')], check=True)
+subprocess.run(['ffmpeg', '-v', 'error', '-y', *ins, '-filter_complex', ';'.join(f), '-map', '[o]', '-ar', '48000', '-ac', '2', os.path.join(HERE, os.environ.get('OUT', 'audio/mix.wav'))], check=True)
 print('wrote audio/mix.wav', len(CUES), 'cues')
