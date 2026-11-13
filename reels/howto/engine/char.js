@@ -6,7 +6,7 @@ export const LOOKS = {
   sam: { skin: '#f6b98c', hair: '#3a2a26', top: '#ff6a3d', bottom: '#2f6fd6', hairStyle: 'swoop' },
   guard: { skin: '#c98a5e', hair: '#1d1a26', top: '#ffd23f', bottom: '#e23d3d', hairStyle: 'cap' },
 };
-export const POSE = { armL: [-.35, .25], armR: [.35, -.25], legL: -.06, legR: .06, lean: 0, head: 0, bob: 0, eyes: [0, 0], brow: 0, mouth: 'smile', blink: 0, squash: 1, sink: 0, sweat: 0 };
+export const POSE = { armL: [-.35, .25], armR: [.35, -.25], legL: -.06, legR: .06, lean: 0, head: 0, bob: 0, eyes: [0, 0], brow: 0, mouth: 'smile', blink: 0, squash: 1, sink: 0, sweat: 0, hold: '' };
 function limb(g, x, y, a1, l1, a2, l2, w, col, hand) {   // two-bone limb: angles from straight down, clockwise
   const ex = x + Math.sin(a1) * l1, ey = y + Math.cos(a1) * l1, hx = ex + Math.sin(a1 + a2) * l2, hy = ey + Math.cos(a1 + a2) * l2;
   g.lineCap = g.lineJoin = 'round';
@@ -32,7 +32,8 @@ export function drawChar(g, look, p) {
   rr(g, cx - 82, shY, 164, 250, 70); g.stroke(); g.beginPath(); g.moveTo(cx - 80, shY + 150); g.lineTo(cx + 80, shY + 150); g.lineWidth = 6; g.stroke();
   g.restore();
   // front arm
-  limb(g, cx + 62 + lx, shY + 34, p.armR[0], 105, p.armR[1], 100, 28, look.skin, look.skin);
+  const hand = limb(g, cx + 62 + lx, shY + 34, p.armR[0], 105, p.armR[1], 100, 28, look.skin, look.skin);
+  if (p.hold === 'phone') { g.save(); g.translate(hand[0], hand[1] - 20); g.rotate(-.25); g.fillStyle = '#2a2733'; g.strokeStyle = INK; g.lineWidth = 7; rr(g, -26, -52, 52, 96, 12); g.fill(); g.stroke(); g.fillStyle = '#8fd8ff'; g.fillRect(-18, -42, 36, 62); g.restore(); }
   // head
   const hx = cx + lx * 1.25, hy = shY - 150 + Math.abs(lx) * .08, HW = 330, HH = 300;
   g.save(); g.translate(hx, hy + 120); g.rotate(p.head); g.translate(-hx, -(hy + 120));

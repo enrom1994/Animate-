@@ -7,3 +7,6 @@
 - Get out: "When in doubt, just get out. When you leave close the door behind you to help contain the fire. Call 911.": Longmont.
 - Unattended cooking: "The leading factor contributing to ignition in nonconfined home cooking fires was unattended equipment (37%)"; "Stand by your pan.": US Fire Administration, same page.
 - Not used because no page we read supports it: baking soda, flour, fire blankets, the steam explanation of why water spreads the fire.
+- Extinguishers: "Never discharge a multi-purpose fire extinguisher onto a pan fire - it can spray or shoot burning grease around the kitchen": Longmont, same page. "Only Class K fire extinguishers are rated for the purpose of putting out grease and animal fat fires": Cambridge FD.
+- Oven fire: "In case of an oven fire, turn off the heat and keep the door closed.": Longmont.
+- Smoking oil: "If you see any smoke or the grease starts to boil, turn the burner off.": US Fire Administration.
