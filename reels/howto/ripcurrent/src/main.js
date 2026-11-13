@@ -2,6 +2,9 @@
 // Every frame is a function of time: window.renderAt(t).
 import * as THREE from 'three';
 import { SHOTS, CAPTIONS, DURATION } from './shots.js';
+import { WARP } from './captions.js';
+// film time -> the first take's time, which is what the shots are written in
+const toRef = t => { for (let i = 1; i < WARP.length; i++) if (t <= WARP[i][1]) { const [r0, n0] = WARP[i - 1], [r1, n1] = WARP[i]; return r0 + (r1 - r0) * (t - n0) / (n1 - n0); } return WARP[WARP.length - 1][0]; };
 
 export const W = 720, H = 1280, INK = 0x1d1a26;
 const renderer = new THREE.WebGLRenderer({ antialias: false, preserveDrawingBuffer: true });
@@ -48,8 +51,8 @@ const capEl = document.getElementById('cap'), built = new Map();
 const getShot = i => { if (!built.has(i)) built.set(i, SHOTS[i].build()); return built.get(i); };
 window.DURATION = DURATION;
 window.renderAt = t => {
-  let idx = SHOTS.findIndex(s => t >= s.start && t < s.end); if (idx < 0) idx = SHOTS.length - 1;
-  const shot = getShot(idx), r = shot.update(t - SHOTS[idx].start, t) || {}, cam = shot.camera, scene = shot.scene;
+  const tr = toRef(t); let idx = SHOTS.findIndex(s => tr >= s.start && tr < s.end); if (idx < 0) idx = SHOTS.length - 1;
+  const shot = getShot(idx), r = shot.update(tr - SHOTS[idx].start, tr) || {}, cam = shot.camera, scene = shot.scene;
   cam.aspect = W / H; cam.updateProjectionMatrix();
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.setRenderTarget(rtColor); renderer.render(scene, cam);
