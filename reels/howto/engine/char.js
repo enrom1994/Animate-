@@ -6,7 +6,11 @@ export const LOOKS = {
   sam: { skin: '#f6b98c', hair: '#3a2a26', top: '#ff6a3d', bottom: '#2f6fd6', hairStyle: 'swoop' },
   guard: { skin: '#c98a5e', hair: '#1d1a26', top: '#ffd23f', bottom: '#e23d3d', hairStyle: 'cap' },
 };
-export const POSE = { armL: [-.35, .25], armR: [.35, -.25], legL: -.06, legR: .06, lean: 0, head: 0, bob: 0, eyes: [0, 0], brow: 0, mouth: 'smile', blink: 0, squash: 1, sink: 0, sweat: 0, hold: '' };
+export const POSE = { armL: [-.35, .25], armR: [.35, -.25], legL: -.06, legR: .06, lean: 0, head: 0, bob: 0, eyes: [0, 0], brow: 0, mouth: 'smile', blink: 0, squash: 1, sink: 0, sweat: 0, hold: '', reachL: null, reachR: null };
+// two-bone reach: the angles that put the hand on (tx, ty); the arm stretches a little, cartoon-fashion, when the point is far
+function ik(x, y, tx, ty, l1, l2, side) { let d = Math.hypot(tx - x, ty - y); const k = Math.min(1.75, Math.max(1, d / (l1 + l2 - 2))); l1 *= k; l2 *= k; d = Math.min(d, l1 + l2 - 1);
+  const th = Math.atan2(tx - x, ty - y), A = Math.acos(Math.max(-1, Math.min(1, (l1 * l1 + d * d - l2 * l2) / (2 * l1 * d)))), a1 = th + side * A, ex = x + Math.sin(a1) * l1, ey = y + Math.cos(a1) * l1;
+  return [a1, Math.atan2(tx - ex, ty - ey) - a1, l1, l2]; }
 function limb(g, x, y, a1, l1, a2, l2, w, col, hand) {   // two-bone limb: angles from straight down, clockwise
   const ex = x + Math.sin(a1) * l1, ey = y + Math.cos(a1) * l1, hx = ex + Math.sin(a1 + a2) * l2, hy = ey + Math.cos(a1 + a2) * l2;
   g.lineCap = g.lineJoin = 'round';
@@ -24,7 +28,8 @@ export function drawChar(g, look, p) {
   // legs
   for (const [s, a] of [[-1, p.legL], [1, p.legR]]) { const [hx, hy] = limb(g, cx + s * 34, hipY, a, 125, -a * .5, 120, 30, look.skin); g.fillStyle = look.skin; g.strokeStyle = INK; g.lineWidth = 7; g.beginPath(); g.ellipse(hx + s * 14, hy + 6, 34, 20, 0, 0, TAU); g.fill(); g.stroke(); }
   // back arm (left on screen) behind the body
-  limb(g, cx - 62 + lx, shY + 34, p.armL[0], 105, p.armL[1], 100, 28, look.skin, look.skin);
+  const RL = p.reachL && ik(cx - 62 + lx, shY + 34, p.reachL[0], p.reachL[1] + p.bob, 105, 100, 1), RR = p.reachR && ik(cx + 62 + lx, shY + 34, p.reachR[0], p.reachR[1] + p.bob, 105, 100, -1);
+  if (RL) limb(g, cx - 62 + lx, shY + 34, RL[0], RL[2], RL[1], RL[3], 28, look.skin, look.skin); else limb(g, cx - 62 + lx, shY + 34, p.armL[0], 105, p.armL[1], 100, 28, look.skin, look.skin);
   // body: a bean, top colour over shorts
   g.save(); g.translate(cx, hipY); g.rotate(p.lean * .6); g.translate(-cx, -hipY);
   g.lineWidth = 8; g.strokeStyle = INK;
@@ -32,7 +37,7 @@ export function drawChar(g, look, p) {
   rr(g, cx - 82, shY, 164, 250, 70); g.stroke(); g.beginPath(); g.moveTo(cx - 80, shY + 150); g.lineTo(cx + 80, shY + 150); g.lineWidth = 6; g.stroke();
   g.restore();
   // front arm
-  const hand = limb(g, cx + 62 + lx, shY + 34, p.armR[0], 105, p.armR[1], 100, 28, look.skin, look.skin);
+  const hand = RR ? limb(g, cx + 62 + lx, shY + 34, RR[0], RR[2], RR[1], RR[3], 28, look.skin, look.skin) : limb(g, cx + 62 + lx, shY + 34, p.armR[0], 105, p.armR[1], 100, 28, look.skin, look.skin);
   if (p.hold === 'phone') { g.save(); g.translate(hand[0], hand[1] - 20); g.rotate(-.25); g.fillStyle = '#2a2733'; g.strokeStyle = INK; g.lineWidth = 7; rr(g, -26, -52, 52, 96, 12); g.fill(); g.stroke(); g.fillStyle = '#8fd8ff'; g.fillRect(-18, -42, 36, 62); g.restore(); }
   // head
   const hx = cx + lx * 1.25, hy = shY - 150 + Math.abs(lx) * .08, HW = 330, HH = 300;
@@ -71,5 +76,10 @@ export function makeChar(lookName = 'sam', height = 1.75) {
   mesh.customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: tex, alphaTest: .5 }); mesh.castShadow = true;
   const blob = new THREE.Mesh(new THREE.CircleGeometry(.42, 24), new THREE.MeshBasicMaterial({ color: 0x7a5a2a, transparent: true, opacity: .45, depthWrite: false })); blob.rotation.x = -Math.PI / 2; blob.position.y = .02; blob.scale.y = .55; blob.userData.noInk = true;
   const group = new THREE.Group(); group.add(mesh, blob);
-  return { group, set(p, camera) { drawChar(g, look, { ...POSE, ...p }); tex.needsUpdate = true; mesh.position.y = p.sink ? -(p.sink * CH - 40) / CH * hH : 0; blob.visible = !p.sink; if (camera) group.rotation.y = Math.atan2(camera.position.x - group.position.x, camera.position.z - group.position.z); } };
+  // a point in the world -> the spot on this character's card that covers it from the camera, in canvas pixels
+  const toCard = (pt, camera, yaw) => { const o = camera.position, P = group.position, nx = Math.sin(yaw), nz = Math.cos(yaw), dx = pt[0] - o.x, dy = pt[1] - o.y, dz = pt[2] - o.z, den = dx * nx + dz * nz; if (Math.abs(den) < 1e-6) return null;
+    const s = ((P.x - o.x) * nx + (P.z - o.z) * nz) / den, hx = o.x + dx * s, hy = o.y + dy * s, hz = o.z + dz * s, lx = (hx - P.x) * Math.cos(yaw) - (hz - P.z) * Math.sin(yaw);
+    return [CW / 2 + lx / hW * CW, (CH - 40) - (hy - P.y) / hH * CH]; };
+  return { group, set(p, camera) { if (camera && (p.reach || p.reachWith)) { const yaw = Math.atan2(camera.position.x - group.position.x, camera.position.z - group.position.z), c = toCard(p.reach, camera, yaw); if (c) p = { ...p, [(p.reachWith || (c[0] < CW / 2 ? 'L' : 'R')) === 'L' ? 'reachL' : 'reachR']: c }; }
+    drawChar(g, look, { ...POSE, ...p }); tex.needsUpdate = true; mesh.position.y = p.sink ? -(p.sink * CH - 40) / CH * hH : 0; blob.visible = !p.sink; if (camera) group.rotation.y = Math.atan2(camera.position.x - group.position.x, camera.position.z - group.position.z); } };
 }

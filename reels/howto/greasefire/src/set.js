@@ -6,11 +6,14 @@ import { card, INK } from '../../engine/film.js';
 export const PAN = [-.22, .98, -1.02];
 export function kitchen() {
   const G = new THREE.Group();
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(12, 10), new THREE.MeshToonMaterial({ map: (() => { const t = canvasTex(256, 256, (g, w, h) => { for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) { g.fillStyle = (i + j) % 2 ? '#f6e3c0' : '#e9a25e'; g.fillRect(i * 64, j * 64, 64, 64); } }); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(6, 5); t.magFilter = THREE.NearestFilter; return t; })() })); floor.rotation.x = -Math.PI / 2; floor.position.z = 2; floor.receiveShadow = true; G.add(floor);
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(18, 10), new THREE.MeshToonMaterial({ map: (() => { const t = canvasTex(256, 256, (g, w, h) => { for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) { g.fillStyle = (i + j) % 2 ? '#f6e3c0' : '#e9a25e'; g.fillRect(i * 64, j * 64, 64, 64); } }); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(9, 5); t.magFilter = THREE.NearestFilter; return t; })() })); floor.rotation.x = -Math.PI / 2; floor.position.set(3, 0, 2); floor.receiveShadow = true; G.add(floor);
   const wallTex = canvasTex(1024, 512, (g, w, h) => { g.fillStyle = '#ffe7b8'; g.fillRect(0, 0, w, h); g.fillStyle = '#7fd6cf'; g.fillRect(0, h * .42, w, h * .26); g.strokeStyle = 'rgba(29,26,38,.35)'; g.lineWidth = 3; for (let x = 0; x <= w; x += 64) { g.beginPath(); g.moveTo(x, h * .42); g.lineTo(x, h * .68); g.stroke(); } for (const y of [.42, .55, .68]) { g.beginPath(); g.moveTo(0, h * y); g.lineTo(w, h * y); g.stroke(); } g.fillStyle = '#e9c98f'; g.fillRect(0, h * .94, w, h * .06); });
   const back = new THREE.Mesh(new THREE.PlaneGeometry(12, 3.4), flat(0xffffff, { map: wallTex })); back.position.set(0, 1.7, -1.6); G.add(back);
   const left = new THREE.Mesh(new THREE.PlaneGeometry(10, 3.4), flat(0xfbdca4, { side: THREE.DoubleSide })); left.rotation.y = Math.PI / 2; left.position.set(-3.1, 1.7, 2); G.add(left);
-  const right = left.clone(); right.rotation.y = -Math.PI / 2; right.position.x = 3.6; G.add(right);
+  // the right-hand wall is built round a real doorway (z 0.9 to 1.9): kitchen colour this side, hall colour beyond
+  for (const [z0, z1, y0, y1] of [[-3, .9, 0, 3.4], [1.9, 7, 0, 3.4], [.9, 1.9, 2.12, 3.4]]) for (const [x, ry, col] of [[3.58, -Math.PI / 2, 0xfbdca4], [3.66, Math.PI / 2, 0xcdbfe8]]) { const m = new THREE.Mesh(new THREE.PlaneGeometry(z1 - z0, y1 - y0), flat(col)); m.rotation.y = ry; m.position.set(x, (y0 + y1) / 2, (z0 + z1) / 2); G.add(m); }
+  G.add(box(.16, 2.16, .07, 0x8a5a2e, [3.62, 1.08, .88]), box(.16, 2.16, .07, 0x8a5a2e, [3.62, 1.08, 1.92]), box(.16, .08, 1.1, 0x8a5a2e, [3.62, 2.15, 1.4]));   // the frame
+  { const far = new THREE.Mesh(new THREE.PlaneGeometry(12, 3.4), flat(0xb9a8dc)); far.rotation.y = -Math.PI / 2; far.position.set(8.5, 1.7, 2); G.add(far); }   // the end of the hall
   // base units and worktop
   for (const [x0, x1] of [[-2.2, -.5], [.5, 2.6]]) { G.add(box(x1 - x0, .86, .66, 0x2bb6a8, [(x0 + x1) / 2, .43, -1.27]), box(x1 - x0 + .04, .07, .72, 0xf4f1ea, [(x0 + x1) / 2, .9, -1.25])); for (let x = x0 + .28; x < x1 - .1; x += .56) { G.add(box(.48, .62, .03, 0x35c9ba, [x, .44, -.93]), ball(.035, 0xffd23f, [x + .16, .62, -.9])); } }
   // the stove: white body, dark top, four rings, knobs
@@ -29,9 +32,7 @@ export function kitchen() {
   // fridge
   G.add(box(.85, 1.95, .7, 0xfff7e8, [-2.65, .975, -1.24]), box(.05, .5, .05, 0xc9ccd4, [-2.32, 1.35, -.87]), box(.05, .3, .05, 0xc9ccd4, [-2.32, .6, -.87]), box(.86, .03, .71, 0xd8d2c4, [-2.65, .95, -1.24]));
   // the way out: a door in the right-hand wall
-  G.add(box(.04, 2.1, 1.0, 0x4a3d5c, [3.6, 1.05, 1.4]));
-  { const hall = new THREE.Mesh(new THREE.PlaneGeometry(10, 3.4), flat(0xcdbfe8)); hall.rotation.y = Math.PI / 2; hall.position.set(3.63, 1.7, 2); G.add(hall); }   // the hall side of that wall   // the doorway, dark beyond
-  const door = new THREE.Group(); door.position.set(3.6, 0, .9); door.add(box(.12, 2.12, 1.02, 0xb07a45, [0, 1.06, .5]), ball(.05, 0xffd23f, [-.09, 1.0, .86]), ball(.05, 0xffd23f, [.09, 1.0, .86])); G.add(door); G.userData.door = door;   // hinged at z = 0.9: rotation.y 0 is shut
+  const door = new THREE.Group(); door.position.set(3.62, 0, .92); door.add(box(.07, 2.08, .96, 0xb07a45, [0, 1.04, .49]), ball(.05, 0xffd23f, [-.07, 1.0, .84]), ball(.05, 0xffd23f, [.07, 1.0, .84])); G.add(door); G.userData.door = door;   // hinged at z = 0.9: rotation.y 0 is shut
   // clock and a smoke alarm
   const clock = board(.42, .42, (g, w, h) => { g.fillStyle = '#fff'; g.beginPath(); g.arc(w / 2, h / 2, w * .46, 0, 7); g.fill(); g.strokeStyle = INK; g.lineWidth = w * .07; g.stroke(); g.lineWidth = w * .05; g.lineCap = 'round'; g.beginPath(); g.moveTo(w / 2, h / 2); g.lineTo(w / 2, h * .22); g.moveTo(w / 2, h / 2); g.lineTo(w * .7, h * .56); g.stroke(); }, 300); clock.material.transparent = true; clock.material.alphaTest = .5; clock.position.set(-.95, 2.62, -1.59); clock.userData.noInk = true; G.add(clock);
   return G;
