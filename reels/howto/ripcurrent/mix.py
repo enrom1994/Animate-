@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Sound for the pilot: the voice, a sea bed, and real recorded cues on the cuts and marks (EDITING.md section 4).
    python3 mix.py  ->  audio/mix.wav   (the library is .claude/kit/sfx/library; nothing is synthesised)"""
-import os, subprocess
+import os, subprocess, json
 HERE = os.path.dirname(os.path.realpath(__file__)); LIB = os.path.realpath(os.path.join(HERE, '../../../.claude/kit/sfx/library'))
 import json
 WARP = json.load(open(os.path.join(HERE, 'tools/warp.json'))); DUR = WARP[-1][1]
@@ -10,7 +10,8 @@ def T(r):   # a time in the first take -> this take (the cue list below is writt
         if r <= r1: return n0 + (n1 - n0) * (r - r0) / (r1 - r0)
     return DUR
 W = ['whoosh/quick_air_woosh_mixkit2605.mp3', 'whoosh/air_woosh_mixkit1489.mp3', 'whoosh/transition_windy_swoosh_mixkit1474.mp3', 'whoosh/cinematic_whoosh_fast_transition_mixkit1492.mp3']
-CUTS = [1.62, 3.3, 6.25, 9.45, 11.05, 12.52, 14.45, 17.65, 19.15, 21.65, 23.5, 25.38, 27.25, 31.7]
+D1, C0 = (lambda j: (j['D1'], j['C0']))(json.load(open(os.path.join(HERE, 'tools/words_ref.json'))))
+CUTS = [1.62, 3.3, 6.25, 9.45, 11.05, 12.52, 14.45, 17.65, 19.15, 21.65, 23.5, 25.38, 27.25, 28.72, 29.98, 31.5, 27.25 + D1, 31.7 + D1, C0]
 # (time, file, gain, start offset in the file, length)
 CUES = [(0, 'ambience/sea_waves_ambience_mixkit1189.mp3', .22, 0, DUR)]
 def attack(fn):   # seconds until the sound first reaches half its peak, so that moment can sit on the cut
@@ -28,7 +29,10 @@ CUES += [(.80, 'whoosh/deep_air_woosh_mixkit2604.mp3', .5, 0, 1.6),            #
          (15.5, 'foley/wood_hard_hit_stamp_mixkit2182.mp3', .45, 0, 1),        # the width lands
          (17.92, 'whoosh/quick_air_woosh_mixkit2605.mp3', .45, 0, 1),          # the sideways arrow
          (25.9, 'foley/impact_of_a_blow_thud_mixkit2150.mp3', .35, 0, 1),      # the lifeguard jumps
-         (32.5, 'impact/movie_impact_intro_presentation_mixkit2902.mp3', .4, 0, 1.5)]  # "the rip"
+         (28.92, 'foley/body_punch_quick_hit_thud_mixkit2153.mp3', .7, 0, 1),  # stopped at the water's edge
+         (30.26, 'whoosh/deep_air_woosh_mixkit2604.mp3', .5, 0, 1.4),          # the ring flies
+         (31.18, 'foley/impact_of_a_blow_thud_mixkit2150.mp3', .4, 0, 1),      # and lands
+         (32.5 + D1, 'impact/movie_impact_intro_presentation_mixkit2902.mp3', .4, 0, 1.5)]  # "the rip"
 ins, f, lab = ['-i', os.path.join(HERE, 'audio/vo.wav')], ['[0:a]aresample=48000,volume=1.0[v]'], ['[v]']
 SFX = float(os.environ.get('SFX', .4))   # every effect sits well under the voice; SFX=0 or VOICE=0 gives one stem alone, to measure
 VOICE = float(os.environ.get('VOICE', 1))

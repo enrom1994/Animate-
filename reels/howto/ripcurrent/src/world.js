@@ -47,7 +47,10 @@ export function makeWorld() {
   const buoy = new THREE.Group(); buoy.add(cyl(.5, .6, .5, 0xff5d4d, [0, .2, 0]), cyl(.06, .06, 1.3, 0xffffff, [0, 1.0, 0], 8), box(2.5, 1.15, .08, 0xffd23f, [0, 2.1, 0]));
   { const f = board(2.4, 1.05, (g, w, h) => { g.fillStyle = '#ffd23f'; g.fillRect(0, 0, w, h); g.fillStyle = INK; g.textAlign = 'center'; g.font = `800 ${h * .26}px Cap, sans-serif`; g.fillText('UP TO', w / 2, h * .3); g.font = `800 ${h * .36}px Cap, sans-serif`; g.fillText('8 FEET', w / 2, h * .64); g.font = `800 ${h * .22}px Cap, sans-serif`; g.fillText('A SECOND', w / 2, h * .9); }); f.position.set(0, 2.1, -.05); f.rotation.y = Math.PI; buoy.add(f); } scene.add(buoy);
   const duck = new THREE.Group(); duck.add(ball(.42, 0xffd23f, [0, .25, 0], [1, .8, 1.25]), ball(.28, 0xffd23f, [0, .72, -.3])); { const c = new THREE.Mesh(new THREE.ConeGeometry(.12, .3, 10), toon(0xff7a1a)); c.rotation.x = -Math.PI / 2; c.position.set(0, .7, -.62); duck.add(c); for (const s of [-1, 1]) duck.add(ball(.05, 0x1d1a26, [s * .13, .82, -.5])); } scene.add(duck);
-  const props = { X, down, side, pathSide, pathBack, width, outline, name, buoy, duck };
+  // a ring buoy to throw, and the red-over-yellow flags that mark a patrolled stretch of beach
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(.36, .12, 12, 28), new THREE.MeshToonMaterial({ map: canvasTex(256, 8, (g, w, h) => { for (let i = 0; i < 8; i++) { g.fillStyle = i % 2 ? '#ffffff' : '#e6232e'; g.fillRect(i * w / 8, 0, w / 8 + 1, h); } }) })); ring.castShadow = true; scene.add(ring);
+  const patrol = new THREE.Group(); for (const x of [-3.2, 3.2]) { patrol.add(cyl(.05, .05, 3.4, 0xffffff, [x, 1.7, 0], 8)); const f = new THREE.Mesh(new THREE.PlaneGeometry(1.2, .8), new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, map: canvasTex(64, 64, (g, w, h) => { g.fillStyle = '#e6232e'; g.fillRect(0, 0, w, h / 2); g.fillStyle = '#ffd23f'; g.fillRect(0, h / 2, w, h / 2); }) })); f.position.set(x + .62, 2.95, 0); patrol.add(f); } scene.add(patrol);
+  const props = { X, down, side, pathSide, pathBack, width, outline, name, buoy, duck, ring, patrol };
   return { scene, camera, set, A, props, ripple, flowAt, pop,
     reset(t) { animate(set, t); for (const k in props) props[k].visible = false; flow.forEach(m => m.visible = false); ripples.forEach(r => r.visible = false); for (const k in A) { A[k].group.visible = false; A[k].group.rotation.set(0, 0, 0); } },
     cam(pos, look, fov = 40) { camera.fov = fov; camera.position.set(...pos); camera.up.set(0, 1, 0); camera.lookAt(...look); },
@@ -57,3 +60,4 @@ export function makeWorld() {
 // poses
 export const swim = (ph, o = {}) => ({ armL: [-(1.95 + .55 * Math.sin(ph)), -.5 * Math.cos(ph)], armR: [1.95 + .55 * Math.sin(ph + Math.PI), .5 * Math.cos(ph + Math.PI)], sink: .4, bob: 8 * Math.sin(ph * 2), head: .07 * Math.sin(ph), ...o });
 export const afloat = (t, o = {}) => ({ armL: [-1.4 + .08 * Math.sin(t * 2), -.15], armR: [1.4 - .08 * Math.sin(t * 2), .15], sink: .4, bob: 10 * Math.sin(t * 2.2), ...o });
+export const run = (ph, o = {}) => ({ legL: .7 * Math.sin(ph), legR: -.7 * Math.sin(ph), armL: [-.2 - .8 * Math.sin(ph), -.9], armR: [.2 - .8 * Math.sin(ph), .9], lean: .1, bob: 16 * Math.abs(Math.sin(ph)), ...o });
