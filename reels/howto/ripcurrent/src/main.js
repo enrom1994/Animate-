@@ -59,7 +59,7 @@ window.DURATION = DURATION;
 window.renderAt = t => {
   const tr = toRef(t); let idx = SHOTS.findIndex(s => tr >= s.start && tr < s.end); if (idx < 0) idx = SHOTS.length - 1;
   const shot = getShot(idx), r = shot.update(tr - SHOTS[idx].start, tr) || {}, cam = shot.camera, scene = shot.scene;
-  cam.aspect = W / H; cam.updateProjectionMatrix();
+  cam.aspect = W / H; cam.setViewOffset(W, H, 0, 55, W, H);   // the whole picture sits a little high: the bottom fifth of a Short is under the player's own text
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.setRenderTarget(rtColor); renderer.render(scene, cam);
   const swap = []; scene.traverse(o => { if (o.isMesh) { swap.push([o, o.material]); o.material = o.userData.nmat || NORMAL; if (o.userData.noInk) o.visible = false; } });
