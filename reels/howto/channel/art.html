@@ -4,7 +4,7 @@
 <body><canvas id="avatar" width="800" height="800"></canvas><canvas id="banner" width="2560" height="1440"></canvas>
 <script type="module">
 // Channel art for "Now What, Sam?", drawn with the same character code as the films (../ripcurrent/src/char.js).
-import { drawChar, LOOKS, POSE } from '/ripcurrent/src/char.js';
+import { drawChar, LOOKS, POSE } from '/engine/char.js';
 const INK = '#1d1a26', TAU = Math.PI * 2;
 const person = (look, pose) => { const c = document.createElement('canvas'); c.width = 640; c.height = 960; drawChar(c.getContext('2d'), LOOKS[look], { ...POSE, ...pose }); return c; };
 const label = (g, text, x, y, size, fill, lw) => { g.font = `800 ${size}px Cap, sans-serif`; g.lineJoin = 'round'; g.lineWidth = lw; g.strokeStyle = INK; g.strokeText(text, x, y); g.fillStyle = fill; g.fillText(text, x, y); };

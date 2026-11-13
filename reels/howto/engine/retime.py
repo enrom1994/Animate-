@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""After a new voice take: python3 tools/retime.py
+"""After a new voice take: python3 engine/retime.py <film folder>
 The shots in src/shots.js are timed against a reference take (tools/words_ref.json: word start times and the end). This maps them onto the take in
 audio/vo.words.json word by word, and rewrites src/captions.js (captions, duration, the time map) for the new take."""
 import json, os, re
-HERE = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+import sys
+HERE = os.path.realpath(sys.argv[1])
 ref_path = os.path.join(HERE, 'tools/words_ref.json')
 W = json.load(open(os.path.join(HERE, 'audio/vo.words.json')))
 if not os.path.exists(ref_path): json.dump({'end': round(W[-1]['e'] + .9, 2), 'words': [round(w['s'], 3) for w in W]}, open(ref_path, 'w'))
@@ -24,6 +25,6 @@ for i, w in enumerate(W):
     if re.search(r'[.,?!]$', w['w']) or len(cur) >= 3 or sum(len(x['w']) for x in cur) >= 11 or (nxt and nxt['s'] - w['e'] > .25): flush()
 flush()
 for a, b in zip(caps, caps[1:]): a[2] = min(a[2], b[0])
-open(os.path.join(HERE, 'src/captions.js'), 'w').write('// written by tools/retime.py from audio/vo.words.json\nexport const CAPTIONS = ' + json.dumps(caps) + ';\nexport const DURATION = ' + str(end) + ';\n// [time in the first take, time in this take]: the shots are written in first-take seconds\nexport const WARP = ' + json.dumps(warp) + ';\n')
+open(os.path.join(HERE, 'src/captions.js'), 'w').write('// written by engine/retime.py from audio/vo.words.json\nexport const CAPTIONS = ' + json.dumps(caps) + ';\nexport const DURATION = ' + str(end) + ';\n// [time in the first take, time in this take]: the shots are written in first-take seconds\nexport const WARP = ' + json.dumps(warp) + ';\n')
 json.dump(warp, open(os.path.join(HERE, 'tools/warp.json'), 'w'))
 print('duration', end, len(caps), 'captions')

@@ -1,8 +1,9 @@
 // Toon renderer: flat-shaded 3D set + flat 2D characters, one ink-outline pass over both.
 // Every frame is a function of time: window.renderAt(t).
 import * as THREE from 'three';
-import { SHOTS, CAPTIONS, DURATION } from './shots.js';
-import { WARP } from './captions.js';
+// the film is chosen in the address: /engine/index.html?film=ripcurrent loads /ripcurrent/src/shots.js
+const FILM = new URLSearchParams(location.search).get('film');
+const { SHOTS, CAPTIONS, DURATION, WARP } = await import(`/${FILM}/src/shots.js`);
 // film time -> the first take's time, which is what the shots are written in
 const toRef = t => { for (let i = 1; i < WARP.length; i++) if (t <= WARP[i][1]) { const [r0, n0] = WARP[i - 1], [r1, n1] = WARP[i]; return r0 + (r1 - r0) * (t - n0) / (n1 - n0); } return WARP[WARP.length - 1][0]; };
 

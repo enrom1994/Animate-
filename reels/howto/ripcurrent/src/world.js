@@ -1,8 +1,8 @@
 // One shared world for every shot: the beach, the actors and the props. A shot resets it, then shows what it needs.
 import * as THREE from 'three';
-import { stage, toon, flat, box, cyl, ball, canvasTex, board, pr, ease, lerp, clamp } from './toon.js';
+import { stage, toon, flat, box, cyl, ball, canvasTex, board, pr, ease, lerp, clamp } from '../../engine/toon.js';
 import { beach, animate } from './set.js';
-import { makeChar, LOOKS } from './char.js';
+import { makeChar, LOOKS } from '../../engine/char.js';
 const INK = '#1d1a26';
 LOOKS.pro = { skin: '#e8a877', hair: '#1d1a26', top: '#22303f', bottom: '#2bb673', hairStyle: 'cap' };
 // a picture painted on the water (or the sand): its ink line is in the drawing

@@ -1,7 +1,7 @@
 // The beach: sand, a sea with breaking waves and one calm dark gap (the rip), a lifeguard tower, flags, an umbrella.
 // World: metres, y up, the sea is at -z, the waterline at z = 0.
 import * as THREE from 'three';
-import { toon, flat, box, cyl, ball, canvasTex, board } from './toon.js';
+import { toon, flat, box, cyl, ball, canvasTex, board } from '../../engine/toon.js';
 const INK = '#1d1a26';
 export const RIP_X = 0;   // the rip runs out to sea along x = 0
 export function seaTexture() {   // u: along the shore (64 m), v: 0 at the shore to 1 at 80 m out

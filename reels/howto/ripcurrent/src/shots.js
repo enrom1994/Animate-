@@ -1,7 +1,7 @@
 // The edit: "How to survive a rip current". 15 shots over 34 s, cut on the voice (times are seconds of audio/vo.wav).
 import { makeWorld, swim, afloat, run } from './world.js';
-import { pr, lerp, ease, clamp } from './toon.js';
-export { CAPTIONS, DURATION } from './captions.js';
+import { pr, lerp, ease, clamp } from '../../engine/toon.js';
+export { CAPTIONS, DURATION, WARP } from './captions.js';
 const SHAKES = [[.82, .02], [1.76, .03], [11.3, .02], [13.3, .025], [15.5, .015], [28.92, .035], [31.18, .02], [32.5 + 5.28, .02]];   // first-take seconds
 let Wd; const W = () => Wd || (Wd = makeWorld());
 const SH = [];   // [start, end, fn(lt, t, u, world)] : u runs 0..1 through the shot

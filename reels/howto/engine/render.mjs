@@ -1,11 +1,11 @@
-// node render.mjs stills 0.5,3 out_dir   |   node render.mjs video out.mp4 [fps] [from] [to]
+// node engine/render.mjs <film> stills 0.5,3 out_dir   |   node engine/render.mjs <film> video out.mp4 [fps] [from] [to]
 // GL=swiftshader for machines without a GPU. three.js and fonts are served from the shared kit.
 import { createRequire } from 'node:module';
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
-const ROOT = path.dirname(new URL(import.meta.url).pathname), KIT = path.resolve(ROOT, '../../../.claude/kit');
+const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..'), KIT = path.resolve(ROOT, '../../.claude/kit');
 let chromium; try { ({ chromium } = createRequire(import.meta.url)('playwright')); } catch { ({ chromium } = createRequire(KIT + '/')('playwright')); }   // the machine's own Playwright first, then the kit's
 const types = { '.html': 'text/html', '.js': 'text/javascript', '.woff2': 'font/woff2' };
 const server = http.createServer((req, res) => {
@@ -17,11 +17,11 @@ const browser = await chromium.launch({ args: [...GL, '--ignore-gpu-blocklist'] 
 const page = await browser.newPage({ viewport: { width: 720, height: 1280 } });
 page.on('console', m => { if (m.type() === 'error') console.log('[page]', m.text()); });
 page.on('pageerror', e => console.log('[pageerror]', e.message));
-await page.goto(`http://localhost:${server.address().port}/index.html?render=1`);
+await page.goto(`http://localhost:${server.address().port}/engine/index.html?render=1&film=${process.argv[2]}`);
 await page.waitForFunction(() => window.renderAt && window.ready);
 await page.evaluate(() => window.ready);
 const shot = () => page.screenshot({ clip: { x: 0, y: 0, width: 720, height: 1280 }, type: 'png' });
-const [mode, a, b, c, d] = process.argv.slice(2);
+const [mode, a, b, c, d] = process.argv.slice(3);
 if (mode === 'stills') {
   fs.mkdirSync(b, { recursive: true });
   for (const t of a.split(',').map(Number)) { const t0 = Date.now(); await page.evaluate(t => window.renderAt(t), t); fs.writeFileSync(path.join(b, `t_${t.toFixed(2)}.png`), await shot()); console.log('still', t, Date.now() - t0, 'ms'); }

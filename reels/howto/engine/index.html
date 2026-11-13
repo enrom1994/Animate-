@@ -2,9 +2,9 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>how-to: rip current</title>
+<title>how-to engine</title>
 <style>
-  @font-face { font-family: 'Cap'; src: url('node_modules/@fontsource/montserrat/files/montserrat-latin-800-normal.woff2') format('woff2'); font-weight: 800; }
+  @font-face { font-family: 'Cap'; src: url('/node_modules/@fontsource/montserrat/files/montserrat-latin-800-normal.woff2') format('woff2'); font-weight: 800; }
   html, body { margin: 0; background: #000; overflow: hidden; }
   #stage { position: relative; width: 720px; height: 1280px; }
   canvas { display: block; }
@@ -13,11 +13,11 @@
   #cap b { color: #ffd23f; font-weight: 800; }
 </style>
 <script type="importmap">
-{ "imports": { "three": "./node_modules/three/build/three.module.js", "three/addons/": "./node_modules/three/examples/jsm/" } }
+{ "imports": { "three": "/node_modules/three/build/three.module.js", "three/addons/": "/node_modules/three/examples/jsm/" } }
 </script>
 </head>
 <body>
 <div id="stage"><div id="cap"></div></div>
-<script type="module" src="./src/main.js"></script>
+<script type="module" src="/engine/main.js"></script>
 </body>
 </html>
