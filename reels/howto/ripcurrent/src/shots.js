@@ -14,9 +14,9 @@ shot(0, 1.62, (lt, t, u, w) => { const g = out(pr(lt, .82, 1.62)), z = lerp(-6.2
   w.ripple(0, 0, z, t); if (grabbed) w.flowAt(t, pr(lt, .82, 1.0), z - 1.5, -30, 9); return { focus: 5 }; });
 // 2  "do not swim back to shore" : flat out toward the beach, going backwards anyway
 shot(1.62, 3.3, (lt, t, u, w) => { const z = lerp(-11.2, -12.6, u);
-  w.cam([lerp(-.9, -.6, u), lerp(1.3, 1.15, u), lerp(-7.0, -7.6, u)], [0, .75, -11.5], 40);
+  w.cam([lerp(-.9, -.6, u), lerp(1.3, 1.15, u), lerp(-7.0, -7.6, u)], [0, .95, -11.5], 40);
   w.act('sam', 0, z, swim(t * 16, { mouth: 'grit', brow: -.5, sweat: 1, eyes: [0, .3] })); w.ripple(0, 0, z, t * 2, 1.2); w.flowAt(t, 1, z - 1.5, -30, 6);
-  w.props.X.position.set(0, 2.15, z + .1); w.pop(w.props.X, pr(lt, .12, .34), .62); w.props.X.rotation.z = Math.sin(t * 20) * .05 * (1 - pr(lt, .12, .6)); return { focus: 4.5 }; });
+  w.props.X.position.set(0, 1.95, z + .1); w.pop(w.props.X, pr(lt, .12, .34), .55); w.props.X.rotation.z = Math.sin(t * 20) * .05 * (1 - pr(lt, .12, .6)); return { focus: 4.5 }; });
 // 3  "A rip is a river of water running out to sea" : crane up over the channel
 shot(3.3, 6.25, (lt, t, u, w) => { const k = io(u);
   w.cam([lerp(-3.6, -1.6, k), lerp(5, 13, k), lerp(7, -1, k)], [0, 0, lerp(-9, -20, k)], 44);
@@ -66,13 +66,13 @@ shot(23.5, 25.38, (lt, t, u, w) => { const calm = lt > 1.25, c = io(pr(lt, 1.25,
   w.act('sam', 0, -12, calm ? afloat(t, { mouth: 'smile', blink: .9 * c, brow: 0, bob: 6 * Math.sin(t * 2) }) : swim(23.5 * 9 + lt * 9 - lt * lt * 3, { mouth: 'sad', brow: .9, sweat: 1, blink: .4 })); w.ripple(0, 0, -12, t * (calm ? .7 : 1.4)); w.flowAt(t, .6, -13.5, -30, 4); return { focus: 2.8 }; });
 // 13 "face the shore, and wave for help" : the lifeguard sees it
 shot(25.38, 27.25, (lt, t, u, w) => { const seen = pr(lt, .5, .7);
-  w.cam([lerp(.2, -.1, u), lerp(1.8, 1.65, u), lerp(6.6, 5.9, u)], [-.4, .85, -3], 44);
-  w.act('guard', .35, 2.6, { armL: [lerp(-.3, -2.2, seen), lerp(.2, -.2, seen)], armR: [.4, 1.6 * seen], mouth: seen > .5 ? 'shout' : 'smile', brow: .5 * seen, eyes: [-.7, -.4], bob: 26 * Math.sin(Math.PI * seen) * (seen < 1 ? 1 : 0) + 4 * Math.abs(Math.sin(t * 6)) * seen });
+  w.cam([lerp(.2, -.1, u), lerp(1.8, 1.65, u), lerp(6.6, 5.9, u)], [-.4, .45, -3], 44);
+  w.act('guard', .05, 2.6, { armL: [lerp(-.3, -2.2, seen), lerp(.2, -.2, seen)], armR: [.4, 1.6 * seen], mouth: seen > .5 ? 'shout' : 'smile', brow: .5 * seen, eyes: [-.7, -.4], bob: 26 * Math.sin(Math.PI * seen) * (seen < 1 ? 1 : 0) + 4 * Math.abs(Math.sin(t * 6)) * seen });
   w.act('sam', -1.0, -3.6, afloat(t, { armR: [2.2 + Math.sin(t * 11) * .35, .3], mouth: 'smile' })); w.ripple(0, -1.0, -3.6, t); return { focus: 4 }; });
 // 14 "And before you get in, look for the calm, dark gap between the breaking waves"
 shot(27.25, 31.7, (lt, t, u, w) => { const k = io(pr(lt, .5, 4.45)), point = pr(lt, .9, 1.2);
   w.cam([lerp(.5, .3, k), lerp(2.0, 7.5, k), lerp(7.6, 9.5, k)], [0, lerp(1.2, 0, k), lerp(0, -9, k)], 44);
-  w.act('sam', -.35, 2.4, { armL: [-.3, .2], armR: [lerp(.3, 2.5, point), .2 * point], eyes: [.5, -.6], mouth: 'smile', brow: -.2, bob: 6 * Math.abs(Math.sin(t * 3)), blink: blinkAt(t) });
+  w.act('sam', -.35, 2.4, { armL: [-.3, .2], armR: [lerp(.3, 2.0, point), .35 * point + .12 * Math.sin(t * 7) * point], lean: .05 * point, eyes: [.5, -.6], mouth: 'smile', brow: -.2, bob: 6 * Math.abs(Math.sin(t * 3)), blink: blinkAt(t) });
   const a = pr(lt, 2.15, 2.5); w.props.outline.visible = a > 0; w.props.outline.material.opacity = a; return { focus: lerp(5.5, 14, k), blur: 1 - k }; });
 // 15 "That gap is the rip." : keep moving to the last frame
 shot(31.7, 34, (lt, t, u, w) => {

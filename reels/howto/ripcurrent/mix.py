@@ -8,7 +8,12 @@ W = ['whoosh/quick_air_woosh_mixkit2605.mp3', 'whoosh/air_woosh_mixkit1489.mp3',
 CUTS = [1.62, 3.3, 6.25, 9.45, 11.05, 12.52, 14.45, 17.65, 19.15, 21.65, 23.5, 25.38, 27.25, 31.7]
 # (time, file, gain, start offset in the file, length)
 CUES = [(0, 'ambience/sea_waves_ambience_mixkit1189.mp3', .22, 0, DUR)]
-CUES += [(t - .12, W[i % len(W)], .30, 0, 1.2) for i, t in enumerate(CUTS)]
+def attack(fn):   # seconds until the sound first reaches half its peak, so that moment can sit on the cut
+    import array
+    raw = subprocess.run(['ffmpeg', '-v', 'error', '-t', '1.5', '-i', os.path.join(LIB, fn), '-f', 's16le', '-ac', '1', '-ar', '8000', '-'], capture_output=True, check=True).stdout
+    a = array.array('h', raw); pk = max(1, max(abs(x) for x in a)); return next(i for i, x in enumerate(a) if abs(x) >= pk * .5) / 8000
+ATT = {w: attack(w) for w in W}
+CUES += [(t - ATT[W[i % len(W)]], W[i % len(W)], .30, 0, 1.6) for i, t in enumerate(CUTS)]
 CUES += [(.80, 'whoosh/deep_air_woosh_mixkit2604.mp3', .5, 0, 1.6),            # the sea takes hold
          (1.76, 'foley/body_punch_quick_hit_thud_mixkit2153.mp3', .7, 0, 1),   # the red cross: "not"
          (3.3, 'ambience/river_water_flowing_mixkit2454.mp3', .3, 0, 2.9),     # "a river of water"
