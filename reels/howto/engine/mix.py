@@ -6,7 +6,7 @@ The voice, a bed, a whoosh on every cut and the cues in <film>/cues.json. Every 
 import array, json, os, subprocess, sys
 FILM = os.path.realpath(sys.argv[1]); LIB = os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../../.claude/kit/sfx/library'))
 C = json.load(open(os.path.join(FILM, 'cues.json'))); WARP = json.load(open(os.path.join(FILM, 'tools/warp.json'))); DUR = WARP[-1][1]
-SFX, VOICE = float(os.environ.get('SFX', .4)), float(os.environ.get('VOICE', 1))   # effects sit about 10 dB under the voice
+SFX, VOICE = float(os.environ.get('SFX', C.get('sfx', .4))), float(os.environ.get('VOICE', 1))   # effects sit about 10 dB under the voice
 def T(r):
     for (r0, n0), (r1, n1) in zip(WARP, WARP[1:]):
         if r <= r1: return n0 + (n1 - n0) * (r - r0) / (r1 - r0)

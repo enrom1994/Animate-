@@ -1,23 +1,131 @@
 {
-  "bed": ["atmosphere/cinematic_room_tone_loop_mixkit3199.mp3", 0.5],
-  "cuts": [1.72, 3.3, 4.9, 7.2, 8.52, 11.7, 14.1, 15.55, 16.85, 18.7, 20.9, 22.5, 25.3, 26.6, 28.12, 29.9, 31.8, 34.5],
-  "cues": [
-    [0.9, "whoosh/deep_air_woosh_mixkit2604.mp3", 0.6, 1.6],
-    [1.95, "foley/body_punch_quick_hit_thud_mixkit2153.mp3", 0.7, 1.0],
-    [3.75, "impact/underground_explosion_impact_echo_mixkit1686.mp3", 0.75, 2.4],
-    [5.4, "foley/impact_of_a_blow_thud_mixkit2150.mp3", 0.35, 1.0],
-    [5.9, "foley/impact_of_a_blow_thud_mixkit2150.mp3", 0.3, 1.0],
-    [7.45, "foley/body_punch_quick_hit_thud_mixkit2153.mp3", 0.65, 1.0],
-    [8.9, "foley/body_punch_quick_hit_thud_mixkit2153.mp3", 0.65, 1.0],
-    [12.1, "whoosh/cinematic_tunnel_reverb_whoosh_mixkit1486.mp3", 0.6, 2.0],
-    [14.6, "foley/typewriter_classic_return_mixkit1381.mp3", 0.4, 0.9],
-    [16.25, "foley/metal_hammer_hit_mixkit833.mp3", 0.4, 1.0],
-    [18.1, "foley/metal_hammer_hit_mixkit833.mp3", 0.35, 1.0],
-    [21.35, "whoosh/deep_air_woosh_mixkit2604.mp3", 0.6, 1.6],
-    [23.75, "foley/typewriter_classic_return_mixkit1381.mp3", 0.4, 0.9],
-    [24.45, "foley/body_punch_quick_hit_thud_mixkit2153.mp3", 0.6, 1.0],
-    [27.6, "foley/wood_hard_hit_stamp_mixkit2182.mp3", 0.6, 1.0],
-    [33.6, "foley/typewriter_classic_return_mixkit1381.mp3", 0.4, 0.9],
-    [36.95, "whoosh/deep_air_woosh_mixkit2604.mp3", 0.6, 1.8]
+ "sfx": 0.32,
+ "bed": [
+  "atmosphere/cinematic_room_tone_loop_mixkit3199.mp3",
+  0.5
+ ],
+ "cuts": [
+  1.72,
+  3.3,
+  4.9,
+  7.2,
+  8.52,
+  11.7,
+  14.1,
+  15.55,
+  16.85,
+  18.7,
+  20.9,
+  22.5,
+  25.3,
+  26.6,
+  28.12,
+  29.9,
+  31.8,
+  34.5
+ ],
+ "cues": [
+  [
+   0.9,
+   "whoosh/deep_air_woosh_mixkit2604.mp3",
+   0.6,
+   1.6
+  ],
+  [
+   1.95,
+   "foley/body_punch_quick_hit_thud_mixkit2153.mp3",
+   0.7,
+   1.0
+  ],
+  [
+   3.75,
+   "impact/underground_explosion_impact_echo_mixkit1686.mp3",
+   0.75,
+   2.4
+  ],
+  [
+   5.4,
+   "foley/impact_of_a_blow_thud_mixkit2150.mp3",
+   0.35,
+   1.0
+  ],
+  [
+   5.9,
+   "foley/impact_of_a_blow_thud_mixkit2150.mp3",
+   0.3,
+   1.0
+  ],
+  [
+   7.45,
+   "foley/body_punch_quick_hit_thud_mixkit2153.mp3",
+   0.65,
+   1.0
+  ],
+  [
+   8.9,
+   "foley/body_punch_quick_hit_thud_mixkit2153.mp3",
+   0.65,
+   1.0
+  ],
+  [
+   12.1,
+   "whoosh/cinematic_tunnel_reverb_whoosh_mixkit1486.mp3",
+   0.6,
+   2.0
+  ],
+  [
+   14.6,
+   "foley/typewriter_classic_return_mixkit1381.mp3",
+   0.4,
+   0.9
+  ],
+  [
+   16.25,
+   "foley/metal_hammer_hit_mixkit833.mp3",
+   0.4,
+   1.0
+  ],
+  [
+   18.1,
+   "foley/metal_hammer_hit_mixkit833.mp3",
+   0.35,
+   1.0
+  ],
+  [
+   21.35,
+   "whoosh/deep_air_woosh_mixkit2604.mp3",
+   0.6,
+   1.6
+  ],
+  [
+   23.75,
+   "foley/typewriter_classic_return_mixkit1381.mp3",
+   0.4,
+   0.9
+  ],
+  [
+   24.45,
+   "foley/body_punch_quick_hit_thud_mixkit2153.mp3",
+   0.6,
+   1.0
+  ],
+  [
+   27.6,
+   "foley/wood_hard_hit_stamp_mixkit2182.mp3",
+   0.6,
+   1.0
+  ],
+  [
+   33.6,
+   "foley/typewriter_classic_return_mixkit1381.mp3",
+   0.4,
+   0.9
+  ],
+  [
+   36.95,
+   "whoosh/deep_air_woosh_mixkit2604.mp3",
+   0.6,
+   1.8
   ]
+ ]
 }
