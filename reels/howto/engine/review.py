@@ -33,6 +33,6 @@ def rows(prefix, times, before, n, per=5, label=''):
         for i, im in enumerate(ims): sheet.paste(im, (0, i * H))
         sheet.save(os.path.join(OUT, f'{prefix}_{k // per + 1:02d}.jpg'), quality=85)
 rows('cuts', C['cuts'], 3, 6, label='cut ')
-rows('contacts', [t for t, f, g, ln in C['cues'] if 'whoosh' not in f and 'ambience' not in f], 3, 7, label='hit ')
+rows('contacts', [c[0] for c in C['cues'] if len(c) < 5 and 'whoosh' not in c[1] and 'ambience' not in c[1]], 3, 7, label='hit ')
 strip(os.path.join(OUT, 'phone.jpg'), 0, 8, step=11, w=360, cols=4)
 print('wrote', len(os.listdir(OUT)), 'review sheets in', OUT)

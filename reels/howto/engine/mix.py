@@ -15,14 +15,16 @@ def attack(fn):   # seconds until the sound first reaches half its peak, so that
     raw = subprocess.run(['ffmpeg', '-v', 'error', '-t', '1.5', '-i', os.path.join(LIB, fn), '-f', 's16le', '-ac', '1', '-ar', '8000', '-'], capture_output=True, check=True).stdout
     a = array.array('h', raw); pk = max(1, max(abs(x) for x in a)); return next(i for i, x in enumerate(a) if abs(x) >= pk * .5) / 8000
 WH = ['whoosh/quick_air_woosh_mixkit2605.mp3', 'whoosh/air_woosh_mixkit1489.mp3', 'whoosh/transition_windy_swoosh_mixkit1474.mp3', 'whoosh/cinematic_whoosh_fast_transition_mixkit1492.mp3']
-cues = [(0, C['bed'][0], C['bed'][1] * .75, DUR, False)] + [(t, WH[i % 4], .30, 1.6, True) for i, t in enumerate(C['cuts'])] + [(t, f, g, ln, True) for t, f, g, ln in C['cues']]
+# a cue is [time, file, gain, length]; add "loop" as a fifth item for a sound that runs for that long (a fire, a pan frying): it loops, fades in and out, and starts exactly on its time
+cues = [(0, C['bed'][0], C['bed'][1] * .75, DUR, False)] + [(t, WH[i % 4], .30, 1.6, True) for i, t in enumerate(C['cuts'])] + [(c[0], c[1], c[2], c[3], len(c) < 5) for c in C['cues']]
 ATT = {}
 ins, f, lab = ['-i', os.path.join(FILM, 'audio/vo.wav')], [f'[0:a]aresample=48000,volume={VOICE}[v]'], ['[v]']
 for i, (t, fn, g, ln, hit) in enumerate(cues, 1):
     if hit and fn not in ATT: ATT[fn] = attack(fn)
     t = T(t) - (ATT[fn] if hit else 0)
     ins += ['-stream_loop', '-1', '-t', str(ln), '-i', os.path.join(LIB, fn)] if not hit else ['-t', str(ln), '-i', os.path.join(LIB, fn)]
-    fade = f'afade=t=in:d=0.4,afade=t=out:st={ln - 1.2:.2f}:d=1.2' if not hit else f'afade=t=out:st={max(0, ln - .3):.2f}:d=0.3'
+    long = ln > 6
+    fade = (f'afade=t=in:d=0.4,afade=t=out:st={ln - 1.2:.2f}:d=1.2' if long else f'afade=t=in:d=0.12,afade=t=out:st={max(0, ln - .35):.2f}:d=0.35') if not hit else f'afade=t=out:st={max(0, ln - .3):.2f}:d=0.3'
     f.append(f'[{i}:a]aresample=48000,aformat=channel_layouts=stereo,{fade},volume={g * SFX},adelay={int(max(0, t) * 1000)}:all=1[c{i}]'); lab.append(f'[c{i}]')
 f.append(''.join(lab) + f'amix=inputs={len(lab)}:normalize=0:duration=longest,atrim=0:{DUR},alimiter=limit=.9[o]')
 subprocess.run(['ffmpeg', '-v', 'error', '-y', *ins, '-filter_complex', ';'.join(f), '-map', '[o]', '-ar', '48000', '-ac', '2', os.path.join(FILM, os.environ.get('OUT', 'audio/mix.wav'))], check=True)

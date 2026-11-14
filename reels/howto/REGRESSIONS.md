@@ -13,3 +13,4 @@ Every fault reported on a film stays here and is checked on every later one (`ST
 | 7 | greasefire | (found in review) The jug and the extinguisher moved with nobody holding them. | Every moving prop has a visible owner. |
 | 8 | greasefire | The character faced the camera while working at the stove. | Side view for working at something, three-quarter for reacting, front for speaking to the viewer. |
 | 9 | greasefire | The vertical-smear transition broke the picture into bars. | No vertical whips. On every cut, the review strips show picture content in every frame: no bars, combs or streaked lettering. |
+| 10 | greasefire | (found in review) The fire burned in silence. | Everything on screen that would make a sound has a real recording of that thing: check the cue list against the shot list before mixing. |
