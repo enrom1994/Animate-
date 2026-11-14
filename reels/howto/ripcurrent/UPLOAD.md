@@ -5,6 +5,12 @@ File: `ripcurrent.mp4` (1080 x 1920, 30 fps, about 38 s, H.264 + AAC, about -14 
 ## Title (45 characters)
 Caught in a rip current? Do NOT swim to shore
 
+### Four more titles to choose from or test
+- Rip current survival: the one move that gets you out
+- Why swimming to shore is the wrong move in a rip current
+- How to escape a rip current in 40 seconds
+- Stuck in a rip? Swim sideways, not back
+
 ## Description
 A rip current will not pull you under, and it is usually narrow. Swim sideways, along the beach, until the pull lets go, then swim back in at an angle. Too tired? Relax, face the shore and wave for help.
 
@@ -32,6 +38,12 @@ Sound effects: Mixkit (Mixkit Sound Effects Free License). Narration: synthetic 
 
 ## Cover frame
 `cover.png`, the swimmer under the red cross at about 0:02. On a phone, pick this moment with the cover selector when uploading.
+
+## Rights record
+- Picture: drawn in code in this repository. Type: Montserrat (SIL Open Font License).
+- Narration: Kokoro voice "Fenrir" (model licence Apache 2.0), a synthetic voice.
+- Effects: Mixkit sound effects under the Mixkit Sound Effects Free License; the files are not redistributed.
+- Not certifiable here: Content ID matches and monetisation eligibility. Pending until YouTube's own checks run on upload.
 
 ## Before pressing publish
 1. The handle `@nowwhatsam` is claimed and the profile picture, banner and About text from `../channel/` are in place.

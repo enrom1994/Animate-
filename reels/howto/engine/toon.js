@@ -24,7 +24,8 @@ export function stage({ sky = 0x6ec6f5, sun = [-4, 7, 5], shadow = 9 } = {}) {
   const c = key.shadow.camera; c.left = c.bottom = -shadow; c.right = c.top = shadow; c.near = .5; c.far = 40; key.shadow.bias = -.0005; key.shadow.normalBias = .03; key.shadow.radius = 2;
   scene.add(key, key.target); scene.userData.key = key; return scene;
 }
-export const ease = { io: u => u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2, out: u => 1 - Math.pow(1 - u, 3), in: u => u * u * u };
+// anti: a small wind-up the wrong way before the move, then a slight overshoot and settle (anticipation, action, recovery)
+export const ease = { anti: u => { const c = 1.9; return u < .5 ? (Math.pow(2 * u, 2) * ((c + 1) * 2 * u - c)) / 2 : (Math.pow(2 * u - 2, 2) * ((c + 1) * (u * 2 - 2) + c) + 2) / 2; }, io: u => u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2, out: u => 1 - Math.pow(1 - u, 3), in: u => u * u * u };
 export const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 export const pr = (t, a, b) => clamp((t - a) / (b - a));
 export const lerp = (a, b, u) => a + (b - a) * u;

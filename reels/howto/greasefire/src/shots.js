@@ -13,18 +13,18 @@ shot(0, 1.72, (lt, t, u, w) => { const lit = pr(lt, .86, 1.1);
   w.cam([lerp(-.5, -.9, io(u)), lerp(1.75, 1.85, u), lerp(.6, 2.6, io(u))], [lerp(PX, .4, io(u)), lerp(1.1, 1.3, u), -1], 44);
   w.flame(t, lit * (1.05 + .25 * Math.sin(Math.PI * lit)));
   w.act('sam', ...SAM, lit > 0 ? scared(t, { bob: 34 * Math.sin(Math.PI * pr(lt, .9, 1.2)) }) : { view: 'q', face: -1, armL: [-.3, .2], armR: [.9, 1.0], mouth: 'smile', eyes: [-.7, .3], blink: blinkAt(t), bob: 4 * Math.sin(t * 4) }); return { focus: 2.6, blur: .5 }; });
-// 2  "do not throw water on it." : the jug comes up, the cross lands on it
-shot(1.72, 3.3, (lt, t, u, w) => { const up = out(pr(lt, 0, .25));
-  w.cam([lerp(1.4, .5, io(u)), lerp(1.55, 1.7, u), lerp(1.5, 1.9, u)], [.05, 1.35, -1], 42);
-  w.flame(t, 1.1); w.props.jug.visible = true; w.props.jug.position.set(.36, lerp(1.0, 1.52, up), -.72); w.props.jug.rotation.z = .5 * up;
-  w.act('sam', ...SAM, { view: 'q', face: -1, armL: [-1.75, -.5], armR: [.4, .4], mouth: 'grit', brow: -.5, sweat: 1, eyes: [-.8, 0] });
-  cross(w, [.36, 1.66, -.5], pr(lt, .2, .4), .2); return { focus: 2.4, blur: .5 }; });
+// 2  "do not throw water on it." : Sam lifts the jug, the cross lands on it
+shot(1.72, 3.3, (lt, t, u, w) => { const up = ease.anti(pr(lt, 0, .34)), j = [.16, lerp(.98, 1.08, up), -.6];
+  w.cam([lerp(-1.7, -1.1, io(u)), lerp(1.55, 1.7, u), lerp(2.7, 2.3, u)], [.25, 1.3, -.8], 42);
+  w.flame(t, 1.1); w.props.jug.visible = true; w.props.jug.position.set(...j); w.props.jug.rotation.z = .5 * up;
+  w.act('sam', ...SAM, { view: 'side', face: -1, reach: [j[0] + .13, j[1] + .13, j[2]], reachWith: 'L', armR: [.4, .4], mouth: 'grit', brow: -.5, sweat: 1, eyes: [-.8, 0] });
+  cross(w, [.16, 1.5, -.5], pr(lt, .24, .44), .16); return { focus: 2.8, blur: .5 }; });
 // 3  "Water makes the fire bigger," : what happens if you do
-shot(3.3, 4.9, (lt, t, u, w) => { const pour = pr(lt, .15, .45), boom = out(pr(lt, .42, .8));
-  w.cam([lerp(-.4, -1.1, out(pr(lt, .42, 1.6))), lerp(1.6, 2.0, boom), lerp(1.7, 3.6, out(pr(lt, .42, 1.6)))], [0, lerp(1.35, 1.75, boom), -1], 46);
-  w.flame(t, 1.1 + 2.3 * boom); w.props.jug.visible = true; w.props.jug.position.set(.3, 1.6, -.78); w.props.jug.rotation.z = .5 + 1.1 * pour;
-  w.props.water.visible = pour > 0 && boom < .5; w.props.water.position.set(.02, 1.35, -.9); w.props.water.rotation.z = -.5; w.props.water.scale.set(1, pour, 1);
-  w.act('sam', lerp(SAM[0], 1.25, boom), lerp(SAM[1], -.1, boom), scared(t, { lean: .1 * boom, eyes: [-.8, -.4] })); return { focus: 3, blur: .4 }; });
+shot(3.3, 4.9, (lt, t, u, w) => { const pour = pr(lt, .15, .45), boom = out(pr(lt, .42, .8)), sx = lerp(.66, .98, boom), j = [lerp(.12, .5, boom), lerp(1.1, 1.0, boom), -.62];
+  w.cam([lerp(-1.1, -1.9, out(pr(lt, .42, 1.6))), lerp(1.6, 2.0, boom), lerp(2.4, 3.9, out(pr(lt, .42, 1.6)))], [.4, lerp(1.3, 1.7, boom), -1], 46);
+  w.flame(t, 1.1 + 2.3 * boom); w.props.jug.visible = true; w.props.jug.position.set(...j); w.props.jug.rotation.z = .5 + 1.1 * pour - 1.2 * boom;
+  w.props.water.visible = pour > 0 && boom < .5; w.props.water.position.set(-.04, 1.06, -.8); w.props.water.rotation.z = -1.1; w.props.water.scale.set(1, pour, 1);
+  w.act('sam', sx, lerp(-.45, -.1, boom), { view: boom > .2 ? 'q' : 'side', face: -1, reach: [j[0] + .13, j[1] + .13, j[2]], reachWith: 'L', armR: boom > .2 ? [2.1, .4] : [.4, .4], lean: .1 * boom, mouth: boom > .2 ? 'shout' : 'grit', brow: boom > .2 ? .9 : -.5, sweat: 1, eyes: [-.8, -.4 * boom] }); return { focus: 3.2, blur: .4 }; });
 // 4  "and throws burning oil across your kitchen." : it lands everywhere
 shot(4.9, 7.2, (lt, t, u, w) => { const f = out(pr(lt, 0, 1.3));
   w.cam([lerp(1.9, .2, io(u)), lerp(2.3, 1.9, u), lerp(3.9, 3.2, u)], [lerp(.2, .5, u), lerp(1.3, 1.0, u), -.6], 48);
@@ -34,34 +34,34 @@ shot(4.9, 7.2, (lt, t, u, w) => { const f = out(pr(lt, 0, 1.3));
 shot(7.2, 8.52, (lt, t, u, w) => { const r = out(pr(lt, 0, .25)), back = io(pr(lt, .5, .8));
   w.cam([lerp(-1.0, -1.6, io(u)), lerp(1.75, 1.6, u), lerp(3.0, 2.6, u)], [.3, 1.1, -.6], 42);
   w.flame(t, 1.15); const tip = [PX + .02, 1.07, PZ + .64];
-  w.act('sam', .5, -.05, back < .5 ? { view: 'side', face: -1, reach: [lerp(.35, tip[0], r), lerp(.9, tip[1], r), lerp(-.1, tip[2], r)], reachWith: 'L', armR: [.5, .5], lean: -.08, mouth: 'grit', brow: -.5, sweat: 1, eyes: [-.8, .3] } : { armL: [-2.0, -.5], armR: [2.0, .5], mouth: 'o', brow: .8, sweat: 1, eyes: [-.6, -.5], lean: .06 });
-  cross(w, [PX - .35, 1.25, PZ + .75], pr(lt, .2, .4), .13); return { focus: 2.4, blur: .5 }; });
+  w.act('sam', .38, -.05, back < .5 ? { view: 'side', face: -1, reach: [lerp(.35, tip[0], r), lerp(.9, tip[1], r), lerp(-.1, tip[2], r)], reachWith: 'L', armR: [.5, .5], lean: -.08, mouth: 'grit', brow: -.5, sweat: 1, eyes: [-.8, .3] } : { armL: [-2.0, -.5], armR: [2.0, .5], mouth: 'o', brow: .8, sweat: 1, eyes: [-.6, -.5], lean: .06 });
+  cross(w, [PX + .28, 1.5, PZ + .66], pr(lt, .2, .4), .14); return { focus: 2.4, blur: .5 }; });
 // 6  "And do not grab an ordinary fire extinguisher." : the obvious tool, the wrong one
-shot(8.52, 11.7, (lt, t, u, w) => { const up = out(pr(lt, .05, .35));
-  w.cam([lerp(-1.5, -.2, io(u)), lerp(1.5, 1.7, u), lerp(1.2, 2.4, io(u))], [lerp(.5, .35, u), 1.3, -.8], 44);
-  w.flame(t, 1.15); w.props.ext.visible = true; w.props.ext.position.set(.3, lerp(.2, .96, up), -.5); w.props.ext.rotation.z = .15 * Math.sin(t * 3);
-  w.act('sam', ...SAM, { view: 'q', face: -1, armL: [-1.1 * up - .3, -.6 * up], armR: [.4, .4], mouth: lt > .7 ? 'o' : 'grit', brow: lt > .7 ? .8 : -.5, sweat: 1, eyes: [-.7, lt > .7 ? -.6 : .1] });
-  cross(w, [.3, 1.62, -.4], pr(lt, .36, .56), .17); return { focus: 2.6, blur: .5 }; });
+shot(8.52, 11.7, (lt, t, u, w) => { const up = ease.anti(pr(lt, .05, .42)), e = [.32, lerp(.2, .78, up), -.5];
+  w.cam([lerp(-1.9, -1.0, io(u)), lerp(1.5, 1.7, u), lerp(2.0, 2.8, io(u))], [lerp(.45, .3, u), 1.25, -.8], 44);
+  w.flame(t, 1.15); w.props.ext.visible = true; w.props.ext.position.set(...e); w.props.ext.rotation.z = .1 * Math.sin(t * 3);
+  w.act('sam', ...SAM, { view: 'side', face: -1, reach: [e[0] + .11, e[1] + .22, e[2]], reachWith: 'L', armR: [.4, .4], lean: -.05, mouth: lt > .8 ? 'o' : 'grit', brow: lt > .8 ? .8 : -.5, sweat: 1, eyes: [-.7, lt > .8 ? -.6 : .3] });
+  cross(w, [.32, 1.55, -.4], pr(lt, .4, .6), .15); return { focus: 2.8, blur: .5 }; });
 // 7  "It can blast burning oil around the room." : the jet lifts the oil out of the pan
-shot(11.7, 14.1, (lt, t, u, w) => { const go = pr(lt, .3, .5), f = out(pr(lt, .45, 1.7));
-  w.cam([lerp(.9, -1.6, io(u)), lerp(1.45, 2.1, io(u)), lerp(1.4, 3.3, io(u))], [lerp(-.2, -.6, u), 1.25, -.9], 46);
-  w.flame(t, lerp(1.15, 1.9, f)); w.props.ext.visible = true; w.props.ext.position.set(.55, 1.02, -.6); w.props.ext.rotation.z = .5;
-  w.props.spray.userData.set(t, go, [.42, 1.45, -.7], [PX - .1, 1.12, PZ], w.camera, 2.2, .7); w.fling(t, f, -1); w.spread(t, [0, .8 * pr(lt, 1.1, 1.6), 0]);
-  w.act('sam', SAM[0] + .15, SAM[1], scared(t, { armL: [-1.4, -.6], eyes: [-.8, -.2] })); return { focus: 3.4, blur: .4 }; });
+shot(11.7, 14.1, (lt, t, u, w) => { const go = pr(lt, .3, .5), f = out(pr(lt, .45, 1.7)), e = [.5, .82, -.6];
+  w.cam([lerp(-.6, -2.0, io(u)), lerp(1.45, 2.1, io(u)), lerp(2.2, 3.6, io(u))], [lerp(.35, .2, u), 1.25, -.9], 46);
+  w.flame(t, lerp(1.15, 1.9, f)); w.props.ext.visible = true; w.props.ext.position.set(...e); w.props.ext.rotation.z = .5;
+  w.props.spray.userData.set(t, go, [.34, 1.26, -.7], [PX - .1, 1.12, PZ], w.camera, 2.2, .7); w.fling(t, f, -1); w.spread(t, [0, .8 * pr(lt, 1.1, 1.6), 0]);
+  w.act('sam', .88, SAM[1], { view: f > .3 ? 'q' : 'side', face: -1, reach: [e[0] + .1, e[1] + .2, e[2]], reachWith: 'L', armR: f > .3 ? [2.1, .4] : [.4, .4], mouth: f > .3 ? 'shout' : 'grit', brow: f > .3 ? .9 : -.5, sweat: 1, eyes: [-.8, -.2], lean: .08 * f }); return { focus: 3.4, blur: .4 }; });
 // 8  "Instead, turn off the burner." : one knob, a quarter turn
-shot(14.1, 15.55, (lt, t, u, w) => { const turn = io(pr(lt, .42, .8)), r = out(pr(lt, 0, .35));
+shot(14.1, 15.55, (lt, t, u, w) => { const turn = ease.anti(pr(lt, .42, .8)), r = out(pr(lt, 0, .35));
   w.cam([lerp(-1.9, -1.4, io(u)), lerp(1.5, 1.35, u), lerp(2.5, 2.1, u)], [.0, 1.0, -.7], 40);
-  w.flame(t, 1.1); w.burner(1 - turn);
+  w.flame(t, 1.1); w.burner(clamp(1 - turn));
   w.act('sam', .3, -.42, { view: 'side', face: -1, reach: [lerp(.1, -.33, r), lerp(.7, .86, r), lerp(-.5, -.82, r)], reachWith: 'L', armR: [.4, .3], lean: -.1, mouth: 'grit', brow: -.4, sweat: 1, eyes: [-.8, .5] }); return { focus: 2, blur: .6 }; });
 // 9  "Slide a lid over the pan." : the flames have nowhere to go
-shot(15.55, 16.85, (lt, t, u, w) => { const s = io(pr(lt, .1, .75)), lx = lerp(PX + .75, PX, s);
+shot(15.55, 16.85, (lt, t, u, w) => { const s = ease.anti(pr(lt, .1, .75)), lx = lerp(PX + .75, PX, s);
   w.cam([lerp(-1.9, -1.4, io(u)), lerp(1.6, 1.7, u), lerp(2.2, 2.6, u)], [.25, 1.15, -.8], 40);
-  w.burner(0); w.flame(t, 1.1 * (1 - s) * (1 - s)); w.props.lid.visible = true; w.props.lid.position.set(lx, PY + .11, PZ); w.props.lid.rotation.z = .2 * (1 - s);
+  w.burner(0); w.flame(t, 1.1 * Math.pow(clamp(1 - s), 2)); w.props.lid.visible = true; w.props.lid.position.set(lx, PY + .11, PZ); w.props.lid.rotation.z = .2 * (1 - s);
   w.act('sam', .5, -.42, { view: 'side', face: -1, reach: [lx + .02, PY + .18, PZ + .04], reachWith: 'L', armR: [.4, .3], lean: -.06 - .06 * s, mouth: 'grit', brow: -.5, eyes: [-.8, .2] }); return { focus: 2.2, blur: .6 }; });
 // 10 "No lid? Use a baking sheet." : the same move with what is to hand
-shot(16.85, 18.7, (lt, t, u, w) => { const ask = lt < .62, s = io(pr(lt, .72, 1.3)), sx = lerp(PX + .85, PX, s);
+shot(16.85, 18.7, (lt, t, u, w) => { const ask = lt < .62, s = ease.anti(pr(lt, .72, 1.3)), sx = lerp(PX + .85, PX, s);
   w.cam([lerp(-1.1, -1.8, io(u)), lerp(2.1, 1.85, u), lerp(2.7, 2.4, u)], [.25, 1.1, -.8], 42);
-  w.burner(0); w.flame(t, ask ? 1.0 : 1.0 * (1 - s) * (1 - s));
+  w.burner(0); w.flame(t, ask ? 1.0 : Math.pow(clamp(1 - s), 2));
   w.props.sheet.visible = !ask; w.props.sheet.position.set(sx, PY + .11, PZ); w.props.sheet.rotation.y = .25 * (1 - s);
   w.act('sam', .55, -.42, ask ? { armL: [-1.5, -1.2], armR: [1.5, 1.2], mouth: 'o', brow: .7, eyes: [-.6, -.3], sweat: 1 } : { view: 'side', face: -1, reach: [sx + .3, PY + .14, PZ + .12], reachWith: 'L', armR: [.4, .3], lean: -.06 - .05 * s, mouth: 'grit', brow: -.5, eyes: [-.8, .2] }); return { focus: 2.2, blur: .6 }; });
 // 11 "Then leave it covered until the pan is cool," : time passes, hands off
