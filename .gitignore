@@ -31,3 +31,4 @@ reels/**/silent.mp4
 .claude/kit/lemo-opuscar/
 reels/**/out/
 reels/opuscar/**/voices/*.wav
+reels/**/review/
