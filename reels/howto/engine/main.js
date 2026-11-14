@@ -70,7 +70,7 @@ window.renderAt = t => {
   for (const [o, m] of swap) { o.material = m; o.visible = true; } scene.background = bg;
   ink.uniforms.near.value = cam.near; ink.uniforms.far.value = cam.far; ink.uniforms.uBlur.value = r.blur ?? 1; ink.uniforms.uFocus.value = r.focus ?? 6;
   // transitions: the last and first frames of a shot smear (a whip) or burst (a zoom), alternating
-  const WH = .13, lt = tr - SHOTS[idx].start, rem = SHOTS[idx].end - tr, KINDS = [[1, 0, 0], [0, 0, 1], [-1, 0, 0], [0, -1, 0], [1, 0, 0], [0, 0, 1], [-1, 0, 0], [0, 1, 0]];
+  const WH = .13, lt = tr - SHOTS[idx].start, rem = SHOTS[idx].end - tr, KINDS = [[1, 0, 0], [0, 0, 1], [-1, 0, 0], [0, 0, -.7]];   // whip right, zoom in, whip left, zoom out. No vertical whips: on a tall frame they turn lettering and faces into streaks
   let wx = 0, wy = 0, wz = 0;
   if (rem < WH && idx < SHOTS.length - 1) { const k = KINDS[idx % KINDS.length], a = Math.pow(1 - rem / WH, 2); wx = k[0] * a * .5; wy = k[1] * a * .26; wz = k[2] * a * .45; }   // the frame is tall: a vertical whip travels half as far as a horizontal one
   else if (lt < WH && idx > 0) { const k = KINDS[(idx - 1) % KINDS.length], a = Math.pow(1 - lt / WH, 2); wx = -k[0] * a * .5; wy = -k[1] * a * .26; wz = -k[2] * a * .45; }

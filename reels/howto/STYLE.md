@@ -25,7 +25,7 @@ The model sheet is `engine/sheet/turnaround.png` (`node engine/sheet/make.mjs` r
 2. **Nobody passes through anything solid.** Doors are real openings in real walls; a character goes through the
    opening and the door is opened or closed by a hand on its knob. The same holds for furniture, water lines and props.
 3. **The character never hides the subject.** If Sam stands between the camera and the thing being shown, move the camera to the side and back.
-4. **Motion between shots:** every cut has a whip or zoom transition; every shot arcs or cranes, lands with a short push-in, and carries a slight handheld drift; hits shake the frame.
+4. **Motion between shots:** every cut has a sideways whip or a zoom burst (never a vertical whip: on a tall frame it turns lettering and faces into streaks); every shot arcs or cranes, lands with a short push-in, and carries a slight handheld drift; hits shake the frame.
 5. **Sound:** the voice is Fenrir (Kokoro, speed about 1.06 to 1.1). Effects sit about 10 dB under the voice (`"sfx"` in `cues.json`). Real recordings only.
 6. **Captions:** one to three words, lower case, ending at 78% of the frame height; the picture sits slightly high so faces stay clear of them.
 7. **Length:** 35 to 45 seconds. If the voiced script comes in under 35, add sourced content, never padding.
