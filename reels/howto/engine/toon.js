@@ -17,10 +17,10 @@ export function board(w, h, draw, res = 256) {
   const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: canvasTex(Math.round(w * res), Math.round(h * res), draw) }));
   m.userData.noInk = false; return m;
 }
-export function stage({ sky = 0x6ec6f5, sun = [-4, 7, 5], shadow = 9 } = {}) {
+export function stage({ sky = 0x6ec6f5, sun = [-4, 7, 5], shadow = 9, hemi = 1.5, key: keyI = 2.4, ground = 0xd8c8a8 } = {}) {   // hemi and key: lower them for a storm or a night
   const scene = new THREE.Scene(); scene.background = new THREE.Color(sky);
-  scene.add(new THREE.HemisphereLight(0xffffff, 0xd8c8a8, 1.5));
-  const key = new THREE.DirectionalLight(0xfff4dd, 2.4); key.position.set(...sun); key.castShadow = true; key.shadow.mapSize.set(2048, 2048);
+  scene.add(new THREE.HemisphereLight(0xffffff, ground, hemi));
+  const key = new THREE.DirectionalLight(0xfff4dd, keyI); key.position.set(...sun); key.castShadow = true; key.shadow.mapSize.set(2048, 2048);
   const c = key.shadow.camera; c.left = c.bottom = -shadow; c.right = c.top = shadow; c.near = .5; c.far = 40; key.shadow.bias = -.0005; key.shadow.normalBias = .03; key.shadow.radius = 2;
   scene.add(key, key.target); scene.userData.key = key; return scene;
 }

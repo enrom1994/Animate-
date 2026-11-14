@@ -5,7 +5,7 @@ audio/vo.words.json word by word, and rewrites src/captions.js (captions, durati
 import json, os, re
 import sys
 HERE = os.path.realpath(sys.argv[1])
-ref_path = os.path.join(HERE, 'tools/words_ref.json'); os.makedirs(os.path.join(HERE, 'tools'), exist_ok=True)
+ref_path = os.path.join(HERE, 'tools/words_ref.json'); os.makedirs(os.path.join(HERE, 'tools'), exist_ok=True); os.makedirs(os.path.join(HERE, 'src'), exist_ok=True)
 W = json.load(open(os.path.join(HERE, 'audio/vo.words.json')))
 if not os.path.exists(ref_path): json.dump({'end': round(W[-1]['e'] + .9, 2), 'words': [round(w['s'], 3) for w in W]}, open(ref_path, 'w'))
 RJ = json.load(open(ref_path)); REF, REF_END = RJ['words'], RJ['end']; assert len(REF) == len(W), 'the script changed: re-time src/shots.js by hand and delete tools/words_ref.json'
