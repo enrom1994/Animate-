@@ -7,7 +7,7 @@ export const LOOKS = {
   guard: { skin: '#c98a5e', hair: '#1d1a26', top: '#ffd23f', bottom: '#e23d3d', hairStyle: 'cap' },
   friend: { skin: '#8d5a3b', hair: '#b5532a', top: '#7b4bd6', bottom: '#2bb673', hairStyle: 'swoop' },
 };
-export const POSE = { armL: [-.35, .25], armR: [.35, -.25], legL: -.06, legR: .06, lean: 0, head: 0, bob: 0, eyes: [0, 0], brow: 0, mouth: 'smile', blink: 0, squash: 1, sink: 0, sweat: 0, hold: '', reachL: null, reachR: null, view: 'front', face: 1 };
+export const POSE = { armL: [-.35, .25], armR: [.35, -.25], legL: -.06, legR: .06, lean: 0, head: 0, bob: 0, eyes: [0, 0], brow: 0, mouth: 'smile', blink: 0, squash: 1, sink: 0, sweat: 0, hold: '', reachL: null, reachR: null, view: 'front', face: 1, kneeL: null, kneeR: null, lie: 0, lieK: 1 };   // kneeL/kneeR: the bend at the knee (default: half the swing); lie: 1 or -1 lays the character down, lieK 0..1 is how far down
 // two-bone reach: the angles that put the hand on (tx, ty); the arm stretches a little, cartoon-fashion, when the point is far
 function ik(x, y, tx, ty, l1, l2, side) { let d = Math.hypot(tx - x, ty - y); const k = Math.min(1.75, Math.max(1, d / (l1 + l2 - 2))); l1 *= k; l2 *= k; d = Math.min(d, l1 + l2 - 1);
   const th = Math.atan2(tx - x, ty - y), A = Math.acos(Math.max(-1, Math.min(1, (l1 * l1 + d * d - l2 * l2) / (2 * l1 * d)))), a1 = th + side * A, ex = x + Math.sin(a1) * l1, ey = y + Math.cos(a1) * l1;
@@ -42,12 +42,12 @@ export function drawChar(g, look, p0) {
   let p = p0; const view = p.view || 'front', flip = p.face < 0 && (view === 'q' || view === 'side');
   g.clearRect(0, 0, CW, CH); g.save();
   const fy = CH - 40, cx = CW / 2, sq = p.squash, mir = v => v && [2 * cx - v[0], v[1]], neg = a => [-a[0], -a[1]];
-  if (flip) { p = { ...p, armL: neg(p.armR), armR: neg(p.armL), legL: -p.legR, legR: -p.legL, reachL: mir(p.reachR), reachR: mir(p.reachL), lean: -p.lean, head: -p.head, eyes: [-p.eyes[0], p.eyes[1]] }; g.translate(2 * cx, 0); g.scale(-1, 1); }
+  if (flip) { p = { ...p, armL: neg(p.armR), armR: neg(p.armL), legL: -p.legR, legR: -p.legL, kneeL: p.kneeR == null ? null : -p.kneeR, kneeR: p.kneeL == null ? null : -p.kneeL, reachL: mir(p.reachR), reachR: mir(p.reachL), lean: -p.lean, head: -p.head, eyes: [-p.eyes[0], p.eyes[1]] }; g.translate(2 * cx, 0); g.scale(-1, 1); }
   g.translate(cx, fy); g.scale(1 / Math.sqrt(sq), sq); g.translate(-cx, -fy); g.translate(0, -p.bob);
   const side = view === 'side', back = view === 'back', q = view === 'q';
   const hipY = fy - 250, shY = hipY - 190, lx = Math.sin(p.lean) * 190, bw = side ? 62 : 82, sL = side ? 10 : q ? -56 : -62, sR = side ? -6 : q ? 52 : 62, far = 'rgba(0,0,0,.16)';
   // legs: in profile they stand one behind the other and the feet point the way the character faces
-  for (const [s, a] of [[-1, p.legL], [1, p.legR]]) { const [hx, hy] = limb(g, cx + s * (side ? 10 : 34), hipY, a, 125, -a * .5, 120, 30, look.skin); g.fillStyle = look.skin; g.strokeStyle = INK; g.lineWidth = 7; g.beginPath(); g.ellipse(hx + (side ? 20 : q ? s * 14 + 8 : s * 14), hy + 6, 34, 20, 0, 0, TAU); g.fill(); g.stroke(); }
+  for (const [s, a, kn] of [[-1, p.legL, p.kneeL], [1, p.legR, p.kneeR]]) { const [hx, hy] = limb(g, cx + s * (side ? 10 : 34), hipY, a, 125, kn == null ? -a * .5 : kn, 120, 30, look.skin); g.fillStyle = look.skin; g.strokeStyle = INK; g.lineWidth = 7; g.beginPath(); g.ellipse(hx + (side ? 20 : q ? s * 14 + 8 : s * 14), hy + 6, 34, 20, 0, 0, TAU); g.fill(); g.stroke(); }
   // the arm on the far side, behind the body
   const RL = p.reachL && ik(cx + sL + lx, shY + 34, p.reachL[0], p.reachL[1] + p.bob, 105, 100, 1), RR = p.reachR && ik(cx + sR + lx, shY + 34, p.reachR[0], p.reachR[1] + p.bob, 105, 100, -1);
   if (RL) limb(g, cx + sL + lx, shY + 34, RL[0], RL[2], RL[1], RL[3], 28, look.skin, look.skin); else limb(g, cx + sL + lx, shY + 34, p.armL[0], 105, p.armL[1], 100, 28, look.skin, look.skin);
@@ -98,7 +98,8 @@ export function makeChar(lookName = 'sam', height = 1.75) {
   const turned = (p, camera) => { const yc = Math.atan2(camera.position.x - group.position.x, camera.position.z - group.position.z); let r = Math.atan2(p.toward[0] - group.position.x, p.toward[1] - group.position.z) - yc; r = Math.atan2(Math.sin(r), Math.cos(r)); const a = Math.abs(r);
     return { ...p, view: a < .45 ? 'front' : a < 1.15 ? 'q' : a < 2.0 ? 'side' : 'back', face: r >= 0 ? 1 : -1 }; };
   return { group, tint(hex) { mesh.material.color.setHex(hex); },   // dim the card to sit in a dark scene (the characters are unlit)
-    set(p, camera) { if (camera && p.toward) p = turned(p, camera); if (camera && (p.reach || p.reachWith)) { const yaw = Math.atan2(camera.position.x - group.position.x, camera.position.z - group.position.z), c = toCard(p.reach, camera, yaw); if (c) p = { ...p, [(p.reachWith || (c[0] < CW / 2 ? 'L' : 'R')) === 'L' ? 'reachL' : 'reachR']: c }; }
-    drawChar(g, look, { ...POSE, ...p }); tex.needsUpdate = true; mesh.position.y = p.sink ? -(p.sink * CH - 40) / CH * hH : p.lie ? .3 : 0; blob.visible = !p.sink && !p.lie;
-    mesh.rotation.z = p.lie ? p.lie * Math.PI / 2 : 0; /* lie: 1 lays the character down with the head to screen left, -1 to screen right */ if (camera) group.rotation.y = Math.atan2(camera.position.x - group.position.x, camera.position.z - group.position.z); } };
+    set(p, camera) { if (camera && p.toward) p = turned(p, camera); if (p.lie) p = { ...p, view: 'side', face: p.lie };   // lying is drawn side-on, face to the sky: the profile turned a quarter turn if (camera && (p.reach || p.reachWith)) { const yaw = Math.atan2(camera.position.x - group.position.x, camera.position.z - group.position.z), c = toCard(p.reach, camera, yaw); if (c) p = { ...p, [(p.reachWith || (c[0] < CW / 2 ? 'L' : 'R')) === 'L' ? 'reachL' : 'reachR']: c }; }
+    drawChar(g, look, { ...POSE, ...p }); tex.needsUpdate = true; const lk = p.lie ? (p.lieK ?? 1) : 0; mesh.position.y = p.sink ? -(p.sink * CH - 40) / CH * hH : .33 * lk; blob.visible = !p.sink;
+    blob.scale.set(1 + 1.5 * lk, .55, 1); blob.position.x = -(p.lie || 0) * .85 * lk;   /* the shadow stretches out under a body on the ground */
+    mesh.rotation.z = p.lie ? p.lie * Math.PI / 2 * lk : 0; /* lie: 1 lays the character down with the head to screen left, -1 to screen right */ if (camera) group.rotation.y = Math.atan2(camera.position.x - group.position.x, camera.position.z - group.position.z); } };
 }

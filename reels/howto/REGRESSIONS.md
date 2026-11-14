@@ -14,3 +14,5 @@ Every fault reported on a film stays here and is checked on every later one (`ST
 | 8 | greasefire | The character faced the camera while working at the stove. | Side view for working at something, three-quarter for reacting, front for speaking to the viewer. |
 | 9 | greasefire | The vertical-smear transition broke the picture into bars. | No vertical whips. On every cut, the review strips show picture content in every frame: no bars, combs or streaked lettering. |
 | 10 | greasefire | (found in review) The fire burned in silence. | Everything on screen that would make a sound has a real recording of that thing: check the cue list against the shot list before mixing. |
+| 11 | thunderstorm | (found in review) Sam popped into the car through a closed door. | Entering anything is shown: a hand on the handle, then a cut inside. |
+| 12 | thunderstorm | The lying pose, the car interior, the house interior, the clock and the thunderbolt all needed more work. | Interiors are built, poses are drawn, facts sit on objects, effects have a life (`STYLE.md` rules 18 to 21). |

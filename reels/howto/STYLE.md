@@ -47,6 +47,12 @@ artwork and characters are not used here. These rules transfer:
 ## Publishing kit (same source)
 Each finished film gets, in `UPLOAD.md`: five distinct accurate titles (search intent, curiosity, broad appeal), a description with verified source links only, tags, one pinned question, and a pre-publish checklist where every line is marked checked, pending or not applicable. A cover frame is checked at phone size. No promise about views, and no claim that rights or monetisation are cleared beyond the licences recorded.
 
+## Rules from the thunderstorm review
+18. **Inside means inside.** A character in a car, a house or any room is shown in a built interior: seated or standing in it, with the things one would touch. Never a head placed in front of a window.
+19. **A pose is drawn, not turned.** Lying, sitting and kneeling each have their own drawing (`lie`, `kneeL`/`kneeR`); a standing figure tipped over is not a lying figure.
+20. **Information lives on something.** A clock is on a wall, a sign is on a post. Nothing that shows a fact floats beside a building.
+21. **An effect has a life.** Lightning travels, flickers, forks and lands; fire catches, burns and dies. A shape that appears and vanishes is a placeholder.
+
 ## Script pattern
 1. The trouble and the wrong instinct in the first sentence ("If X happens, do not Y").
 2. Why the instinct fails, shown happening.
