@@ -193,7 +193,7 @@
    35.3,
    "thunder/mid_strength_single_thunder_mixkit1298.mp3",
    0.9,
-   4.5
+   2.4
   ],
   [
    35.8,
@@ -208,5 +208,8 @@
    0.5,
    1.0
   ]
+ ],
+ "quiet_cuts": [
+  38.52
  ]
 }
