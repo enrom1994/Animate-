@@ -62,12 +62,12 @@ shot(16.38, 18.58, (lt, t, u, w) => { const su = pr(lt, .95, 1.35), [fx, fz] = S
 shot(18.58, 20.28, (lt, t, u, w) => { const k = io(u), x = lerp(3.4, 8.3, k), z = lerp(-2.4, .3, k);
   w.cam([lerp(1.2, 4.6, k), lerp(1.5, 1.7, u), lerp(-6.6, -5.2, k)], [lerp(5.4, 8.6, k), lerp(1.4, 1.9, k), lerp(0, 2.4, k)], 46);
   at(w, 'sam', x, z, runTo(t, SPOT.door, { mouth: 'grit', eyes: [0, -.2] })); return { focus: 7, blur: .35, rain: RAIN }; });
-// 11 "or a car with a metal roof" : in, and the door shut
-shot(20.28, 21.9, (lt, t, u, w) => { const k = out(pr(lt, 0, .62)), inCar = lt > .66;
-  w.cam([lerp(5.6, 4.6, io(u)), lerp(1.5, 1.7, u), lerp(8.6, 7.6, io(u))], [CAR[0] + .1, 1.25, CAR[2]], 44);
+// 11 "or a car with a metal roof" : to the door, a hand on the handle; the cut takes Sam inside
+shot(20.28, 21.9, (lt, t, u, w) => { const k = out(pr(lt, 0, .62)), there = k >= 1, h = [3.17, .97, 4.9];
+  w.cam([lerp(5.2, 4.2, io(u)), lerp(1.5, 2.0, io(u)), lerp(10.2, 9.6, io(u))], [CAR[0] + .9, lerp(1.1, 1.4, io(u)), CAR[2]], 44);
   w.glass.forEach(g => g.scale.y = .25);
-  if (inCar) w.act('sam', CAR[0] - .05, CAR[2] - .02, { mouth: 'o', brow: .5, eyes: [.4, -.5], sweat: 1 }, false, .32); else at(w, 'sam', lerp(6.4, CAR[0] + 1.25, k), lerp(6.6, CAR[2] + 1.5, k), runTo(t, [CAR[0], CAR[2]]));
-  return { focus: 4.6, blur: .5, rain: RAIN }; });
+  at(w, 'sam', lerp(7.0, 3.95, k), lerp(6.8, 5.2, k), there ? { view: 'side', face: -1, reach: h, reachWith: 'L', armR: [.4, .3], lean: -.06, mouth: 'grit', brow: .5, eyes: [-.6, -.5], sweat: 1 } : runTo(t, [CAR[0], CAR[2]]));
+  return { focus: 4.8, blur: .5, rain: RAIN }; });
 // 12 "and the windows up." : glass up, weather out
 shot(21.9, 22.9, (lt, t, u, w) => { const up = anti(pr(lt, .12, .7));
   w.cam([lerp(4.4, 4.0, u), lerp(1.75, 1.7, u), lerp(6.9, 6.5, u)], [CAR[0], 1.4, CAR[2]], 40);
