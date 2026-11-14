@@ -36,8 +36,9 @@ const ink = new THREE.ShaderMaterial({
     void main(){
       vec3 c = vec3(0.); float tr = length(uWhip) + abs(uZoom);
       if (tr > .001) {                                                                    // on a cut: the picture smears out one way and in from the other
-        for (int k = 0; k < 14; k++) { float f = float(k) / 13.; vec2 u = vUv + uWhip * (.55 + f * .9); u = .5 + (u - .5) * (1. - uZoom * (.35 + f * .65)); c += texture2D(tC, clamp(u, .001, .999)).rgb; }
-        c /= 14.;
+        float dz = fract(sin(dot(vUv, vec2(12.9898, 78.233))) * 43758.5453);   // each pixel starts its samples at a different point, so the blur is smooth and never a comb of ghost copies
+        for (int k = 0; k < 32; k++) { float f = (float(k) + dz) / 32.; vec2 u = vUv + uWhip * (.35 + f * .6); u = .5 + (u - .5) * (1. - uZoom * (.35 + f * .65)); u = abs(mod(u + 1., 2.) - 1.); c += texture2D(tC, clamp(u, .001, .999)).rgb; }   // past an edge the picture folds back on itself, so the smear is made of picture, never of one stretched row of pixels
+        c /= 32.;
       } else {
         float z = 1. / iz(vUv), far01 = max(smoothstep(uFocus * 2.2, uFocus * 7., z) * .7, smoothstep(uFocus * .5, uFocus * .22, z) * 1.6) * uBlur;   // the background goes soft, the subject stays crisp
         float n = 0.;
@@ -71,8 +72,8 @@ window.renderAt = t => {
   // transitions: the last and first frames of a shot smear (a whip) or burst (a zoom), alternating
   const WH = .13, lt = tr - SHOTS[idx].start, rem = SHOTS[idx].end - tr, KINDS = [[1, 0, 0], [0, 0, 1], [-1, 0, 0], [0, -1, 0], [1, 0, 0], [0, 0, 1], [-1, 0, 0], [0, 1, 0]];
   let wx = 0, wy = 0, wz = 0;
-  if (rem < WH && idx < SHOTS.length - 1) { const k = KINDS[idx % KINDS.length], a = Math.pow(1 - rem / WH, 2); wx = k[0] * a * .5; wy = k[1] * a * .5; wz = k[2] * a * .45; }
-  else if (lt < WH && idx > 0) { const k = KINDS[(idx - 1) % KINDS.length], a = Math.pow(1 - lt / WH, 2); wx = -k[0] * a * .5; wy = -k[1] * a * .5; wz = -k[2] * a * .45; }
+  if (rem < WH && idx < SHOTS.length - 1) { const k = KINDS[idx % KINDS.length], a = Math.pow(1 - rem / WH, 2); wx = k[0] * a * .5; wy = k[1] * a * .26; wz = k[2] * a * .45; }   // the frame is tall: a vertical whip travels half as far as a horizontal one
+  else if (lt < WH && idx > 0) { const k = KINDS[(idx - 1) % KINDS.length], a = Math.pow(1 - lt / WH, 2); wx = -k[0] * a * .5; wy = -k[1] * a * .26; wz = -k[2] * a * .45; }
   ink.uniforms.uWhip.value.set(wx, wy); ink.uniforms.uZoom.value = wz;
   renderer.setRenderTarget(null); renderer.render(quadScene, quadCam);
   const c = CAPTIONS.filter(c => t >= c[0]).pop(); capEl.innerHTML = c && (c[2] == null || t < c[2]) ? c[1] : '';
