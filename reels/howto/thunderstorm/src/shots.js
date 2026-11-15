@@ -59,9 +59,9 @@ shot(16.38, 18.58, (lt, t, u, w) => { const su = pr(lt, .95, 1.35), [fx, fz] = S
   at(w, 'sam', fx, fz, su > 0 ? scared(t, { eyes: [.8, -.2], bob: 26 * Math.sin(Math.PI * clamp(su * 1.5)) }) : { view: 'q', face: 1, armL: [-.3, .2], armR: [2.0, 1.1], mouth: 'o', brow: .6, eyes: [.7, -.4], sweat: 1 });
   const f = w.bolt([hit[0], 0, hit[1]], su); w.ground(hit, pr(lt, 1.0, 2.1), 1.6); return { focus: 6, blur: .35, rain: RAIN, flash: f }; });
 // 10 "So run for a real building," : lit windows, walls, a roof; a hand on the door
-shot(18.58, 20.28, (lt, t, u, w) => { const k = io(pr(lt, 0, 1.25)), x = lerp(3.4, 8.85, k), z = lerp(-2.4, .55, k), there = k >= 1;
+shot(18.58, 20.28, (lt, t, u, w) => { const k = io(pr(lt, 0, 1.25)), x = lerp(3.4, 9.7, k), z = lerp(-2.4, 1.2, k), there = k >= 1;   // ends on the doorstep, beside the knob
   w.cam([lerp(1.2, 5.6, io(u)), lerp(1.5, 1.7, u), lerp(-6.6, -4.2, io(u))], [lerp(5.4, 9.1, io(u)), lerp(1.4, 1.5, u), lerp(0, 1.6, io(u))], 46);
-  w.act('sam', x, z, there ? { view: 'side', face: -1, reach: SPOT.knob, reachWith: 'L', armR: [.4, .3], lean: -.05, mouth: 'grit', brow: .4, eyes: [-.6, 0], sweat: 1 } : runTo(t, SPOT.door, { eyes: [0, -.2] }), false, there ? .1 : hillY(x, z)); return { focus: 7, blur: .35, rain: RAIN }; });
+  w.act('sam', x, z, there ? { toward: [SPOT.knob[0], SPOT.knob[2]], reach: SPOT.knob, armR: [.4, .3], lean: -.05, mouth: 'grit', brow: .4, eyes: [-.6, 0], sweat: 1 } : runTo(t, SPOT.door, { eyes: [0, -.2] }), false, there ? .1 : hillY(x, z)); return { focus: 7, blur: .35, rain: RAIN }; });
 // 11 "or a car with a metal roof" : to the door, a hand on the handle; the cut takes Sam inside
 shot(20.28, 21.9, (lt, t, u, w) => { const k = out(pr(lt, 0, .62)), there = k >= 1, h = [3.17, .97, 4.9];
   w.cam([lerp(5.2, 4.2, io(u)), lerp(1.5, 2.0, io(u)), lerp(10.2, 9.6, io(u))], [CAR[0] + .9, lerp(1.1, 1.4, io(u)), CAR[2]], 44);
