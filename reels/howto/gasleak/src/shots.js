@@ -21,8 +21,8 @@ shot(0, 1.95, (lt, t, u, w) => { const k = io(u), x = lerp(6.6, 5.2, k), pinch =
   w.smell(t, DOOR_IN, .7, 1.4, 1.5); return { focus: 3.6, blur: .5 }; });
 // 2  "do not flip a light switch." : a hand on its way to the switch, and the cross
 shot(1.95, 3.7, (lt, t, u, w) => { const r = anti(pr(lt, .05, .55));
-  w.cam([lerp(5.7, 5.2, io(u)), lerp(1.6, 1.5, u), lerp(5.2, 4.7, io(u))], [4.3, 1.25, 1.8], 44);
-  w.act('sam', 4.5, 2.05, { view: 'side', face: -1, reach: [SWITCH[0] + .02, 1.24, lerp(2.55, SWITCH[2], clamp(r))], reachWith: 'L', armR: [.4, .3], mouth: 'grit', brow: .5, eyes: [-.7, 0] });
+  w.cam([lerp(5.4, 4.9, io(u)), lerp(1.6, 1.5, u), lerp(5.4, 4.9, io(u))], [3.95, 1.3, 1.9], 46);
+  w.act('sam', 4.22, 2.12, { view: 'side', face: -1, reach: [SWITCH[0] + .02, 1.3, lerp(2.55, SWITCH[2], clamp(r))], reachWith: 'L', armR: [.4, .3], mouth: 'grit', brow: .5, eyes: [-.7, 0] });
   w.smell(t, DOOR_IN, .8, 1.6, 1.4); w.cross([SWITCH[0] + .06, 1.72, SWITCH[2] + .25], pr(lt, .6, .8), .2); return { focus: 3.0, blur: .5 }; });
 // 3  "That smell is added to gas" : at the stove, where it comes from
 shot(3.7, 5.32, (lt, t, u, w) => {
@@ -40,8 +40,8 @@ shot(7.1, 8.6, (lt, t, u, w) => { const sp = pr(lt, .12, .5);
   return { focus: .9, blur: .7, flash: sp > 0 && sp < 1 ? .25 * Math.sin(Math.PI * sp) : 0 }; });
 // 6  "So do not turn anything on or off." : the hand stops short and comes back
 shot(8.6, 11.05, (lt, t, u, w) => { const r = out(pr(lt, .1, .6)), back = io(pr(lt, 1.15, 1.6));
-  w.cam([lerp(5.6, 6.0, io(u)), lerp(1.6, 1.7, u), lerp(4.6, 5.2, io(u))], [4.4, 1.25, 1.6], 44);
-  w.act('sam', 4.5, 2.05, back < 1 ? { view: 'side', face: -1, reach: [SWITCH[0] + .25 + .35 * back, 1.24, lerp(2.55, SWITCH[2] + .1, r * (1 - back))], reachWith: 'L', armR: [.4, .3], mouth: 'grit', brow: .5, eyes: [-.7, 0] } : { view: 'q', face: -1, armL: [-1.2, -1.4], armR: [.4, .3], mouth: 'o', brow: .6, eyes: [-.6, 0] });
+  w.cam([lerp(5.3, 5.7, io(u)), lerp(1.6, 1.7, u), lerp(5.0, 5.6, io(u))], [3.95, 1.3, 1.9], 46);
+  w.act('sam', 4.22, 2.12, back < 1 ? { view: 'side', face: -1, reach: [SWITCH[0] + .02, lerp(.95, 1.16, r) - .25 * back, SWITCH[2] + .06], reachWith: 'L', armR: [.4, .3], mouth: 'grit', brow: .5, eyes: [-.7, 0] } : { view: 'q', face: -1, armL: [-1.2, -1.4], armR: [.4, .3], mouth: 'o', brow: .6, eyes: [-.6, 0] });
   w.smell(t, DOOR_IN, .8, 1.6, 1.4); return { focus: 3.0, blur: .5 }; });
 // 7  "No lights," : the lamp in the hall
 shot(11.05, 11.95, (lt, t, u, w) => { const r = out(pr(lt, 0, .3));
