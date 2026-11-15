@@ -36,7 +36,7 @@ Sound effects: Mixkit (Mixkit Sound Effects Free License). Narration: synthetic 
 - Pinned comment: What should Sam get stuck in next?
 
 ## Cover frame
-`cover.png`, Sam reaching for the light switch under the red cross at about 0:02. On a phone, pick this moment with the cover selector when uploading.
+`cover.png`, Sam reaching for the light switch under the red cross at about 0:03. On a phone, pick this moment with the cover selector when uploading.
 
 ## Rights record
 - Picture: drawn in code in this repository. Type: Montserrat (SIL Open Font License).
@@ -48,5 +48,5 @@ Sound effects: Mixkit (Mixkit Sound Effects Free License). Narration: synthetic 
 - Title has no typo and the three source links open: pending (check at upload)
 - Captions sit above the Shorts player's own text on a phone: pending (watch once on a phone, sound on)
 - Voice clearly above the effects: measured, effects 13.6 dB under the voice; listening check by the user done on this cut
-- Cover readable at phone size: pending (check the exported frame)
+- Cover readable at phone size: checked on the exported frame
 - Channel handle, profile picture, banner and About text in place: pending
