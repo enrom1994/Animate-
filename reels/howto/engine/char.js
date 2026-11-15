@@ -6,6 +6,7 @@ export const LOOKS = {
   sam: { skin: '#f6b98c', hair: '#3a2a26', top: '#ff6a3d', bottom: '#2f6fd6', hairStyle: 'swoop' },
   guard: { skin: '#c98a5e', hair: '#1d1a26', top: '#ffd23f', bottom: '#e23d3d', hairStyle: 'cap' },
   friend: { skin: '#8d5a3b', hair: '#b5532a', top: '#7b4bd6', bottom: '#2bb673', hairStyle: 'swoop' },
+  gasworker: { skin: '#e8b48a', hair: '#ffffff', top: '#ff8a1f', bottom: '#27304a', hairStyle: 'cap' },
 };
 export const POSE = { armL: [-.35, .25], armR: [.35, -.25], legL: -.06, legR: .06, lean: 0, head: 0, bob: 0, eyes: [0, 0], brow: 0, mouth: 'smile', blink: 0, squash: 1, sink: 0, sweat: 0, hold: '', reachL: null, reachR: null, view: 'front', face: 1, kneeL: null, kneeR: null, lie: 0, lieK: 1 };   // kneeL/kneeR: the bend at the knee (default: half the swing); lie: 1 or -1 lays the character down, lieK 0..1 is how far down
 // two-bone reach: the angles that put the hand on (tx, ty); the arm stretches a little, cartoon-fashion, when the point is far
@@ -98,7 +99,7 @@ export function makeChar(lookName = 'sam', height = 1.75) {
   const turned = (p, camera) => { const yc = Math.atan2(camera.position.x - group.position.x, camera.position.z - group.position.z); let r = Math.atan2(p.toward[0] - group.position.x, p.toward[1] - group.position.z) - yc; r = Math.atan2(Math.sin(r), Math.cos(r)); const a = Math.abs(r);
     return { ...p, view: a < .45 ? 'front' : a < 1.15 ? 'q' : a < 2.0 ? 'side' : 'back', face: r >= 0 ? 1 : -1 }; };
   return { group, tint(hex) { mesh.material.color.setHex(hex); },   // dim the card to sit in a dark scene (the characters are unlit)
-    set(p, camera) { if (camera && p.toward) p = turned(p, camera); if (p.lie) p = { ...p, view: 'side', face: p.lie };   // lying is drawn side-on, face to the sky: the profile turned a quarter turn if (camera && (p.reach || p.reachWith)) { const yaw = Math.atan2(camera.position.x - group.position.x, camera.position.z - group.position.z), c = toCard(p.reach, camera, yaw); if (c) p = { ...p, [(p.reachWith || (c[0] < CW / 2 ? 'L' : 'R')) === 'L' ? 'reachL' : 'reachR']: c }; }
+    set(p, camera) { if (camera && p.toward) p = turned(p, camera); if (p.lie) p = { ...p, view: 'side', face: p.lie }; /* lying is drawn side-on, face to the sky: the profile turned a quarter turn */ if (camera && (p.reach || p.reachWith)) { const yaw = Math.atan2(camera.position.x - group.position.x, camera.position.z - group.position.z), c = toCard(p.reach, camera, yaw); if (c) p = { ...p, [(p.reachWith || (c[0] < CW / 2 ? 'L' : 'R')) === 'L' ? 'reachL' : 'reachR']: c }; }
     drawChar(g, look, { ...POSE, ...p }); tex.needsUpdate = true; const lk = p.lie ? (p.lieK ?? 1) : 0; mesh.position.y = p.sink ? -(p.sink * CH - 40) / CH * hH : .33 * lk; blob.visible = !p.sink;
     blob.scale.set(1 + 1.5 * lk, .55, 1); blob.position.x = -(p.lie || 0) * .85 * lk;   /* the shadow stretches out under a body on the ground */
     mesh.rotation.z = p.lie ? p.lie * Math.PI / 2 * lk : 0; /* lie: 1 lays the character down with the head to screen left, -1 to screen right */ if (camera) group.rotation.y = Math.atan2(camera.position.x - group.position.x, camera.position.z - group.position.z); } };

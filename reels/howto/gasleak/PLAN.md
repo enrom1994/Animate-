@@ -32,7 +32,7 @@ a doorbell (as the thing Sam does not press), a front door opening, a street amb
 - **Two points left out** because the sources disagree: opening windows, and turning off the gas at the meter. The film
   says neither, so it never tells a viewer to do something an official source says not to.
 - **The "leave first" closing line** matches Connecticut's wording exactly; it is the strongest line to end on and loops to the opening.
-- **US numbers:** "nine one one" is spoken. Viewers elsewhere use another number; the description will say to call the local emergency number.
+- **Emergency number:** the film says "your emergency services", chosen by the user so it works in every country.
 - **No explosion is shown.** A spark and the cross tell the danger; a blast would be the biggest image in the film and would read as entertainment.
 
 ## Checkpoints

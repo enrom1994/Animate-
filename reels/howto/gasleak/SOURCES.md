@@ -12,7 +12,7 @@ pge.com/en/outages-and-safety/safety/gas-safety.html.
 - Line 5: "do not try to locate the source yourself." CT. "Never use a flashlight, match or candle to look for gas leaks." PG&E
 - Line 6: "evacuate by getting everyone out of your home or building right away" MN. "leave the premises immediately and tell others to leave." CT
 - Line 7: "Don't use a telephone." CT. Cell phones are listed as an ignition source "until you are a safe distance away." PG&E. "Move a safe distance away and then call 911" MN
-- Line 8: "Call your gas company or 911 for help." CT
+- Line 8: "Call your gas company or 911 for help." CT (the film says "your emergency services" so it holds outside the US)
 - Line 9: "Don't go back inside your home or building until your local gas company says it is safe." CT. "Stay away until emergency responders have told you it is safe to return" MN
 - Line 10: "If the smell is strong or you are unsure, leave the building and then call." CT
 
