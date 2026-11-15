@@ -15,7 +15,9 @@ export function hall() { const G = new THREE.Group();
   // stairs up along the back wall, with a rail
   for (let i = 0; i < 9; i++) G.add(box(.42, .22 * (i + 1), 1.0, 0xb07a45, [4.4 + i * .42, .11 * (i + 1), -1.0]));
   for (let i = 0; i < 9; i += 2) G.add(cyl(.025, .025, .9, 0xfff7e8, [4.4 + i * .42, .22 * (i + 1) + .45, -.5], 6)); { const rail = box(3.9, .06, .06, 0x8a5a2e, [6.08, 1.55, -.5]); rail.rotation.z = Math.atan2(.22, .42); G.add(rail); }
-  G.add(box(3.8, .1, 1.0, 0xb07a45, [6.8, 2.1, -1.0]));                                             // the landing upstairs
+  G.add(box(.8, .1, 1.0, 0xb07a45, [8.15, 2.03, -1.0]));                                           // the landing at the top of the stairs
+  { const c = new THREE.Mesh(new THREE.PlaneGeometry(11.6, 9), flat(0xfff3dc, { side: THREE.DoubleSide })); c.rotation.x = Math.PI / 2; c.position.set(2.7, 3.4, 2.9); G.add(c); }   // a ceiling over the kitchen and the hall
+  { const lamp = new THREE.Group(); lamp.position.set(7.4, 0, .1); lamp.add(cyl(.04, .04, 1.5, 0x8a5a2e, [0, .75, 0], 8), cyl(.2, .2, .05, 0x8a5a2e, [0, .03, 0], 12), box(.06, .1, .04, 0x1d1a26, [.06, 1.1, .03])); const sh = new THREE.Mesh(new THREE.ConeGeometry(.32, .38, 16, 1, true), flat(0xffe08a, { side: THREE.DoubleSide })); sh.position.y = 1.62; lamp.add(sh); G.add(lamp); }
   // the front door in the end wall: frame, a door hinged at its left edge, a mat, a coat hook
   G.add(box(.16, 2.16, .07, 0x8a5a2e, [FRONT[0], 1.08, FRONT[2] - .52]), box(.16, 2.16, .07, 0x8a5a2e, [FRONT[0], 1.08, FRONT[2] + .52]), box(.16, .08, 1.1, 0x8a5a2e, [FRONT[0], 2.15, FRONT[2]]));
   const door = new THREE.Group(); door.position.set(FRONT[0] - .02, 0, FRONT[2] - .48); door.add(box(.07, 2.08, .96, 0x3f86c9, [0, 1.04, .48]), ball(.05, 0xffd23f, [-.07, 1.0, .84])); G.add(door);
@@ -36,7 +38,7 @@ export function street() { const G = new THREE.Group(); G.position.set(...OUT);
   const ours = house(0, 0, 0xf2e3c4, 0xc9523f); G.add(ours); G.add(house(-1, 15.5, 0xbfe3d8, 0x5a6f8a, Math.PI), house(12, 15.5, 0xf3c9b5, 0x8a5a2e, Math.PI), house(-12.5, 0, 0xe6dcc0, 0x7a5a9a));
   // our front door: a real door that swings out, and the doorbell button beside it
   const door = new THREE.Group(); door.position.set(-.48, 0, .12); door.add(box(.96, 2.08, .07, 0x3f86c9, [.48, 1.04, 0]), ball(.05, 0xffd23f, [.84, 1.0, .06])); G.add(door);
-  G.add(box(.16, .22, .05, 0xfff7e8, [.95, 1.25, .04]), cyl(.04, .04, .03, 0xffd23f, [.95, 1.25, .08], 12).rotateX(Math.PI / 2));
+  G.add(box(.16, .22, .05, 0xfff7e8, [.95, 1.12, .04]), cyl(.04, .04, .03, 0xffd23f, [.95, 1.12, .08], 12).rotateX(Math.PI / 2));
   G.add(box(4.5, .7, .25, 0x8a5a2e, [-3.4, .35, 3.3]), box(4.5, .7, .25, 0x8a5a2e, [3.4, .35, 3.3]));   // low front fence with a gap for the path
   for (const x of [-9, 9]) { G.add(cyl(.08, .1, 4, 0x55525f, [x, 2, 9.9], 8), box(.6, .25, .25, 0x55525f, [x + .25, 4, 9.9])); }
   for (const [x, z, s] of [[-6, -1, 1.3], [6.5, -.5, 1.1], [16, 13, 1.4]]) G.add(cyl(.15, .2, 1.6 * s, 0x7a5230, [x, .8 * s, z], 8), ball(1.1 * s, 0x3f9a58, [x, 2.2 * s, z]));

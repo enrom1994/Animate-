@@ -6,6 +6,7 @@ export const LOOKS = {
   sam: { skin: '#f6b98c', hair: '#3a2a26', top: '#ff6a3d', bottom: '#2f6fd6', hairStyle: 'swoop' },
   guard: { skin: '#c98a5e', hair: '#1d1a26', top: '#ffd23f', bottom: '#e23d3d', hairStyle: 'cap' },
   friend: { skin: '#8d5a3b', hair: '#b5532a', top: '#7b4bd6', bottom: '#2bb673', hairStyle: 'swoop' },
+  neighbour: { skin: '#f0c49a', hair: '#8a8f99', top: '#3a7bd5', bottom: '#5a4636', hairStyle: 'swoop' },
   gasworker: { skin: '#e8b48a', hair: '#ffffff', top: '#ff8a1f', bottom: '#27304a', hairStyle: 'cap' },
 };
 export const POSE = { armL: [-.35, .25], armR: [.35, -.25], legL: -.06, legR: .06, lean: 0, head: 0, bob: 0, eyes: [0, 0], brow: 0, mouth: 'smile', blink: 0, squash: 1, sink: 0, sweat: 0, hold: '', reachL: null, reachR: null, view: 'front', face: 1, kneeL: null, kneeR: null, lie: 0, lieK: 1 };   // kneeL/kneeR: the bend at the knee (default: half the swing); lie: 1 or -1 lays the character down, lieK 0..1 is how far down
