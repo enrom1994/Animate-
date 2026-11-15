@@ -1,7 +1,7 @@
 // Our own flat 2D people: a soft-square head with a hair swoop, big eyes, a bean body, thick ink limbs.
 // Drawn on a canvas every frame from a pose, shown on a card that turns to face the camera.
 import * as THREE from 'three';
-const INK = '#1d1a26', CW = 640, CH = 960, TAU = Math.PI * 2;
+const INK = '#1d1a26', CW = 1120, CH = 960, TAU = Math.PI * 2;   // the card is wide enough that a full reach, arm stretched, never runs off its edge
 export const LOOKS = {
   sam: { skin: '#f6b98c', hair: '#3a2a26', top: '#ff6a3d', bottom: '#2f6fd6', hairStyle: 'swoop' },
   guard: { skin: '#c98a5e', hair: '#1d1a26', top: '#ffd23f', bottom: '#e23d3d', hairStyle: 'cap' },
@@ -42,8 +42,8 @@ function face(g, p, hx, hy, HW, view) {
 // Poses stay in screen terms whatever the view: armL and reachL are the arm on the left of the picture.
 export function drawChar(g, look, p0) {
   let p = p0; const view = p.view || 'front', flip = p.face < 0 && (view === 'q' || view === 'side');
-  g.clearRect(0, 0, CW, CH); g.save();
-  const fy = CH - 40, cx = CW / 2, sq = p.squash, mir = v => v && [2 * cx - v[0], v[1]], neg = a => [-a[0], -a[1]];
+  const GW = g.canvas.width; g.clearRect(0, 0, GW, CH); g.save();   // drawn centred in whatever canvas it is given (the model sheet and channel art use narrower ones)
+  const fy = CH - 40, cx = GW / 2, sq = p.squash, mir = v => v && [2 * cx - v[0], v[1]], neg = a => [-a[0], -a[1]];
   if (flip) { p = { ...p, armL: neg(p.armR), armR: neg(p.armL), legL: -p.legR, legR: -p.legL, kneeL: p.kneeR == null ? null : -p.kneeR, kneeR: p.kneeL == null ? null : -p.kneeL, reachL: mir(p.reachR), reachR: mir(p.reachL), lean: -p.lean, head: -p.head, eyes: [-p.eyes[0], p.eyes[1]] }; g.translate(2 * cx, 0); g.scale(-1, 1); }
   g.translate(cx, fy); g.scale(1 / Math.sqrt(sq), sq); g.translate(-cx, -fy); g.translate(0, -p.bob);
   const side = view === 'side', back = view === 'back', q = view === 'q';
@@ -81,7 +81,7 @@ export function drawChar(g, look, p0) {
   if (!back) face(g, p, hx, hy, HW, view);
   if (p.sweat > 0) { const dx = back ? -HW + 60 : 0; g.fillStyle = '#8fd8ff'; g.strokeStyle = INK; g.lineWidth = 6; g.globalAlpha = p.sweat; g.beginPath(); g.moveTo(hx + HW / 2 - 30 + dx, hy - 110); g.quadraticCurveTo(hx + HW / 2 + 4 + dx, hy - 60, hx + HW / 2 - 30 + dx, hy - 50); g.quadraticCurveTo(hx + HW / 2 - 62 + dx, hy - 60, hx + HW / 2 - 30 + dx, hy - 110); g.fill(); g.stroke(); g.globalAlpha = 1; }
   g.restore(); g.restore();
-  if (p.sink > 0) g.clearRect(0, CH - p.sink * CH, CW, CH);   // in the water: everything below the surface is cut away
+  if (p.sink > 0) g.clearRect(0, CH - p.sink * CH, GW, CH);   // in the water: everything below the surface is cut away
 }
 export function makeChar(lookName = 'sam', height = 1.75) {
   const look = LOOKS[lookName], c = document.createElement('canvas'); c.width = CW; c.height = CH; const g = c.getContext('2d');

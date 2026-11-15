@@ -10,6 +10,9 @@ const runTo = (t, toward, o = {}) => ({ toward, legL: .7 * Math.sin(t * 22), leg
 const walkTo = (t, toward, o = {}) => ({ toward, legL: .35 * Math.sin(t * 9), legR: -.35 * Math.sin(t * 9), armL: [-.15 - .35 * Math.sin(t * 9), -.3], armR: [.15 - .35 * Math.sin(t * 9), .3], bob: 6 * Math.abs(Math.sin(t * 9)), ...o });
 const nose = (o = {}) => ({ reachR: null, armL: [-.3, .2], armR: [2.55, 1.55], mouth: 'grit', brow: .7, eyes: [0, .4], sweat: 1, ...o });   // a hand pinching the nose
 const stairY = x => clamp((x - 4.19) * .524, 0, 1.98);
+// the height of the street's surfaces, so feet stand on them and not inside them: path, pavements, road
+const streetY = (x, z) => (Math.abs(x - OX) < .65 && z > 0 && z < 3.3) ? .055 : (z > 3.3 && z < 4.5) || (z > 9.1 && z < 10.3) ? .065 : (z >= 4.5 && z <= 9.1) ? .045 : 0;
+const out_ = (w, name, x, z, pose) => w.act(name, x, z, pose, false, streetY(x, z));
 
 // 1  "If your home smells like rotten eggs," : in the hall, the smell drifting out of the kitchen
 shot(0, 1.95, (lt, t, u, w) => { const k = io(u), x = lerp(6.6, 5.2, k), pinch = pr(lt, .9, 1.2);
@@ -53,7 +56,7 @@ shot(11.95, 12.75, (lt, t, u, w) => { const r = out(pr(lt, 0, .3));
 // 9  "not even the doorbell." : outside, a neighbour's finger stops short of the button
 shot(12.75, 13.85, (lt, t, u, w) => { const r = out(pr(lt, 0, .4));
   w.cam([lerp(OX + 1.9, OX + 1.6, u), 1.55, lerp(4.4, 4.0, u)], [OX + 1.25, 1.15, .2], 40);
-  w.act('neighbour', OX + 1.95, .5, { view: 'side', face: -1, reach: [BELL[0] + .06, BELL[1], lerp(.55, BELL[2] + .08, r)], reachWith: 'L', armR: [.4, .3], mouth: 'smile', eyes: [-.7, .2] });
+  out_(w, 'neighbour', OX + 1.95, .5, { view: 'side', face: -1, reach: [BELL[0] + .06, BELL[1], lerp(.55, BELL[2] + .08, r)], reachWith: 'L', armR: [.4, .3], mouth: 'smile', eyes: [-.7, .2] });
   w.cross([BELL[0], 1.65, BELL[2] + .25], pr(lt, .4, .6), .15); return { focus: 1.9, blur: .5 }; });
 // 10 "Do not strike a match or light a candle." : the matches stay in the box
 shot(13.85, 15.85, (lt, t, u, w) => { const r = out(pr(lt, .1, .55));
@@ -81,21 +84,21 @@ shot(19.95, 21.3, (lt, t, u, w) => { const op = out(pr(lt, 0, .3)), k = pr(lt, .
 // 14 "Do not use your phone until you are well away from the building." : not here, not yet
 shot(21.3, 23.3, (lt, t, u, w) => { const out1 = pr(lt, .1, .45), go = pr(lt, 1.05, 2.0);
   w.cam([lerp(OX + 1.6, OX + 3.4, io(u)), lerp(1.6, 1.8, u), lerp(6.4, 9.0, io(u))], [OX + .6, 1.2, lerp(3.4, 5.2, io(u))], 44);
-  w.act('sam', OX + .5, lerp(3.7, 9.4, go), go > 0 ? runTo(t, [OX + .5, 14], { armR: [.9, 1.0], hold: 'phone' }) : { view: 'q', face: 1, armL: [-.3, .2], armR: [lerp(.3, .9, out1), lerp(-.2, 1.0, out1)], hold: out1 > .3 ? 'phone' : '', mouth: 'o', brow: .4, eyes: [.6, .7] });
-  w.act('friend', OX - .6, lerp(3.4, 8.8, go), go > 0 ? runTo(t + .2, [OX - .6, 14]) : { view: 'q', face: 1, armL: [-.3, .2], armR: [.3, -.2], mouth: 'o', brow: .4 });
+  out_(w, 'sam', OX + .5, lerp(3.7, 9.4, go), go > 0 ? runTo(t, [OX + .5, 14], { armR: [.9, 1.0], hold: 'phone' }) : { view: 'q', face: 1, armL: [-.3, .2], armR: [lerp(.3, .9, out1), lerp(-.2, 1.0, out1)], hold: out1 > .3 ? 'phone' : '', mouth: 'o', brow: .4, eyes: [.6, .7] });
+  out_(w, 'friend', OX - .6, lerp(3.4, 8.8, go), go > 0 ? runTo(t + .2, [OX - .6, 14]) : { view: 'q', face: 1, armL: [-.3, .2], armR: [.3, -.2], mouth: 'o', brow: .4 });
   w.cross([OX + .75, 1.75, 3.9], pr(lt, .45, .65), .17); return { focus: 4.8, blur: .4 }; });
 // 15 "Then call your gas company or your emergency services." : across the street, the house well behind them
 shot(23.3, 26.55, (lt, t, u, w) => { const k = io(u);
   w.cam([lerp(OX + .6, OX + 1.2, k), lerp(1.6, 1.9, k), lerp(14.6, 15.6, k)], [OX + 1.95, lerp(1.5, 1.8, k), 6], 46);
-  w.act('sam', OX + 1.2, 10.4, { view: 'q', face: 1, armL: [-.3, .2], armR: [1.9, 1.2], hold: 'phone', mouth: (t % .5) < .25 ? 'o' : 'smile', brow: .3, eyes: [.4, -.2] });
-  w.act('friend', OX + 2.4, 10.2, { view: 'q', face: -1, armL: [-.3, .2], armR: [.3, -.2], mouth: 'o', brow: .3, eyes: [-.5, 0], blink: blinkAt(t) }); return { focus: 4.4, blur: .4 }; });
+  out_(w, 'sam', OX + 1.2, 10.4, { view: 'q', face: 1, armL: [-.3, .2], armR: [1.9, 1.2], hold: 'phone', mouth: (t % .5) < .25 ? 'o' : 'smile', brow: .3, eyes: [.4, -.2] });
+  out_(w, 'friend', OX + 2.4, 10.2, { view: 'q', face: -1, armL: [-.3, .2], armR: [.3, -.2], mouth: 'o', brow: .3, eyes: [-.5, 0], blink: blinkAt(t) }); return { focus: 4.4, blur: .4 }; });
 // 16 "Stay out until they tell you it is safe to go back in." : the gas company arrives; the worker holds them back
 shot(26.55, 29.6, (lt, t, u, w) => { const v = out(pr(lt, 0, 1.0)), wk = pr(lt, 1.1, 1.9), wx = OX + lerp(4.6, 3.5, wk), wz = lerp(7.6, 9.4, wk);
   w.cam([lerp(OX - .6, OX - .2, io(u)), lerp(2.6, 2.3, u), lerp(18.0, 17.2, io(u))], [OX + 3.2, 1.2, 7.8], 50);
   w.props.van.visible = true; w.props.van.position.set(OX + lerp(20, 5.2, v), 0, 6.8);
-  w.act('sam', OX + 1.2, 10.4, { view: 'q', face: 1, armL: [-.3, .2], armR: [.3, -.2], mouth: wk >= 1 ? 'smile' : 'o', brow: .2, eyes: [.6, 0], blink: blinkAt(t) });
-  w.act('friend', OX + 2.0, 10.6, { view: 'q', face: 1, armL: [-.3, .2], armR: [.3, -.2], mouth: 'smile', brow: .2, eyes: [.6, 0] });
-  if (wk > 0) w.act('worker', wx, wz, wk < 1 ? walkTo(t, [OX + 1.2, 10.4], { mouth: 'smile' }) : { view: 'q', face: -1, armL: [-2.0, -1.6], armR: [.3, -.2], mouth: 'smile', brow: 0, eyes: [-.6, 0] }); return { focus: 4.6, blur: .4 }; });
+  out_(w, 'sam', OX + 1.2, 10.4, { view: 'q', face: 1, armL: [-.3, .2], armR: [.3, -.2], mouth: wk >= 1 ? 'smile' : 'o', brow: .2, eyes: [.6, 0], blink: blinkAt(t) });
+  out_(w, 'friend', OX + 2.0, 10.6, { view: 'q', face: 1, armL: [-.3, .2], armR: [.3, -.2], mouth: 'smile', brow: .2, eyes: [.6, 0] });
+  if (wk > 0) out_(w, 'worker', wx, wz, wk < 1 ? walkTo(t, [OX + 1.2, 10.4], { mouth: 'smile' }) : { view: 'q', face: -1, armL: [-2.0, -1.6], armR: [.3, -.2], mouth: 'smile', brow: 0, eyes: [-.6, 0] }); return { focus: 4.6, blur: .4 }; });
 // 17 "And if the smell is ever strong, or you are not sure," : back in the hall, as at the start
 shot(29.6, 32.3, (lt, t, u, w) => { const shrug = pr(lt, 1.6, 1.9);
   w.cam([lerp(6.2, 5.8, io(u)), lerp(1.7, 1.6, u), lerp(5.4, 4.9, io(u))], [5.0, 1.3, 1.4], 44);
@@ -110,6 +113,6 @@ shot(32.3, 33.5, (lt, t, u, w) => { const k = out(pr(lt, 0, .8)), x = lerp(5.6, 
 shot(33.5, 35.83, (lt, t, u, w) => { const op = out(pr(lt, 0, .3)), k = pr(lt, .12, 2.33);
   w.cam([lerp(OX + 2.4, OX + 3.0, io(u)), lerp(1.8, 5.2, io(u)), lerp(7.2, 12.5, io(u))], [OX + .3, lerp(1.2, .8, u), lerp(1.2, 3.0, u)], 46);
   w.outDoor.rotation.y = -1.4 * op;
-  if (k > 0) w.act('sam', OX + .15, lerp(.4, 5.0, k), runTo(t, [OX + .3, 12], { armR: [.9, 1.0], hold: 'phone' }));
+  if (k > 0) out_(w, 'sam', OX + .15, lerp(.4, 5.0, k), runTo(t, [OX + .3, 12], { armR: [.9, 1.0], hold: 'phone' }));
   return { focus: 6, blur: .3 }; });
 export const SHOTS = D.SHOTS();

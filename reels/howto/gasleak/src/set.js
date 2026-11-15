@@ -43,7 +43,29 @@ export function street() { const G = new THREE.Group(); G.position.set(...OUT);
   for (const x of [-9, 9]) { G.add(cyl(.08, .1, 4, 0x55525f, [x, 2, 9.9], 8), box(.6, .25, .25, 0x55525f, [x + .25, 4, 9.9])); }
   for (const [x, z, s] of [[-6, -1, 1.3], [6.5, -.5, 1.1], [16, 13, 1.4]]) G.add(cyl(.15, .2, 1.6 * s, 0x7a5230, [x, .8 * s, z], 8), ball(1.1 * s, 0x3f9a58, [x, 2.2 * s, z]));
   G.userData = { door }; return G; }
-// gas you can see: wavy smell lines (drawn once) that drift and turn
-export function smellLine() { return card(.5, 1.1, (g, w, h) => { g.lineCap = 'round'; for (const [col, lw] of [[INK, w * .18], ['#c8e04a', w * .1]]) { g.strokeStyle = col; g.lineWidth = lw; g.beginPath(); for (let i = 0; i <= 30; i++) { const y = h * (.06 + .88 * i / 30), x = w * (.5 + .28 * Math.sin(i / 30 * Math.PI * 3)); i ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); } }, 300); }
+// gas you can see: a cartoon stink cue, three thin wavy strokes rising side by side over a soft pale haze. See-through, so it can fade.
+export function smellLine() { const tex = canvasTex(260, 420, (g, w, h) => {
+    const haze = g.createRadialGradient(w / 2, h * .62, 0, w / 2, h * .62, w * .55); haze.addColorStop(0, 'rgba(214,232,140,.55)'); haze.addColorStop(1, 'rgba(214,232,140,0)'); g.fillStyle = haze; g.fillRect(0, 0, w, h);
+    g.lineCap = 'round';
+    for (const [dx, len] of [[-.24, .78], [0, .92], [.24, .72]]) { const path = () => { g.beginPath(); for (let i = 0; i <= 26; i++) { const k = i / 26, y = h * (.95 - k * len), x = w * (.5 + dx + .07 * Math.sin(k * Math.PI * 3.2 + dx * 9)); i ? g.lineTo(x, y) : g.moveTo(x, y); } };
+      path(); g.strokeStyle = 'rgba(29,26,38,.75)'; g.lineWidth = 15; g.stroke(); path(); g.strokeStyle = '#d6e88c'; g.lineWidth = 8; g.stroke(); } });
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(.45, .73), new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false })); m.userData.noInk = true; m.renderOrder = 3; return m; }
+// the gas company's van: a long body and a cab with glass, wheels with hubs, lights, bumpers, an amber light bar and its livery
+export function gasVan() { const V = new THREE.Group(), white = 0xf7f7f2;
+  V.add(box(3.2, 1.9, 2.0, white, [-.6, 1.35, 0]), box(1.3, 1.25, 2.0, white, [1.65, 1.02, 0]));                       // load box and bonnet
+  { const slope = box(.9, .9, 1.96, white, [1.25, 1.95, 0]); slope.rotation.z = -.55; V.add(slope); }                    // the cab roof sloping into the windscreen
+  V.add(box(4.6, .14, 2.04, 0x1d1a26, [.1, .38, 0]), box(.14, .3, 2.06, 0x55525f, [2.32, .55, 0]), box(.14, .3, 2.06, 0x55525f, [-2.22, .6, 0]));   // sill and bumpers
+  const glass = (w, h, pos, ry = 0) => { const g = board(w, h, (c, ww, hh) => { c.fillStyle = '#9fd3f2'; c.fillRect(0, 0, ww, hh); c.strokeStyle = 'rgba(255,255,255,.85)'; c.lineWidth = ww * .06; c.beginPath(); c.moveTo(ww * .2, hh * .9); c.lineTo(ww * .45, hh * .1); c.stroke(); c.strokeStyle = INK; c.lineWidth = Math.max(4, ww * .05); c.strokeRect(0, 0, ww, hh); }); g.position.set(...pos); g.rotation.y = ry; V.add(g); };
+  glass(.75, .6, [1.25, 1.85, 1.005]); glass(.75, .6, [1.25, 1.85, -1.005], Math.PI);                                    // cab side windows
+  { const ws = board(1.7, .62, (c, ww, hh) => { c.fillStyle = '#9fd3f2'; c.fillRect(0, 0, ww, hh); c.strokeStyle = INK; c.lineWidth = 8; c.strokeRect(0, 0, ww, hh); }); ws.position.set(1.66, 1.98, 0); ws.rotation.y = Math.PI / 2; ws.rotation.x = -.55; V.add(ws); }   // windscreen
+  // livery on both sides: an orange band, the lettering, a flame mark
+  for (const [z, ry] of [[1.006, 0], [-1.006, Math.PI]]) { const l = board(3.1, 1.2, (c, ww, hh) => { c.fillStyle = '#ff8a1f'; c.fillRect(0, hh * .56, ww, hh * .2); c.fillStyle = INK; c.textAlign = 'center'; c.font = `800 ${hh * .2}px Cap, sans-serif`; c.fillText('GAS EMERGENCY', ww * .55, hh * .4);
+      c.fillStyle = '#ff8a1f'; c.beginPath(); c.moveTo(ww * .08, hh * .48); c.quadraticCurveTo(ww * .14, hh * .2, ww * .1, hh * .1); c.quadraticCurveTo(ww * .2, hh * .3, ww * .16, hh * .48); c.closePath(); c.fill(); c.strokeStyle = INK; c.lineWidth = 5; c.stroke(); });
+    l.material.transparent = true; l.position.set(-.6, 1.45, z); l.rotation.y = ry; V.add(l); }
+  V.add(box(.04, 1.5, .02, 0xd8d8d0, [.4, 1.25, 1.005]), box(.04, 1.5, .02, 0xd8d8d0, [.4, 1.25, -1.005]), box(.3, .05, .05, 0x55525f, [.1, 1.25, 1.03]));   // door seams and a handle
+  for (const [x, z] of [[-1.5, 1.0], [1.45, 1.0], [-1.5, -1.0], [1.45, -1.0]]) { const w = cyl(.42, .42, .26, 0x1d1a26, [x, .42, z], 18); w.rotation.x = Math.PI / 2; const hub = cyl(.2, .2, .27, 0xc9ccd4, [x, .42, z], 12); hub.rotation.x = Math.PI / 2; V.add(w, hub); }
+  for (const z of [.7, -.7]) V.add(box(.06, .2, .32, 0xfff3b0, [2.3, 1.0, z]), box(.06, .16, .26, 0xe6232e, [-2.23, 1.0, z]));   // headlights and tail lights
+  const bar = new THREE.Group(); bar.add(box(.3, .1, 1.2, 0x55525f, [0, 0, 0]), box(.26, .14, .34, 0xffb21f, [0, .1, -.38]), box(.26, .14, .34, 0xffb21f, [0, .1, .38])); bar.position.set(.95, 2.42, 0); V.add(bar); V.userData.bar = bar;
+  return V; }
 // a spark: a small white-and-yellow star
 export function spark() { return card(.5, .5, (g, w, h) => { const star = (R, r, col) => { g.beginPath(); for (let i = 0; i < 16; i++) { const a = i / 16 * Math.PI * 2, rr = i % 2 ? r : R; g.lineTo(w / 2 + Math.cos(a) * rr * w, h / 2 + Math.sin(a) * rr * w); } g.closePath(); g.fillStyle = col; g.fill(); }; star(.48, .16, INK); star(.42, .13, '#ffd21f'); star(.26, .08, '#ffffff'); }, 300); }
