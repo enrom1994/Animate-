@@ -86,15 +86,15 @@ shot(21.3, 23.3, (lt, t, u, w) => { const out1 = pr(lt, .1, .45), go = pr(lt, 1.
   w.cross([OX + .75, 1.75, 3.9], pr(lt, .45, .65), .17); return { focus: 4.8, blur: .4 }; });
 // 15 "Then call your gas company or your emergency services." : across the street, the house well behind them
 shot(23.3, 26.55, (lt, t, u, w) => { const k = io(u);
-  w.cam([lerp(OX + 3.6, OX + 4.4, k), lerp(1.6, 1.9, k), lerp(14.2, 15.2, k)], [OX + .6, lerp(1.5, 1.9, k), 6], 44);
+  w.cam([lerp(OX + .6, OX + 1.2, k), lerp(1.6, 1.9, k), lerp(14.6, 15.6, k)], [OX + 1.95, lerp(1.5, 1.8, k), 6], 46);
   w.act('sam', OX + 1.2, 10.4, { view: 'q', face: 1, armL: [-.3, .2], armR: [1.9, 1.2], hold: 'phone', mouth: (t % .5) < .25 ? 'o' : 'smile', brow: .3, eyes: [.4, -.2] });
-  w.act('friend', OX + 2.3, 10.6, { view: 'q', face: -1, armL: [-.3, .2], armR: [.3, -.2], mouth: 'o', brow: .3, eyes: [-.5, 0], blink: blinkAt(t) }); return { focus: 4.4, blur: .4 }; });
+  w.act('friend', OX + 2.4, 10.2, { view: 'q', face: -1, armL: [-.3, .2], armR: [.3, -.2], mouth: 'o', brow: .3, eyes: [-.5, 0], blink: blinkAt(t) }); return { focus: 4.4, blur: .4 }; });
 // 16 "Stay out until they tell you it is safe to go back in." : the gas company arrives; the worker holds them back
-shot(26.55, 29.6, (lt, t, u, w) => { const v = out(pr(lt, 0, 1.0)), wk = pr(lt, 1.1, 1.9), wx = OX + lerp(4.0, 2.6, wk), wz = lerp(7.8, 9.2, wk);
-  w.cam([lerp(OX + 4.8, OX + 4.2, io(u)), lerp(1.8, 1.7, u), lerp(14.6, 14.0, io(u))], [OX + 1.8, 1.4, 7.5], 46);
+shot(26.55, 29.6, (lt, t, u, w) => { const v = out(pr(lt, 0, 1.0)), wk = pr(lt, 1.1, 1.9), wx = OX + lerp(4.6, 3.5, wk), wz = lerp(7.6, 9.4, wk);
+  w.cam([lerp(OX - .6, OX - .2, io(u)), lerp(2.6, 2.3, u), lerp(18.0, 17.2, io(u))], [OX + 3.2, 1.2, 7.8], 50);
   w.props.van.visible = true; w.props.van.position.set(OX + lerp(20, 5.2, v), 0, 6.8);
   w.act('sam', OX + 1.2, 10.4, { view: 'q', face: 1, armL: [-.3, .2], armR: [.3, -.2], mouth: wk >= 1 ? 'smile' : 'o', brow: .2, eyes: [.6, 0], blink: blinkAt(t) });
-  w.act('friend', OX + .3, 10.6, { view: 'q', face: 1, armL: [-.3, .2], armR: [.3, -.2], mouth: 'smile', brow: .2, eyes: [.6, 0] });
+  w.act('friend', OX + 2.0, 10.6, { view: 'q', face: 1, armL: [-.3, .2], armR: [.3, -.2], mouth: 'smile', brow: .2, eyes: [.6, 0] });
   if (wk > 0) w.act('worker', wx, wz, wk < 1 ? walkTo(t, [OX + 1.2, 10.4], { mouth: 'smile' }) : { view: 'q', face: -1, armL: [-2.0, -1.6], armR: [.3, -.2], mouth: 'smile', brow: 0, eyes: [-.6, 0] }); return { focus: 4.6, blur: .4 }; });
 // 17 "And if the smell is ever strong, or you are not sure," : back in the hall, as at the start
 shot(29.6, 32.3, (lt, t, u, w) => { const shrug = pr(lt, 1.6, 1.9);
