@@ -89,9 +89,9 @@ shot(29.2, 32.2, (lt, t, u, w) => { const f = [TABLE[0] + .55, .93, TABLE[2] - .
   w.act('sam', -.35, -.55, { view: 'q', face: -1, armL: [-.6, -1.5], armR: [.6, 1.5], mouth: 'smile', brow: .2, eyes: [-.4, -.9], blink: blinkAt(t), legR: .15 * Math.max(0, Math.sin(lt * 10)) }); return { focus: 2.6, blur: .5 }; });
 // 15 "It can take up to a day to dry." : night falls in the window and lifts again
 shot(32.2, 34.4, (lt, t, u, w) => { const n = Math.sin(Math.PI * pr(lt, .1, 2.0));
-  w.cam([lerp(1.4, 2.0, io(u)), lerp(1.75, 1.8, u), lerp(1.8, 1.4, io(u))], [2.65, 1.6, -1.5], 46);
+  w.cam([lerp(1.3, 1.9, io(u)), lerp(1.7, 1.75, u), lerp(2.9, 2.5, io(u))], [2.5, 1.45, -1.4], 46);
   w.night.material.opacity = .85 * n; w.props.moon.visible = n > .4;
-  w.act('sam', 2.1, -.55, { view: n > .5 ? 'q' : 'q', face: 1, armL: [-.3, .2], armR: n > .5 ? [2.4, 1.5] : [.3, -.2], mouth: n > .5 ? 'o' : 'smile', eyes: [.5, -.4], blink: n > .7 ? .8 : 0 }); return { focus: 2.4, blur: .5 }; });
+  w.act('sam', 2.25, -.45, { view: 'q', face: 1, armL: [-.3, .2], armR: n > .5 ? [2.4, 1.5] : [.3, -.2], mouth: n > .5 ? 'o' : 'smile', eyes: [.6, -.5], blink: 0 }); return { focus: 3.4, blur: .5 }; });
 // 16 "So next time your phone takes a swim," : the same slip, from another side
 shot(34.4, 37.0, (lt, t, u, w) => { const f = pr(lt, .9, 1.2), sp = pr(lt, 1.2, 1.8), hp = [1.95, 1.18, -.95];
   w.cam([lerp(3.6, 3.0, io(u)), lerp(1.75, 1.65, u), lerp(2.6, 2.1, io(u))], [1.95, 1.2, -.95], 46);
