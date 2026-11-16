@@ -143,10 +143,10 @@ function shot9({ makeStage }) { const scene = makeStage({ shadowSize: 1.5 }); co
   const chips = Array.from({ length: 10 }, (_, i) => { const m = box(.012, .004, .03, std(0xc98f58)); scene.add(m); return m; }); const c = cam(36);
   return { scene, camera: c, update(t) { const hit = 4.0; const pu = range(t, 1.2, hit), y = lerp(2.6, .72 + .03, easeIn(pu));
     const f = flutter(t, .12, [.18, 1.25, .05], .04); pe.position.set(f.x, Math.max(.75, f.y), f.z); pe.rotation.set(f.rx, 0, f.rz); pe.visible = false;
-    P.position.set(0, t < hit ? y : .72 - .05, 0); P.rotation.set(0, 0, 0); P.visible = true; tr.set(V(0, y + 1.2 * pu, 0), V(0, y + .2, 0), .008, t < hit && pu > 0 ? .7 : 0);
+    P.position.set(t < 1.2 ? Math.sin(t * 3) * .03 : 0, t < hit ? y + (t < 1.2 ? Math.sin(t * 4) * .03 : 0) : .72 - .05, 0); P.rotation.set(0, t < 1.2 ? t * 2 : 0, t < 1.2 ? Math.sin(t * 3) * .12 : 0); P.visible = true; tr.set(V(0, y + 1.2 * pu, 0), V(0, y + .2, 0), .008, t < hit && pu > 0 ? .7 : 0);
     sp.update(t - hit); chips.forEach((m, i) => { const b = Math.max(0, t - hit), a = i / 10 * Math.PI * 2; m.visible = t > hit; m.position.set(Math.cos(a) * b * .5, .73 + b * 1.2 - 3 * b * b, Math.sin(a) * b * .5); m.rotation.set(b * 10 + i, i, 0); });
     const s = t > hit ? shake(t, 5 * Math.exp(-(t - hit) * 3)) : [0, 0, 0];
-    if (t < 1.1) place(c, [lerp(.5, .6, t), 2.65, lerp(.9, 1.0, t)], [0, 2.65, 0]); else if (t < hit) place(c, [lerp(.8, .55, pu), y + .15, lerp(1.1, .7, pu)], [0, y - .05, 0]); else place(c, [.42 + s[0], .92 + s[1], .55], [0, .74, 0]);
+    if (t < 1.1) place(c, [lerp(.9, .3, t / 1.1), lerp(2.4, 2.8, t / 1.1), lerp(1.2, .7, t / 1.1)], [0, 2.65, 0]); else if (t < hit) place(c, [lerp(.8, .55, pu), y + .15, lerp(1.1, .7, pu)], [0, y - .05, 0]); else { const o = (t - hit) * .45; place(c, [Math.sin(o) * .62 + s[0], .92 - .1 * Math.min(1, t - hit) + s[1], Math.cos(o) * .62 * .9], [0, .76, 0]); } /* after the hit the camera keeps circling the plank */
     return { dof: { focus: t < 2 ? .9 : .7, aperture: .003, maxblur: .008 }, bloom: t > hit ? .9 : .4 }; } }; }
 
 export const SHOTS = [
