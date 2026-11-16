@@ -12,3 +12,9 @@ Wikipedia, "Leaning Tower of Pisa" (en.wikipedia.org/wiki/Leaning_Tower_of_Pisa)
 - Line 10: "the tower was reopened to the public on 15 December 2001". Wikipedia
 
 Left out: the stability figure (the page gives 300 years in one place and 200 in another), the engineers' names (not in the text read), height and weight (the two sources disagree).
+
+## Picture choices (not claims)
+- The piazza shots use the true geometry: the lean at the plumb line's height (41 m) moves 45 cm between the "1990" and "1838" marks (0.0809 and 0.07 rad).
+- The underground cutaway is a diagram: there the tower tips back from 0.10 to 0.07 rad so the move can be seen. It is drawn larger than life on purpose.
+- Section layers (topsoil, soft clay, sand, deeper clay) are a simplified sketch, not a survey drawing; the narration only says "soft ground".
+- The voice reads tools/say.json (years spelled out: "eleven seventies", "eighteen thirty-eight"); script.json keeps the digits for the captions.

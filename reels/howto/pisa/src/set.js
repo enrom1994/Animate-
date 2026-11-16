@@ -17,17 +17,18 @@ export function tower() { const T = new THREE.Group(), lean = new THREE.Group();
   { const m = new THREE.Mesh(new THREE.CylinderGeometry(R, R + .15, base, 48, 1, true), toon(0xffffff, { map: arcadeTex(14, '#d4ccba') })); m.position.y = base / 2; m.castShadow = m.receiveShadow = true; lean.add(m);
     const cap0 = cyl(R + .25, R + .25, .5, MARBLE, [0, .25, 0], 48); lean.add(cap0); }
   // six open galleries, each a core, a ring of columns and a cornice
-  let y = base; const gh = 5.4;
-  for (let k = 0; k < 6; k++) { const core = new THREE.Mesh(new THREE.CylinderGeometry(R - .55, R - .55, gh, 40, 1, true), toon(0xffffff, { map: stripes(18) })); core.position.y = y + gh / 2; lean.add(core);
+  let y = base; const gh = 5.4, tiers = [];
+  for (let k = 0; k < 6; k++) { const st = new THREE.Group(); lean.add(st); tiers.push(st); { const lean = st; const core = new THREE.Mesh(new THREE.CylinderGeometry(R - .55, R - .55, gh, 40, 1, true), toon(0xffffff, { map: stripes(18) })); core.position.y = y + gh / 2; lean.add(core);
     lean.add(cyl(R + .2, R + .2, .35, MARBLE, [0, y + .17, 0], 48), cyl(R + .25, R + .2, .4, GREY, [0, y + gh - .2, 0], 48));
     const arch = new THREE.Mesh(new THREE.CylinderGeometry(R + .08, R + .08, 1.2, 48, 1, true), toon(0xffffff, { map: arcadeTex(30, 'rgba(0,0,0,0)'), transparent: true, alphaTest: .5, side: THREE.DoubleSide })); arch.position.y = y + gh - 1.0; lean.add(arch);
-    for (let i = 0; i < 30; i++) { const a = i / 30 * Math.PI * 2; const c = cyl(.13, .15, gh - 1.4, MARBLE, [Math.cos(a) * (R + .05), y + .35 + (gh - 1.4) / 2, Math.sin(a) * (R + .05)], 10); lean.add(c); }
+    for (let i = 0; i < 30; i++) { const a = i / 30 * Math.PI * 2; const c = cyl(.13, .15, gh - 1.4, MARBLE, [Math.cos(a) * (R + .05), y + .35 + (gh - 1.4) / 2, Math.sin(a) * (R + .05)], 10); lean.add(c); } }
     y += gh; }
   // the belfry: a narrower drum with big openings and a little roof rail; a bell inside
-  { const b = new THREE.Mesh(new THREE.CylinderGeometry(R - .9, R - .9, 4.5, 40, 1, true), toon(0xffffff, { map: arcadeTex(12, '#2d2a33'), side: THREE.DoubleSide })); b.position.y = y + 2.25; b.castShadow = true; lean.add(b);
+  const belfry = new THREE.Group(); lean.add(belfry); tiers.push(belfry);
+  { const lean = belfry; const b = new THREE.Mesh(new THREE.CylinderGeometry(R - .9, R - .9, 4.5, 40, 1, true), toon(0xffffff, { map: arcadeTex(12, '#2d2a33'), side: THREE.DoubleSide })); b.position.y = y + 2.25; b.castShadow = true; lean.add(b);
     lean.add(cyl(R - .7, R - .7, .3, GREY, [0, y + 4.6, 0], 40), cyl(R - .85, R - .85, .25, MARBLE, [0, y + .12, 0], 40));
     const bell = new THREE.Mesh(new THREE.CylinderGeometry(.35, .7, .9, 16), toon(0xb08d3c)); bell.position.set(0, y + 2.6, 0); lean.add(bell); }
-  T.userData = { lean, top: y + 4.7 }; T.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } }); return T; }
+  T.userData = { lean, tiers, top: y + 4.7, R }; T.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } }); return T; }
 // the cathedral front: tiers of little arcades over three doors, a gable, and side aisles
 function cathedral() { const C = new THREE.Group();
   C.add(box(30, 14, 60, MARBLE, [0, 7, -30]), box(14, 8, 60, MARBLE, [0, 18, -30]));
@@ -73,14 +74,15 @@ export function piazza() { const G = new THREE.Group();
   // houses and shops along the near street
   let x = -60; const cols = [0xe9b968, 0xe39a6e, 0xd9c08a, 0xefcf9c, 0xd48a5c], awns = ['#3f8a5a', '#e6232e', '#2f6fd6', '#ffd23f', null];
   for (let i = 0; x < 70; i++) { const w = 7 + (i * 3) % 5, h = 10 + (i * 7) % 6; const H = house(w, h, cols[i % 5], awns[i % 5]); H.position.set(x + w / 2, 0, 27); H.rotation.y = Math.PI; G.add(H); x += w + .2; }
-  // stalls, lamp posts, benches, cypresses, a sign
-  for (const [sx, c] of [[-8, 0xe6232e], [-4, 0x2f6fd6], [6, 0x3f8a5a]]) { const s = stall(c); s.position.set(sx, 0, 17); G.add(s); }
-  for (let lx = -40; lx <= 40; lx += 10) { G.add(cyl(.08, .1, 4.2, 0x2a2733, [lx, 2.1, 15.5], 8)); G.add(ball(.32, 0xfff3b0, [lx, 4.4, 15.5])); }
-  for (const bx of [-14, 12, 22]) { G.add(box(1.8, .1, .5, 0x8a5a2e, [bx, .5, 13.5]), box(1.8, .5, .08, 0x8a5a2e, [bx, .8, 13.28]), box(.08, .5, .5, 0x2a2733, [bx - .85, .25, 13.5]), box(.08, .5, .5, 0x2a2733, [bx + .85, .25, 13.5])); }
+  // stalls, lamp posts, benches, cypresses, a sign (the modern things go in one group, hidden in the 1170s)
+  const MOD = new THREE.Group(); MOD.name = 'modern'; G.add(MOD);
+  for (const [sx, c] of [[-8, 0xe6232e], [-4, 0x2f6fd6], [6, 0x3f8a5a]]) { const s = stall(c); s.position.set(sx, 0, 17); MOD.add(s); }
+  for (let lx = -40; lx <= 40; lx += 10) { MOD.add(cyl(.08, .1, 4.2, 0x2a2733, [lx, 2.1, 15.5], 8)); MOD.add(ball(.32, 0xfff3b0, [lx, 4.4, 15.5])); }
+  for (const bx of [-14, 12, 22]) { MOD.add(box(1.8, .1, .5, 0x8a5a2e, [bx, .5, 13.5]), box(1.8, .5, .08, 0x8a5a2e, [bx, .8, 13.28]), box(.08, .5, .5, 0x2a2733, [bx - .85, .25, 13.5]), box(.08, .5, .5, 0x2a2733, [bx + .85, .25, 13.5])); }
   for (const [cx, cz] of [[40, -20], [44, -24], [48, -18], [-120, -30], [70, -40]]) { const c = new THREE.Mesh(new THREE.ConeGeometry(1.4, 9, 10), toon(0x2f6b45)); c.position.set(cx, 4.5, cz); c.castShadow = true; G.add(c); }
-  { const sign = board(1.6, .6, (g, w, h) => { g.fillStyle = '#2d4a7a'; g.fillRect(0, 0, w, h); g.strokeStyle = '#fff'; g.lineWidth = h * .05; g.strokeRect(h * .06, h * .06, w - h * .12, h * .88); g.fillStyle = '#fff'; g.textAlign = 'center'; g.font = `800 ${h * .32}px Cap, sans-serif`; g.fillText('PIAZZA DEI', w / 2, h * .45); g.fillText('MIRACOLI', w / 2, h * .8); }, 160); sign.position.set(-2, 1.9, 15.3); sign.rotation.y = 0; G.add(sign); G.add(cyl(.05, .05, 1.6, 0x2a2733, [-2, .8, 15.2], 6)); }
+  { const sign = board(1.6, .6, (g, w, h) => { g.fillStyle = '#2d4a7a'; g.fillRect(0, 0, w, h); g.strokeStyle = '#fff'; g.lineWidth = h * .05; g.strokeRect(h * .06, h * .06, w - h * .12, h * .88); g.fillStyle = '#fff'; g.textAlign = 'center'; g.font = `800 ${h * .32}px Cap, sans-serif`; g.fillText('PIAZZA DEI', w / 2, h * .45); g.fillText('MIRACOLI', w / 2, h * .8); }, 160); sign.position.set(-2, 1.9, 15.3); sign.rotation.y = 0; MOD.add(sign); MOD.add(cyl(.05, .05, 1.6, 0x2a2733, [-2, .8, 15.2], 6)); }
   for (let i = 0; i < 26; i++) { const px = 30 + (i * 37) % 26, pz = -6 + (i * 53) % 20; G.add(pigeon(px, pz, i)); }
-  for (let fx = 20; fx <= 64; fx += 4) { G.add(cyl(.06, .06, .7, 0x2a2733, [fx, .35, 15], 8), ball(.09, 0x2a2733, [fx, .72, 15])); const ch = new THREE.Mesh(new THREE.TorusGeometry(2, .025, 4, 24, Math.PI * .5), toon(0x2a2733)); ch.rotation.z = Math.PI * .75; ch.position.set(fx + 2, 1.95, 15); ch.scale.y = .55; ch.position.y = .65 + 2 * .55 * Math.cos(Math.PI / 4) - 1.3; G.add(ch); }
+  for (let fx = 20; fx <= 64; fx += 4) { MOD.add(cyl(.06, .06, .7, 0x2a2733, [fx, .35, 15], 8), ball(.09, 0x2a2733, [fx, .72, 15])); MOD.add(box(4, .03, .03, 0x2a2733, [fx + 2, .62, 15])); }
   G.traverse(o => { if (o.isMesh) { o.receiveShadow = true; } });
   return G; }
 function pigeon(x, z, i) { const P = new THREE.Group(); const body = ball(.16, 0x8a8f99, [0, .16, 0]); body.scale.set(1.4, .9, .9); P.add(body, ball(.08, 0x6f7480, [.2, .3, 0]), ball(.03, 0xe6634a, [.28, .3, 0]));
