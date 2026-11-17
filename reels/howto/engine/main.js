@@ -19,14 +19,16 @@ const rtNorm = new THREE.WebGLRenderTarget(W * 2, H * 2, { depthTexture: new THR
 const NORMAL = new THREE.MeshNormalMaterial();
 const ink = new THREE.ShaderMaterial({
   uniforms: { tC: { value: rtColor.texture }, tN: { value: rtNorm.texture }, tD: { value: rtNorm.depthTexture }, near: { value: .1 }, far: { value: 300 },
-    px: { value: new THREE.Vector2(1 / W, 1 / H) }, ink: { value: new THREE.Color(INK) }, uVig: { value: .22 }, uBlur: { value: 0 }, uFocus: { value: 6 }, uWhip: { value: new THREE.Vector2() }, uZoom: { value: 0 }, uFlash: { value: 0 }, uRain: { value: 0 }, uTime: { value: 0 } },
+    px: { value: new THREE.Vector2(1 / W, 1 / H) }, ink: { value: new THREE.Color(INK) }, uVig: { value: .22 }, uBlur: { value: 0 }, uFocus: { value: 6 }, uWhip: { value: new THREE.Vector2() }, uZoom: { value: 0 }, uFlash: { value: 0 }, uRain: { value: 0 }, uTime: { value: 0 },
+    uInkK: { value: 1 }, uNormK: { value: 1 }, uHaze: { value: new THREE.Vector4(0, 0, 0, 0) }, uDust: { value: 0 }, uWarm: { value: 0 } },
   vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0., 1.); }`,
   fragmentShader: `
-    uniform sampler2D tC, tN, tD; uniform float near, far, uVig, uBlur, uFocus, uZoom, uFlash, uRain, uTime; uniform vec2 px, uWhip;
+    uniform sampler2D tC, tN, tD; uniform float near, far, uVig, uBlur, uFocus, uZoom, uFlash, uRain, uTime, uInkK, uNormK, uDust, uWarm; uniform vec2 px, uWhip; uniform vec4 uHaze;
     float h1(float n){ return fract(sin(n * 127.1) * 43758.5453); }
     // rain: slanted streaks on two scales, falling with time; a function of time only, like everything else
     float rain(vec2 uv, float sc, float sp){ vec2 p = uv * vec2(34., 7.) * sc; p.x += p.y * .22; p.y += uTime * sp; vec2 id = floor(p), f = fract(p); float h = h1(id.x * 17. + id.y * 3.1), on = step(h, .34);
       return on * smoothstep(.07, .0, abs(f.x - .2 - h * 1.7)) * smoothstep(0., .15, f.y) * smoothstep(1., .55, f.y); } uniform vec3 ink; varying vec2 vUv;
+    float dust(vec2 uv){ float s = 0.; for (int l = 0; l < 2; l++) { float sc = 9. + float(l) * 7.; vec2 p = uv * vec2(sc * .5625, sc) + vec2(uTime * .03 * (1. + float(l)), -uTime * .05); vec2 id = floor(p), f = fract(p); float h = h1(id.x * 31. + id.y * 7. + float(l) * 13.); vec2 c0 = vec2(.2 + .6 * h1(h * 91.), .2 + .6 * h1(h * 57.)) + .15 * vec2(sin(uTime * .7 + h * 40.), cos(uTime * .5 + h * 30.)); s += step(.55, h) * smoothstep(.06 - float(l) * .02, 0., length(f - c0)) * (.5 + .5 * sin(uTime * 1.3 + h * 60.)); } return s; }
     float iz(vec2 u){ float d = texture2D(tD, u).x; float z = near * far / (far - d * (far - near)); return 1. / z; }   // 1/viewZ is linear on screen for a plane
     vec3 nm(vec2 u){ return texture2D(tN, u).xyz * 2. - 1.; }
     float edge(vec2 u, float r){
@@ -35,7 +37,7 @@ const ink = new THREE.ShaderMaterial({
       vec3 n = nm(u); float dn = 0.;
       dn = max(dn, 1. - dot(n, nm(u + vec2(o.x, 0.)))); dn = max(dn, 1. - dot(n, nm(u - vec2(o.x, 0.))));
       dn = max(dn, 1. - dot(n, nm(u + vec2(0., o.y)))); dn = max(dn, 1. - dot(n, nm(u - vec2(0., o.y))));
-      return max(smoothstep(.012, .03, lap), smoothstep(.25, .5, dn));
+      return max(smoothstep(.012, .03, lap), smoothstep(.25, .5, dn) * uNormK);   // uNormK < 1: creases inside a shape draw lighter than its outline
     }
     void main(){
       vec3 c = vec3(0.); float tr = length(uWhip) + abs(uZoom);
@@ -50,8 +52,11 @@ const ink = new THREE.ShaderMaterial({
         c /= n;
         float e = 0.; for (int i = 0; i < 4; i++) { vec2 j = (vec2(mod(float(i), 2.), floor(float(i) / 2.)) - .5) * px * .5; e += max(edge(vUv + j, 1.6), edge(vUv + j, .8)); } e *= .25;
         e *= 1. - .75 * far01;                                                              // lines thin out with distance
-        c = mix(c, ink, e);
+        c = mix(c, ink, e * uInkK);
+        c = mix(c, uHaze.rgb, uHaze.a * smoothstep(uFocus * 1.2, uFocus * 9., z));   // haze: far things sink into the air's colour
       }
+      if (uDust > 0.) c += uDust * dust(vUv) * vec3(1., .93, .78);   // dust in the light: soft specks drifting, a function of time
+      if (uWarm > 0.) { c = mix(c, c * vec3(1.07, 1.0, .86) + vec3(.025, .012, 0.), uWarm); }
       if (uRain > 0.) c = mix(c, vec3(.86, .92, 1.), uRain * (.42 * rain(vUv, 1., 9.) + .26 * rain(vUv + .37, 1.9, 13.)));
       c = mix(c, vec3(1.), uFlash * .85);                                                 // lightning: the whole frame goes white and falls back
       vec2 q = vUv - .5; q.x *= .5625; c *= 1. - uVig * smoothstep(.2, .65, length(q));
@@ -75,6 +80,8 @@ window.renderAt = t => {
   renderer.setRenderTarget(rtNorm); renderer.render(scene, cam);
   for (const [o, m] of swap) { o.material = m; o.visible = true; } scene.background = bg;
   ink.uniforms.near.value = cam.near; ink.uniforms.far.value = cam.far; ink.uniforms.uBlur.value = r.blur ?? 1; ink.uniforms.uFocus.value = r.focus ?? 6; ink.uniforms.uFlash.value = r.flash ?? 0; ink.uniforms.uRain.value = r.rain ?? 0; ink.uniforms.uTime.value = t;
+  const L = r.look || {}; ink.uniforms.uInkK.value = L.inkK ?? 1; ink.uniforms.uNormK.value = L.normK ?? 1; ink.uniforms.uDust.value = L.dust ?? 0; ink.uniforms.uWarm.value = L.warm ?? 0;   // look: the richer style's grade (old films leave it out)
+  { const hz = L.haze || [0, 0], hc = new THREE.Color(hz[0]); ink.uniforms.uHaze.value.set(hc.r, hc.g, hc.b, hz[1]); }
   // transitions: the last and first frames of a shot smear (a whip) or burst (a zoom), alternating
   const WH = .13, lt = tr - SHOTS[idx].start, rem = SHOTS[idx].end - tr, KINDS = [[1, 0, 0], [0, 0, 1], [-1, 0, 0], [0, 0, -.7]];   // whip right, zoom in, whip left, zoom out. No vertical whips: on a tall frame they turn lettering and faces into streaks
   let wx = 0, wy = 0, wz = 0;
