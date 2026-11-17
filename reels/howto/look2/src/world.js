@@ -1,7 +1,9 @@
 import * as THREE from 'three';
 import { richStage, skyTex } from '../../engine/rich.js';
 import { worldKit } from '../../engine/film.js';
-import { makeChar } from '../../engine/char.js';
+import { makeChar, LOOKS } from '../../engine/char.js';
+LOOKS.samB = { ...LOOKS.sam, ink: '#3b2522', lw: .55, finish: true };
+LOOKS.samC = { ...LOOKS.sam, ink: '#2e1d1c', lw: .8, finish: true };
 import { kitchen, street } from './set.js';
 export const ST = [200, 0, 0];
 export function makeWorld() {
@@ -10,6 +12,6 @@ export function makeWorld() {
   const key = scene.userData.key;
   // the sun: inside it comes low through the window; outside it rakes along the street from the left
   const sun = (target, dir, half) => { key.target.position.set(...target); key.position.set(target[0] + dir[0], target[1] + dir[1], target[2] + dir[2]); const c = key.shadow.camera; c.left = c.bottom = -half; c.right = c.top = half; c.updateProjectionMatrix(); };
-  const W = worldKit(scene, camera, { sam: makeChar('sam') }, {}, () => {});
+  const W = worldKit(scene, camera, { sam: makeChar('sam'), samB: makeChar('samB'), samC: makeChar('samC') }, {}, () => {});
   return { ...W, sun };
 }

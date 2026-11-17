@@ -20,10 +20,10 @@ const NORMAL = new THREE.MeshNormalMaterial();
 const ink = new THREE.ShaderMaterial({
   uniforms: { tC: { value: rtColor.texture }, tN: { value: rtNorm.texture }, tD: { value: rtNorm.depthTexture }, near: { value: .1 }, far: { value: 300 },
     px: { value: new THREE.Vector2(1 / W, 1 / H) }, ink: { value: new THREE.Color(INK) }, uVig: { value: .22 }, uBlur: { value: 0 }, uFocus: { value: 6 }, uWhip: { value: new THREE.Vector2() }, uZoom: { value: 0 }, uFlash: { value: 0 }, uRain: { value: 0 }, uTime: { value: 0 },
-    uInkK: { value: 1 }, uNormK: { value: 1 }, uHaze: { value: new THREE.Vector4(0, 0, 0, 0) }, uDust: { value: 0 }, uWarm: { value: 0 } },
+    uInkK: { value: 1 }, uNormK: { value: 1 }, uHaze: { value: new THREE.Vector4(0, 0, 0, 0) }, uDust: { value: 0 }, uWarm: { value: 0 }, uSat: { value: 1 } },
   vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0., 1.); }`,
   fragmentShader: `
-    uniform sampler2D tC, tN, tD; uniform float near, far, uVig, uBlur, uFocus, uZoom, uFlash, uRain, uTime, uInkK, uNormK, uDust, uWarm; uniform vec2 px, uWhip; uniform vec4 uHaze;
+    uniform sampler2D tC, tN, tD; uniform float near, far, uVig, uBlur, uFocus, uZoom, uFlash, uRain, uTime, uInkK, uNormK, uDust, uWarm, uSat; uniform vec2 px, uWhip; uniform vec4 uHaze;
     float h1(float n){ return fract(sin(n * 127.1) * 43758.5453); }
     // rain: slanted streaks on two scales, falling with time; a function of time only, like everything else
     float rain(vec2 uv, float sc, float sp){ vec2 p = uv * vec2(34., 7.) * sc; p.x += p.y * .22; p.y += uTime * sp; vec2 id = floor(p), f = fract(p); float h = h1(id.x * 17. + id.y * 3.1), on = step(h, .34);
@@ -56,6 +56,7 @@ const ink = new THREE.ShaderMaterial({
         c = mix(c, uHaze.rgb, uHaze.a * smoothstep(uFocus * 1.2, uFocus * 9., z));   // haze: far things sink into the air's colour
       }
       if (uDust > 0.) c += uDust * dust(vUv) * vec3(1., .93, .78);   // dust in the light: soft specks drifting, a function of time
+      if (uSat != 1.) { float l = dot(c, vec3(.2126, .7152, .0722)); c = max(mix(vec3(l), c, uSat), 0.); }   // storybook colour: push saturation
       if (uWarm > 0.) { c = mix(c, c * vec3(1.07, 1.0, .86) + vec3(.025, .012, 0.), uWarm); }
       if (uRain > 0.) c = mix(c, vec3(.86, .92, 1.), uRain * (.42 * rain(vUv, 1., 9.) + .26 * rain(vUv + .37, 1.9, 13.)));
       c = mix(c, vec3(1.), uFlash * .85);                                                 // lightning: the whole frame goes white and falls back
@@ -80,7 +81,7 @@ window.renderAt = t => {
   renderer.setRenderTarget(rtNorm); renderer.render(scene, cam);
   for (const [o, m] of swap) { o.material = m; o.visible = true; } scene.background = bg;
   ink.uniforms.near.value = cam.near; ink.uniforms.far.value = cam.far; ink.uniforms.uBlur.value = r.blur ?? 1; ink.uniforms.uFocus.value = r.focus ?? 6; ink.uniforms.uFlash.value = r.flash ?? 0; ink.uniforms.uRain.value = r.rain ?? 0; ink.uniforms.uTime.value = t;
-  const L = r.look || {}; ink.uniforms.uInkK.value = L.inkK ?? 1; ink.uniforms.uNormK.value = L.normK ?? 1; ink.uniforms.uDust.value = L.dust ?? 0; ink.uniforms.uWarm.value = L.warm ?? 0;   // look: the richer style's grade (old films leave it out)
+  const L = r.look || {}; ink.uniforms.uInkK.value = L.inkK ?? 1; ink.uniforms.uNormK.value = L.normK ?? 1; ink.uniforms.uDust.value = L.dust ?? 0; ink.uniforms.uWarm.value = L.warm ?? 0; ink.uniforms.uSat.value = L.sat ?? 1;   // look: the richer style's grade (old films leave it out)
   { const hz = L.haze || [0, 0], hc = new THREE.Color(hz[0]); ink.uniforms.uHaze.value.set(hc.r, hc.g, hc.b, hz[1]); }
   // transitions: the last and first frames of a shot smear (a whip) or burst (a zoom), alternating
   const WH = .13, lt = tr - SHOTS[idx].start, rem = SHOTS[idx].end - tr, KINDS = [[1, 0, 0], [0, 0, 1], [-1, 0, 0], [0, 0, -.7]];   // whip right, zoom in, whip left, zoom out. No vertical whips: on a tall frame they turn lettering and faces into streaks

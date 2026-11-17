@@ -61,8 +61,8 @@ export function kitchen() { const K = new THREE.Group();
 // the street: a row of brick and plaster houses with shops, a stone pavement, a road, lamps and the clutter of a pavement
 function windowUnit(w, h, frameTex) { const G = new THREE.Group(), f = mat(frameTex, [1, 1]);
   const glass = new THREE.MeshStandardMaterial({ color: 0x2e3f52, roughness: .15, metalness: .5 }); G.add(slab(w, h, .02, glass, 1, [0, 0, -.06]));
-  for (const [ww, hh, x, y] of [[w + .14, .08, 0, h / 2 + .04], [w + .14, .08, 0, -h / 2 - .04], [.07, h, -w / 2 - .035, 0], [.07, h, w / 2 + .035, 0], [.04, h, 0, 0], [w, .04, 0, h * .12]]) G.add(slab(ww, hh, .08, f, 1, [x, y, 0]));
-  G.add(slab(w + .3, .07, .2, stoneTex('#d9cdb5', { n: 2 }), 1, [0, -h / 2 - .1, .06]), slab(w + .3, .14, .12, stoneTex('#d9cdb5', { n: 2 }), 1, [0, h / 2 + .13, .02]));
+  for (const [ww, hh, x, y] of [[w + .24, .12, 0, h / 2 + .06], [w + .24, .12, 0, -h / 2 - .06], [.12, h, -w / 2 - .06, 0], [.12, h, w / 2 + .06, 0], [.06, h, 0, 0], [w, .06, 0, h * .12]]) G.add(slab(ww, hh, .12, f, 1, [x, y, 0]));
+  G.add(slab(w + .4, .12, .28, stoneTex('#d9cdb5', { n: 2 }), 1, [0, -h / 2 - .1, .06]), slab(w + .3, .14, .12, stoneTex('#d9cdb5', { n: 2 }), 1, [0, h / 2 + .13, .02]));
   for (const s of [-1, 1]) { const sh = slab(w * .5, h, .03, paintTex('#3f6b55', { seed: 7 }), 1, [s * (w * .75 + .09), 0, .02]); G.add(sh); for (let k = 0; k < 7; k++) G.add(slab(w * .46, .015, .03, solid(0x30574a), 1, [s * (w * .75 + .09), -h / 2 + (k + .5) * h / 7, .04])); }
   return G; }
 function house(w, floors, wall, trim, shop) { const H = new THREE.Group(), fh = 3.1, h = floors * fh;
