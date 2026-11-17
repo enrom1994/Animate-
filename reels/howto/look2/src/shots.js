@@ -1,18 +1,20 @@
-// Look test 2: one frame indoors, one outdoors, in the richer style (textured surfaces, warm soft light, thin ink, haze and dust).
-import { makeWorld, ST } from './world.js';
+// Look test 2, the five-second moving test: past the table, into the kitchen; Sam (finish C) walks to the range and turns a knob off.
+import { makeWorld } from './world.js';
 import { director } from '../../engine/film.js';
+import { pr, lerp, ease } from '../../engine/toon.js';
 export { CAPTIONS, DURATION, WARP } from './captions.js';
-const D = director(makeWorld, []), shot = D.shot;
-export const LOOK = { inkK: .8, normK: .5, haze: ['#f2d9ae', .2], dust: .15, warm: .45, sat: 1.28 };
-const NAMES = ['sam', 'samB', 'samC'];
-NAMES.forEach((n, v) => {
-  shot(v, v + 1, (lt, t, u, w) => { w.sun([0, 0, -1], [-9, 6, -1.5], 6);
-    w.cam([2.2, 1.3, 2.5], [-1.1, 1.15, -2.0], 50);
-    w.act(n, -.35, -1.7, { view: 'q', face: 1, armL: [-.3, .2], armR: [.9, 1.0], mouth: 'smile', eyes: [.5, -.2], light: -1 });
-    return { focus: 3.4, blur: .5, look: { ...LOOK, haze: ['#f2d9ae', .05] } }; });
-  shot(3 + v, 4 + v, (lt, t, u, w) => { w.sun([ST[0] - 4, 0, 2], [-14, 10, 9], 16);
-    w.cam([ST[0] + 3.8, 1.15, ST[2] + 6.2], [ST[0] - 6, 2.4, ST[2] + 1], 44);
-    w.act(n, ST[0] - .6, ST[2] + 3.1, { view: 'q', face: -1, armL: [-.3, .2], armR: [.3, -.2], mouth: 'smile', eyes: [-.5, -.2], light: -1 });
-    return { focus: 4, blur: .6, look: LOOK }; });
-});
+const D = director(makeWorld, []), shot = D.shot, io = ease.io, out = ease.out;
+export const LOOK = { inkK: .8, normK: .5, haze: ['#f2d9ae', .05], dust: .15, warm: .45, sat: 1.28 };
+// the range's front left knob, in the world (the range stands at x .55, z -2.66; its knobs on the front face)
+const KNOB = [.55 - .27, .8, -2.66 + .36];
+const walk = (t, toward, o = {}) => ({ toward, legL: .35 * Math.sin(t * 9), legR: -.35 * Math.sin(t * 9), armL: [-.15 - .35 * Math.sin(t * 9), -.3], armR: [.15 - .35 * Math.sin(t * 9), .3], bob: 6 * Math.abs(Math.sin(t * 9)), mouth: 'smile', light: -1, ...o });
+shot(0, 5, (lt, t, u, w) => { const k = io(u), go = pr(lt, .3, 2.1), x = lerp(-1.7, -.18, io(go)), z = lerp(-1.2, -1.95, io(go)), reach = out(pr(lt, 2.3, 2.8)), turnK = pr(lt, 2.9, 3.3), back = pr(lt, 3.9, 4.3);
+  w.sun([0, 0, -1], [-9, 6, -1.5], 6);
+  w.cam([lerp(2.9, 1.3, k), lerp(.98, 1.2, k), lerp(2.3, .7, k)], [lerp(-.6, .1, k), lerp(1.0, 1.05, k), lerp(-1.6, -2.2, k)], lerp(50, 44, k));
+  let pose;
+  if (go < 1) pose = walk(t, [.4, -2.4]);
+  else if (back <= 0) pose = { view: 'q', face: 1, reach: [KNOB[0], KNOB[1] + .02 * Math.sin(turnK * 3), KNOB[2]], reachWith: 'R', armL: [-.3, .2], mouth: turnK > 0 ? 'smile' : 'o', eyes: [.6, .4], light: -1, lean: .05 * reach };
+  else pose = { view: 'q', face: 1, armL: [-.3, .2], armR: [lerp(1.0, 2.2, out(back)), lerp(.9, .4, out(back))], mouth: 'smile', eyes: [0, -.1], blink: lt > 4.6 && lt < 4.7 ? 1 : 0, light: -1 };
+  w.act('samC', x, z, pose);
+  return { focus: lerp(4.4, 2.6, k), blur: .6, look: LOOK }; });
 export const SHOTS = D.SHOTS();

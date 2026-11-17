@@ -88,7 +88,7 @@ export function drawChar(g, look, p0) {
 // matches the painted surfaces. light: -1 = the light comes from screen left, 1 = from screen right. Only painted pixels are touched.
 let GRAIN = null;
 function finish(g, light) { const W = g.canvas.width, H = g.canvas.height;
-  if (!GRAIN) { GRAIN = document.createElement('canvas'); GRAIN.width = GRAIN.height = 256; const q = GRAIN.getContext('2d'); let s = 7; const r = () => (s = (s * 16807) % 2147483647) / 2147483647; for (let i = 0; i < 9000; i++) { q.fillStyle = `rgba(${r() < .5 ? '0,0,0' : '255,240,220'},${.05 + r() * .06})`; q.fillRect(r() * 256, r() * 256, 2, 2); } }
+  if (!GRAIN) { GRAIN = document.createElement('canvas'); GRAIN.width = GRAIN.height = 256; const q = GRAIN.getContext('2d'); let s = 7; const r = () => (s = (s * 16807) % 2147483647) / 2147483647; for (let i = 0; i < 9000; i++) { q.fillStyle = `rgba(${r() < .5 ? '0,0,0' : '255,240,220'},${.022 + r() * .028})`; q.fillRect(r() * 256, r() * 256, 2, 2); } }
   g.save(); g.globalCompositeOperation = 'source-atop';
   const x0 = W / 2 + 300 * light, x1 = W / 2 - 300 * light, gr = g.createLinearGradient(x0, 0, x1, 0); gr.addColorStop(0, 'rgba(255,214,160,.16)'); gr.addColorStop(.45, 'rgba(255,214,160,0)'); gr.addColorStop(.62, 'rgba(70,40,70,0)'); gr.addColorStop(1, 'rgba(70,40,70,.30)'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
   const gv = g.createLinearGradient(0, H * .55, 0, H); gv.addColorStop(0, 'rgba(50,30,30,0)'); gv.addColorStop(1, 'rgba(50,30,30,.22)'); g.fillStyle = gv; g.fillRect(0, 0, W, H);
