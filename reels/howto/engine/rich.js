@@ -87,3 +87,12 @@ export function richStage({ sky = skyTex(), sun = [6, 9, 5], key = 2.6, fill = 1
   const c = k.shadow.camera; c.left = c.bottom = -shadow; c.right = c.top = shadow; c.near = .5; c.far = 80; k.shadow.bias = -.0004; k.shadow.normalBias = .03; k.shadow.radius = 6; k.shadow.blurSamples = 16;
   scene.add(k, k.target); scene.userData.key = k; return scene;
 }
+
+// a sash window with a stone sill and lintel, glass that catches the sky, and louvred shutters either side
+export function windowUnit(w, h, frameTex, shutter = '#3f6b55') { const G = new THREE.Group(), f = mat(frameTex, [1, 1]), stone = stoneTex('#d9cdb5', { n: 2 });
+  const glass = new THREE.MeshStandardMaterial({ color: 0x2e3f52, roughness: .15, metalness: .5 }); G.add(slab(w, h, .02, glass, 1, [0, 0, -.06]));
+  for (const [ww, hh, x, y] of [[w + .24, .12, 0, h / 2 + .06], [w + .24, .12, 0, -h / 2 - .06], [.12, h, -w / 2 - .06, 0], [.12, h, w / 2 + .06, 0], [.06, h, 0, 0], [w, .06, 0, h * .12]]) G.add(slab(ww, hh, .12, f, 1, [x, y, 0]));
+  G.add(slab(w + .4, .12, .28, stone, 1, [0, -h / 2 - .12, .06]), slab(w + .3, .14, .12, stone, 1, [0, h / 2 + .15, .02]));
+  const sh = paintTex(shutter, { seed: 7 }), dark = new THREE.Color(shutter).multiplyScalar(.75).getHex();
+  for (const s of [-1, 1]) { G.add(slab(w * .5, h, .03, sh, 1, [s * (w * .75 + .12), 0, .02])); for (let k = 0; k < 7; k++) G.add(slab(w * .46, .015, .03, solid(dark), 1, [s * (w * .75 + .12), -h / 2 + (k + .5) * h / 7, .04])); }
+  return G; }
