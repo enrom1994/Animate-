@@ -101,7 +101,7 @@ export function makeChar(lookName = 'sam', height = 1.75) {
   mesh.userData.nmat = new THREE.MeshBasicMaterial({ map: tex, alphaTest: .5, color: 0x8080ff });
   mesh.customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: tex, alphaTest: .5 }); mesh.castShadow = true;
   const blob = new THREE.Mesh(new THREE.CircleGeometry(.42, 24), new THREE.MeshBasicMaterial({ color: 0x7a5a2a, transparent: true, opacity: .45, depthWrite: false })); blob.rotation.x = -Math.PI / 2; blob.position.y = .02; blob.scale.y = .55; blob.userData.noInk = true;
-  const group = new THREE.Group(); group.add(mesh, blob);
+  const group = new THREE.Group(); group.add(mesh, blob); group.userData = { char: lookName, hH }; mesh.userData.card = true; blob.userData.card = true;   // tags the checker (check.mjs) uses to find characters
   // a point in the world -> the spot on this character's card that covers it from the camera, in canvas pixels
   const toCard = (pt, camera, yaw) => { const o = camera.position, P = group.position, nx = Math.sin(yaw), nz = Math.cos(yaw), dx = pt[0] - o.x, dy = pt[1] - o.y, dz = pt[2] - o.z, den = dx * nx + dz * nz; if (Math.abs(den) < 1e-6) return null;
     const s = ((P.x - o.x) * nx + (P.z - o.z) * nz) / den, hx = o.x + dx * s, hy = o.y + dy * s, hz = o.z + dz * s, lx = (hx - P.x) * Math.cos(yaw) - (hz - P.z) * Math.sin(yaw);

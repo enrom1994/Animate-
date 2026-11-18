@@ -68,11 +68,12 @@ const quadScene = new THREE.Scene(), quadCam = new THREE.OrthographicCamera(-1, 
 quadScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), ink));
 
 const capEl = document.getElementById('cap'), built = new Map();
+let LAST = null;   // the shot drawn last, for the checker
 const getShot = i => { if (!built.has(i)) built.set(i, SHOTS[i].build()); return built.get(i); };
 window.DURATION = DURATION;
 window.renderAt = t => {
   const tr = toRef(t); let idx = SHOTS.findIndex(s => tr >= s.start && tr < s.end); if (idx < 0) idx = SHOTS.length - 1;
-  const shot = getShot(idx), r = shot.update(tr - SHOTS[idx].start, tr) || {}, cam = shot.camera, scene = shot.scene;
+  const shot = getShot(idx), r = shot.update(tr - SHOTS[idx].start, tr) || {}, cam = shot.camera, scene = shot.scene; LAST = { scene, cam, idx, r };
   cam.aspect = W / H; cam.setViewOffset(W, H, 0, 55, W, H);   // the whole picture sits a little high: the bottom fifth of a Short is under the player's own text
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.setRenderTarget(rtColor); renderer.render(scene, cam);
@@ -96,3 +97,26 @@ window.renderAt = t => {
 const qs = new URLSearchParams(location.search);
 window.ready = document.fonts.load("800 54px Cap").then(() => true);
 if (qs.has('t')) window.ready.then(() => window.renderAt(parseFloat(qs.get('t'))));
+
+// ---- the checker: window.audit(t) draws frame t, then looks for the mistakes we have shipped before (REGRESSIONS.md 17, 19, 20, and the framing rules) ----
+const SOLID = new Set(['BoxGeometry', 'CylinderGeometry', 'SphereGeometry', 'IcosahedronGeometry', 'ConeGeometry', 'LatheGeometry', 'TorusGeometry']);
+const shown = o => { for (let p = o; p; p = p.parent) if (!p.visible) return false; return true; };
+const label = o => { const p = o.geometry.parameters || {}, b = new THREE.Box3().setFromObject(o), s = b.getSize(new THREE.Vector3()); return `${o.geometry.type.replace('Geometry', '')} ${s.x.toFixed(2)}x${s.y.toFixed(2)}x${s.z.toFixed(2)} at (${b.getCenter(new THREE.Vector3()).toArray().map(v => v.toFixed(1)).join(', ')})`; };
+window.audit = t => {
+  window.renderAt(t); const { scene, cam, idx } = LAST, out = [], solids = [], surfaces = [], chars = [];
+  scene.updateMatrixWorld(true);
+  scene.traverse(o => { if (o.userData && o.userData.char && shown(o)) chars.push(o); if (!o.isMesh || !shown(o) || o.userData.card || o.userData.noInk) return; const m = o.material; if (m && (m.transparent && m.opacity < .9)) return;
+    surfaces.push(o); if (SOLID.has(o.geometry.type)) { const b = new THREE.Box3().setFromObject(o), s = b.getSize(new THREE.Vector3()); if (Math.min(s.x, s.y, s.z) > .12) solids.push([o, b]); } });
+  const inside = (p, shrink = .02) => solids.find(([o, b]) => b.clone().expandByScalar(-shrink).containsPoint(p));
+  const ci = inside(cam.position); if (ci) out.push(['error', 'camera inside a solid: ' + label(ci[0])]);
+  const ray = new THREE.Raycaster();
+  for (const g of chars) { if (g.children[0].rotation.z !== 0) continue; const P = g.position, hH = g.userData.hH, name = g.userData.char;
+    ray.set(new THREE.Vector3(P.x, P.y + .3, P.z), new THREE.Vector3(0, -1, 0)); ray.far = 3; const hit = ray.intersectObjects(surfaces, false)[0], gy = hit ? hit.point.y : 0, d = P.y - gy;
+    if (Math.abs(d) > .06) out.push([Math.abs(d) > .15 ? 'error' : 'warn', `${name}'s feet ${d > 0 ? 'float' : 'sink'} ${Math.abs(d).toFixed(2)} m ${d > 0 ? 'above' : 'into'} ${hit ? label(hit.object) : 'the ground'}`]);
+    for (const h of [.5, 1.0]) { const s = inside(new THREE.Vector3(P.x, P.y + h * hH / 1.96, P.z), .04); if (s) { out.push(['error', `${name}'s body is inside ${label(s[0])}`]); break; } }
+    const head = new THREE.Vector3(P.x, P.y + .615 * hH, P.z).project(cam), feet = new THREE.Vector3(P.x, P.y, P.z).project(cam);
+    if (head.z < 1) { if (Math.abs(head.x) > 1 && Math.abs(feet.x) < 1.15) out.push(['warn', `${name}'s face is out of frame`]); else if (Math.abs(head.x) > .9 && Math.abs(head.x) <= 1) out.push(['warn', `${name}'s face is at the frame edge`]);
+      if (head.y < -.4 && head.y > -.62 && Math.abs(head.x) < .75) out.push(['warn', `${name}'s face is under the captions`]); } }
+  return { shot: idx, issues: out };
+};
+window.SHOTCOUNT = SHOTS.length;

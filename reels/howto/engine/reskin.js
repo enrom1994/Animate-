@@ -22,7 +22,7 @@ export function reskin(root, map, { keep = () => false, special = () => null } =
     const m = o.material; if (m.isMeshStandardMaterial || m.transparent || o.userData.noInk) return;
     const sp = special(o); if (sp) { o.material = sp; o.receiveShadow = true; return; }   // a surface picked out by size or place (a floor, a painted wall)
     const hex = m.color ? m.color.getHex() : null, spec = map[hex];
-    if (m.map && !spec) return;                                                    // a painted board: its picture stays
+    if (m.map && !spec) { if (m.isMeshBasicMaterial && !o.userData.keepFlat) { o.material = new THREE.MeshStandardMaterial({ map: m.map, roughness: .6, side: m.side }); o.receiveShadow = true; } return; }   // a painted board keeps its picture but takes the room's light, so it never glows flat white
     let nm;
     if (spec) nm = typeof spec === 'function' ? spec(o) : spec;
     else if (hex != null) { const c = new THREE.Color(hex); c.offsetHSL(0, -.12, -.03); nm = new THREE.MeshStandardMaterial({ color: c, roughness: .7 }); }
