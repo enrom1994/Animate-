@@ -36,6 +36,8 @@ export function makeWorld() {
   X.add(card(1.6, 1.6, (g, w, h) => { const stroke = (x0, y0, x1, y1) => { g.lineCap = 'round'; g.strokeStyle = '#2e1d1c'; g.lineWidth = w * .2; g.beginPath(); g.moveTo(x0 * w, y0 * h); g.quadraticCurveTo(w * .52, h * .48, x1 * w, y1 * h); g.stroke();
       g.strokeStyle = '#c9302a'; g.lineWidth = w * .15; g.stroke(); g.strokeStyle = 'rgba(255,190,160,.35)'; g.lineWidth = w * .035; g.beginPath(); g.moveTo(x0 * w + w * .03, y0 * h - h * .02); g.quadraticCurveTo(w * .54, h * .45, x1 * w + w * .02, y1 * h - h * .03); g.stroke(); };
     stroke(.14, .16, .86, .84); stroke(.86, .14, .16, .86); }, 300));
+  // drawn over the picture, never through it: the mark sits beside what it crosses out, like paint on the lens
+  for (const m of [X.children[0].material, X.children[0].userData.nmat]) { m.depthTest = false; m.depthWrite = false; } X.children[0].renderOrder = 20;
   const lines = Array.from({ length: 10 }, () => { const l = smellLine(); scene.add(l); return l; }), sp = spark(); scene.add(sp);
   // things Sam reaches for and does not use: a matchbox and a candle, a kettle, a phone held low
   const candle = new THREE.Group(); candle.add(cyl(.06, .06, .3, 0xfff7e8, [0, .15, 0], 12), cyl(.01, .01, .05, 0x1d1a26, [0, .32, 0], 6), cyl(.12, .12, .03, 0xc9ccd4, [0, .015, 0], 16)); scene.add(candle);
@@ -81,7 +83,10 @@ export function makeWorld() {
     for (let i = 0; i < 9; i++) { const x = 4.4 + i * .42, y = .22 * (i + 1); H.add(slab(.48, .045, 1.06, oak, 1, [x + .02, y + .02, -1.0]));
       H.add(part(new THREE.CylinderGeometry(.02, .025, .82, 8), mat(cream, [1, 1]), [x, y + .45, -.52])); }
     const len = Math.hypot(3.78, 1.98), sb = slab(len, .32, .05, cream, 1, [6.08, 1.0, -.47]); sb.rotation.z = Math.atan2(1.98, 3.78); H.add(sb);
-    H.add(slab(.12, 1.1, .12, oak, 1, [4.25, .55, -.52]), part(new THREE.SphereGeometry(.08, 12, 8), mat(oak, [1, 1]), [4.25, 1.15, -.52])); }
+    H.add(slab(.12, 1.2, .12, oak, 1, [4.25, .6, -.52]), part(new THREE.SphereGeometry(.08, 12, 8), mat(oak, [1, 1]), [4.25, 1.25, -.52]));
+    // the handrail rides on the spindle tops (tread + 0.86 m) from the newel post to the landing; the old rail ran through their middles
+    byGeo(H, p => p.width === 3.9 && p.height === .06).forEach(o => o.parent.remove(o));
+    { const x0 = 4.25, x1 = 7.97, y = x => .22 + (x - 4.4) * .524 + .88, rl = Math.hypot(x1 - x0, y(x1) - y(x0)), rail = slab(rl, .07, .09, oak, 1, [(x0 + x1) / 2, (y(x0) + y(x1)) / 2, -.52]); rail.rotation.z = Math.atan2(y(x1) - y(x0), x1 - x0); H.add(rail); } }
   // the hall lamp: a pleated fabric shade, lit from inside, on a brass stem
   { const L = H.children.find(o => o.isGroup && Math.abs(o.position.x - 7.4) < .01 && Math.abs(o.position.z - .1) < .01);
     if (L) { L.children.filter(o => o.geometry && o.geometry.type === 'ConeGeometry').forEach(o => L.remove(o));
@@ -97,7 +102,7 @@ export function makeWorld() {
       for (const [ww, hh, x, y] of [[1.16, .08, 0, .44], [1.16, .08, 0, -.44], [.08, .88, -.54, 0], [.08, .88, .54, 0], [.04, .8, 0, 0], [1.0, .04, 0, .1]]) W0.add(slab(ww, hh, .07, cream, 1, [x, y, .02]));
       W0.add(slab(1.24, .05, .16, cream, 1, [0, -.5, .07])); }); }
   // the trees: leafy clusters, not a ball on a stick
-  { const tr = rng(19); byGeo(S, p => p.radius > 1).forEach(o => { const G2 = new THREE.Group(); G2.position.copy(o.position); const R = o.geometry.parameters.radius;
+  { const tr = rng(19); byGeo(S, (p, o) => o.geometry.type === 'SphereGeometry' && p.radius > 1).forEach(o => { const G2 = new THREE.Group(); G2.position.copy(o.position); const R = o.geometry.parameters.radius;
       G2.position.y += R * .35; G2.add(part(new THREE.CylinderGeometry(R * .09, R * .13, R * 1.3, 8), new THREE.MeshStandardMaterial({ color: 0x5a4030, roughness: .9 }), [0, -R * .75, 0]));
       for (let i = 0; i < 12; i++) G2.add(part(new THREE.IcosahedronGeometry(R * (.3 + tr() * .16), 2), new THREE.MeshStandardMaterial({ color: [0x6e9a50, 0x7aa85a, 0x5f8a48][i % 3], roughness: .9 }), [(tr() - .5) * R * .9, (tr() - .2) * R * .55, (tr() - .5) * R * .9]));
       o.parent.add(G2); o.parent.remove(o); }); }
