@@ -90,9 +90,17 @@ export function richStage({ sky = skyTex(), sun = [6, 9, 5], key = 2.6, fill = 1
 
 // a sash window with a stone sill and lintel, glass that catches the sky, and louvred shutters either side
 export function windowUnit(w, h, frameTex, shutter = '#3f6b55') { const G = new THREE.Group(), f = mat(frameTex, [1, 1]), stone = stoneTex('#d9cdb5', { n: 2 });
-  const glass = new THREE.MeshStandardMaterial({ color: 0x2e3f52, roughness: .15, metalness: .5 }); G.add(slab(w, h, .02, glass, 1, [0, 0, -.06]));
+  G.add(slab(w, h, .02, glassMat(), 1, [0, 0, -.03]));
   for (const [ww, hh, x, y] of [[w + .24, .12, 0, h / 2 + .06], [w + .24, .12, 0, -h / 2 - .06], [.12, h, -w / 2 - .06, 0], [.12, h, w / 2 + .06, 0], [.06, h, 0, 0], [w, .06, 0, h * .12]]) G.add(slab(ww, hh, .12, f, 1, [x, y, 0]));
   G.add(slab(w + .4, .12, .28, stone, 1, [0, -h / 2 - .12, .06]), slab(w + .3, .14, .12, stone, 1, [0, h / 2 + .15, .02]));
   const sh = paintTex(shutter, { seed: 7 }), dark = new THREE.Color(shutter).multiplyScalar(.75).getHex();
   for (const s of [-1, 1]) { G.add(slab(w * .5, h, .03, sh, 1, [s * (w * .75 + .12), 0, .02])); for (let k = 0; k < 7; k++) G.add(slab(w * .46, .015, .03, solid(dark), 1, [s * (w * .75 + .12), -h / 2 + (k + .5) * h / 7, .04])); }
   return G; }
+
+// window glass you can read as glass at phone size: deep blue-grey, the sky caught in a pale diagonal streak, a curtain edge inside
+let GLASS = null;
+export function glassMat() { if (GLASS) return GLASS; const c = document.createElement('canvas'); c.width = 128; c.height = 128; const g = c.getContext('2d');
+  const gr = g.createLinearGradient(0, 0, 0, 128); gr.addColorStop(0, '#5f7f99'); gr.addColorStop(1, '#2b3b4c'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128);
+  g.fillStyle = 'rgba(214,232,245,.45)'; g.beginPath(); g.moveTo(20, 0); g.lineTo(52, 0); g.lineTo(12, 128); g.lineTo(-20, 128); g.fill(); g.fillStyle = 'rgba(214,232,245,.25)'; g.beginPath(); g.moveTo(64, 0); g.lineTo(74, 0); g.lineTo(34, 128); g.lineTo(24, 128); g.fill();
+  g.fillStyle = 'rgba(232,214,176,.55)'; g.fillRect(104, 0, 24, 128);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; GLASS = new THREE.MeshStandardMaterial({ map: t, roughness: .2, metalness: .2, emissive: 0x1a2430, emissiveIntensity: .3 }); return GLASS; }
