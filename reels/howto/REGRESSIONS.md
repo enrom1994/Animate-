@@ -22,3 +22,6 @@ Every fault reported on a film stays here and is checked on every later one (`ST
 | 16 | gasleak | The emergency van was a plain box. | Every vehicle has its parts: glass, wheels with hubs, lights, bumpers, and its livery. |
 | 17 | gasleak | Standing on the pavement hid the feet. | Characters stand on the surface height of whatever they are on (pavement, path, step, road). |
 | 18 | gasleak | A reaching hand or arm was cut off. | The character card is wide enough for a full reach; check every reach shot full size for a whole hand. |
+| 19 | gasleak remake | The street camera stood inside the house across the road: walls vanished (they only draw from outside) and its windows, door and roof floated round the lens. | No camera is ever inside a solid. For every shot, check the camera's path against every building's footprint, and keep it at least 2 m clear of a facade unless the shot is about that facade. |
+| 20 | gasleak remake | Someone coming down the stairs walked just in front of them, outside the rail. | A character on stairs walks on the treads: inside the stair's width, behind its rail, feet at the tread height. |
+| 21 | gasleak remake | An opening door showed a brown slab, not a room. | Every door that opens shows a real space behind it (a lit hall, a room, the street), built as geometry with a hole in the wall, never a painted slab. |
