@@ -17,9 +17,9 @@ const streetY = (x, z) => (Math.abs(x - OX) < .65 && z > 0 && z < 3.3) ? .055 : 
 const out_ = (w, name, x, z, pose) => w.act(name, x, z, pose, false, streetY(x, z));
 
 // 1  "If your home smells like rotten eggs," : in the hall, the smell drifting out of the kitchen
-shot(0, 1.95, (lt, t, u, w) => { const k = io(u), x = lerp(6.6, 5.2, k), pinch = pr(lt, .9, 1.2);
-  w.cam([lerp(6.2, 5.6, k), lerp(1.7, 1.6, k), lerp(5.6, 4.9, k)], [lerp(5.4, 4.6, k), 1.3, 1.4], 44);
-  w.act('sam', x, 1.9, pinch > 0 ? nose({ view: 'q', face: -1, eyes: [-.6, .2] }) : walkTo(t, [2, 1.9], { mouth: 'smile', blink: blinkAt(t) }));
+shot(0, 1.95, (lt, t, u, w) => { const k = io(u), x = lerp(5.75, 5.2, k), pinch = pr(lt, .7, 1.0), sniff = pr(lt, 0, .7);
+  w.cam([lerp(6.4, 5.8, k), lerp(1.6, 1.55, k), lerp(5.4, 4.8, k)], [x - .35, 1.25, lerp(1.9, 1.7, k)], 44);
+  w.act('sam', x, 1.95, pinch > 0 ? nose({ view: 'q', face: -1, eyes: [-.6, .2] }) : walkTo(t, [2, 1.95], { view: 'q', face: -1, mouth: 'o', brow: .4 + .2 * Math.sin(sniff * 9), eyes: [-.6, -.3], blink: blinkAt(t) }));   // in frame from the first frame, already sniffing
   w.smell(t, DOOR_IN, .7, 1.4, 1.5); return { focus: 3.6, blur: .5 }; });
 // 2  "do not flip a light switch." : a hand on its way to the switch, and the cross
 shot(1.95, 3.7, (lt, t, u, w) => { const r = anti(pr(lt, .05, .55));

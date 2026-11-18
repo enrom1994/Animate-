@@ -104,3 +104,22 @@ export function glassMat() { if (GLASS) return GLASS; const c = document.createE
   g.fillStyle = 'rgba(214,232,245,.45)'; g.beginPath(); g.moveTo(20, 0); g.lineTo(52, 0); g.lineTo(12, 128); g.lineTo(-20, 128); g.fill(); g.fillStyle = 'rgba(214,232,245,.25)'; g.beginPath(); g.moveTo(64, 0); g.lineTo(74, 0); g.lineTo(34, 128); g.lineTo(24, 128); g.fill();
   g.fillStyle = 'rgba(232,214,176,.55)'; g.fillRect(104, 0, 24, 128);
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; GLASS = new THREE.MeshStandardMaterial({ map: t, roughness: .2, metalness: .2, emissive: 0x1a2430, emissiveIntensity: .3 }); return GLASS; }
+// asphalt: dark grey, a fine speckle of stone, worn patches and a few tar seams
+export function asphaltTex(base = '#55534f', { seed = 12 } = {}) {
+  return paint(`asphalt${base}${seed}`, 1024, 1024, (g, b, w, h) => { const r = rng(seed * 29 + 3); g.fillStyle = base; g.fillRect(0, 0, w, h);
+    mottle(g, w, h, r, 'rgba(120,115,105,A)', 120, .1, .15); mottle(g, w, h, r, 'rgba(20,20,20,A)', 90, .1, .12);
+    for (let i = 0; i < 26000; i++) { const v = r() < .5 ? 40 + r() * 30 : 130 + r() * 60; g.fillStyle = `rgba(${v},${v - 4},${v - 10},.55)`; g.fillRect(r() * w, r() * h, 2, 2); b.fillStyle = `rgb(${100 + r() * 60},${100 + r() * 60},${100 + r() * 60})`; b.fillRect(r() * w, r() * h, 2, 2); }
+    for (let k = 0; k < 4; k++) { let x = r() * w, y = 0; g.strokeStyle = 'rgba(15,15,15,.6)'; g.lineWidth = 3 + r() * 3; g.beginPath(); g.moveTo(x, y); while (y < h) { x += (r() - .5) * 30; y += 30; g.lineTo(x, y); } g.stroke(); } });
+}
+// wallpaper: soft vertical stripes with a small leaf in every other band
+export function wallpaperTex(a = '#efe2c2', b2 = '#d9cba3', { seed = 3 } = {}) {
+  return paint(`paper${a}${b2}${seed}`, 512, 512, (g, b, w, h) => { const r = rng(seed * 41 + 9), n = 8, sw = w / n;
+    for (let i = 0; i < n; i++) { g.fillStyle = i % 2 ? b2 : a; g.fillRect(i * sw, 0, sw + 1, h); if (i % 2 === 0) for (let j = 0; j < 4; j++) { const x = i * sw + sw / 2, y = (j + .5) * h / 4; g.fillStyle = 'rgba(110,130,90,.45)'; g.beginPath(); g.ellipse(x - 5, y, 5, 11, -.5, 0, 7); g.ellipse(x + 5, y + 4, 5, 11, .5, 0, 7); g.fill(); } }
+    mottle(g, w, h, r, 'rgba(120,90,60,A)', 80, .04, .12); });
+}
+// a coir door mat: rough brown fibre in rows, a darker border
+export function coirTex() {
+  return paint('coir', 512, 320, (g, b, w, h) => { const r = rng(77); g.fillStyle = '#8a6a42'; g.fillRect(0, 0, w, h);
+    for (let i = 0; i < 9000; i++) { g.strokeStyle = `rgba(${r() < .5 ? '60,40,20' : '190,150,100'},.35)`; g.lineWidth = 1.5; const x = r() * w, y = r() * h; g.beginPath(); g.moveTo(x, y); g.lineTo(x + (r() - .5) * 6, y + 6); g.stroke(); }
+    g.strokeStyle = '#4a3420'; g.lineWidth = 26; g.strokeRect(13, 13, w - 26, h - 26); });
+}
