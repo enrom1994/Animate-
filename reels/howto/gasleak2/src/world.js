@@ -1,9 +1,9 @@
 // The world of "Smell gas at home": kitchen, hallway and street, Sam, the friend and a gas worker, and the props a shot can switch on.
 import * as THREE from 'three';
-import { stage, box, cyl, ball, toon, clamp, lerp } from '../../engine/toon.js';
+import { stage, box, cyl, ball, toon, clamp, lerp, canvasTex } from '../../engine/toon.js';
 import { worldKit } from '../../engine/film.js';
 import { makeChar, LOOKS } from '../../engine/char.js';
-import { richStage, skyTex, windowUnit, woodTex, brickTex, plasterTex, tileTex, paintTex, stoneTex, mat } from '../../engine/rich.js';
+import { richStage, skyTex, windowUnit, part, woodTex, brickTex, plasterTex, tileTex, paintTex, stoneTex, mat } from '../../engine/rich.js';
 import { reskin, tex, lit, metreUV } from '../../engine/reskin.js';
 // the storybook finish on everyone: a warm medium line, a light and a shadow side, a fine grain
 for (const k of ['sam', 'friend', 'gasworker', 'neighbour']) Object.assign(LOOKS[k], { ink: '#2e1d1c', lw: .8, finish: true });
@@ -42,6 +42,20 @@ export function makeWorld() {
   // the houses' windows: the flat painted cards become real windows, frame, sill, glass and shutters
   { const cards = []; S.traverse(o => { const p = o.geometry && o.geometry.parameters; if (o.isMesh && o.material.map && p && p.width === 1.0 && p.height === .9) cards.push(o); });
     const frame = paintTex('#efe6d2', { seed: 1 }); cards.forEach((c, i) => { const u = windowUnit(.78, .78, frame, ['#3f6b55', '#2f5a6e', '#7a3a32'][i % 3]); u.position.copy(c.position); u.position.z += .03; u.rotation.copy(c.rotation); c.parent.add(u); c.parent.remove(c); }); }
+  // our house gets a real doorway: the solid block is rebuilt round a hallway you see into when the front door opens
+  { const H = S.getObjectByName('ours'), drop = H.children.filter(o => { const p = o.geometry && o.geometry.parameters; return o.isMesh && p && ((p.width === 7 && p.height === 4.2) || (p.width === 1.3 && p.height === 2.3)); }); drop.forEach(o => H.remove(o));
+    const brick = brickTex('#a8543a', { seed: 5 }), wall = (w, h, d, x, y, z) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d)); m.position.set(x, y, z); m.material = tex(brick, .5)(m); m.castShadow = m.receiveShadow = true; H.add(m); };
+    wall(2.95, 4.2, .25, -2.025, 2.1, -.125); wall(2.95, 4.2, .25, 2.025, 2.1, -.125); wall(1.1, 2.05, .25, 0, 3.175, -.125);   // the front wall round the door hole (x -0.55 to 0.55, up to 2.15)
+    wall(7, 4.2, 2.75, 0, 2.1, -3.625); wall(2.3, 4.2, 2.25, -2.35, 2.1, -1.375); wall(2.3, 4.2, 2.25, 2.35, 2.1, -1.375); wall(2.4, 1.6, 2.25, 0, 3.4, -1.375);   // the body, round a hall 2.4 wide and 2 deep
+    const plaster = plasterTex('#e3d6b0', { seed: 6 }), floor = woodTex('#9a6a3f', { planks: 5, seed: 7 }), inner = (w, h, d, x, y, z, t, rpm) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d)); m.position.set(x, y, z); m.material = tex(t, rpm)(m); m.receiveShadow = true; H.add(m); return m; };
+    inner(2.4, .04, 2.0, 0, .02, -1.25, floor, .8); inner(.04, 2.6, 2.0, -1.18, 1.3, -1.25, plaster, .4); inner(.04, 2.6, 2.0, 1.18, 1.3, -1.25, plaster, .4); inner(2.4, 2.6, .04, 0, 1.3, -2.23, plaster, .4); inner(2.4, .04, 2.0, 0, 2.58, -1.25, plaster, .4);
+    inner(.7, .01, 1.6, 0, .045, -1.25, tileTex('#a8493a', '#d9b16a', { n: 6, seed: 3, grout: '#5a2d22' }), 1);   // a runner
+    const wood = woodTex('#6e4326', { planks: 2, seed: 9 }); inner(.7, .05, .32, -.7, .8, -2.02, wood, 1); for (const x of [-1.0, -.4]) inner(.04, .78, .04, x, .39, -1.9, wood, 1);   // a side table
+    H.add(part(new THREE.CylinderGeometry(.08, .1, .25, 12), lit(0xb8653f)(), [-.7, .95, -2.02]), part(new THREE.ConeGeometry(.17, .18, 16, 1, true), new THREE.MeshStandardMaterial({ color: 0xf2e6c8, emissive: 0xffd58a, emissiveIntensity: .5, side: THREE.DoubleSide }), [-.7, 1.17, -2.02]));
+    const pic = new THREE.Mesh(new THREE.PlaneGeometry(.5, .38), new THREE.MeshStandardMaterial({ map: canvasTex(200, 150, (g, w, h) => { g.fillStyle = '#6b4a2e'; g.fillRect(0, 0, w, h); g.fillStyle = '#9fb7a0'; g.fillRect(w * .1, h * .12, w * .8, h * .76); g.fillStyle = '#e7a54a'; g.beginPath(); g.arc(w * .65, h * .38, h * .12, 0, 7); g.fill(); }) })); pic.position.set(.4, 1.6, -2.2); H.add(pic);
+    for (let i = 0; i < 3; i++) H.add(part(new THREE.CylinderGeometry(.012, .012, .1, 6), lit(0xc9a24a, { metalness: .8, roughness: .35 })(), [1.15, 1.75, -.7 - i * .3])), H.children.at(-1).rotation.z = Math.PI / 2;
+    H.add(part(new THREE.CylinderGeometry(.12, .2, .8, 12), lit(0x2f5a6e, { roughness: .9 })(), [1.08, 1.32, -1.0]));   // a coat on a hook
+    const glow = new THREE.PointLight(0xffc98a, 2.2, 4, 1.5); glow.position.set(0, 2.2, -1.4); H.add(glow); }
   const props = { X, sp, candle, matches, van }; lines.forEach((l, i) => props['line' + i] = l);
   // the sun follows the camera: its shadow box is centred where the shot looks, indoors or out
   const key = scene.userData.key, SUN = [3, 7, 4.5];

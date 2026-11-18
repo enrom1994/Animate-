@@ -35,13 +35,13 @@ export function street() { const G = new THREE.Group(); G.position.set(...OUT);
     { const r = new THREE.Mesh(new THREE.ConeGeometry(5.4, 2.2, 4), toon(roof)); r.rotation.y = Math.PI / 4; r.position.set(0, 5.3, -2.5); r.scale.z = .75; r.castShadow = true; H.add(r); }
     for (const [wx, wy] of [[-2.2, 1.4], [2.2, 1.4], [-2.2, 3.2], [2.2, 3.2], [0, 3.2]]) { const w = board(1.0, .9, (g, ww, hh) => { g.fillStyle = '#ffe9a6'; g.fillRect(0, 0, ww, hh); g.strokeStyle = INK; g.lineWidth = ww * .08; g.strokeRect(0, 0, ww, hh); g.beginPath(); g.moveTo(ww / 2, 0); g.lineTo(ww / 2, hh); g.moveTo(0, hh / 2); g.lineTo(ww, hh / 2); g.stroke(); }); w.position.set(wx, wy, .01); H.add(w); }
     H.add(box(1.3, 2.3, .1, 0x8a5a2e, [0, 1.15, .02])); return H; };
-  const ours = house(0, 0, 0xf2e3c4, 0xc9523f); G.add(ours); G.add(house(-1, 15.5, 0xbfe3d8, 0x5a6f8a, Math.PI), house(12, 15.5, 0xf3c9b5, 0x8a5a2e, Math.PI), house(-12.5, 0, 0xe6dcc0, 0x7a5a9a));
+  const ours = house(0, 0, 0xf2e3c4, 0xc9523f); ours.name = 'ours'; G.add(ours); G.add(house(-1, 21.5, 0xbfe3d8, 0x5a6f8a, Math.PI), house(12, 21.5, 0xf3c9b5, 0x8a5a2e, Math.PI), house(-12.5, 0, 0xe6dcc0, 0x7a5a9a));
   // our front door: a real door that swings out, and the doorbell button beside it
   const door = new THREE.Group(); door.position.set(-.48, 0, .12); door.add(box(.96, 2.08, .07, 0x3f86c9, [.48, 1.04, 0]), ball(.05, 0xffd23f, [.84, 1.0, .06])); G.add(door);
   G.add(box(.16, .22, .05, 0xfff7e8, [.95, 1.12, .04]), cyl(.04, .04, .03, 0xffd23f, [.95, 1.12, .08], 12).rotateX(Math.PI / 2));
   G.add(box(4.5, .7, .25, 0x8a5a2e, [-3.4, .35, 3.3]), box(4.5, .7, .25, 0x8a5a2e, [3.4, .35, 3.3]));   // low front fence with a gap for the path
   for (const x of [-9, 9]) { G.add(cyl(.08, .1, 4, 0x55525f, [x, 2, 9.9], 8), box(.6, .25, .25, 0x55525f, [x + .25, 4, 9.9])); }
-  for (const [x, z, s] of [[-6, -1, 1.3], [6.5, -.5, 1.1], [16, 13, 1.4]]) G.add(cyl(.15, .2, 1.6 * s, 0x7a5230, [x, .8 * s, z], 8), ball(1.1 * s, 0x3f9a58, [x, 2.2 * s, z]));
+  for (const [x, z, s] of [[-6, -1, 1.3], [6.5, -.5, 1.1], [16, 15, 1.4]]) G.add(cyl(.15, .2, 1.6 * s, 0x7a5230, [x, .8 * s, z], 8), ball(1.1 * s, 0x3f9a58, [x, 2.2 * s, z]));
   G.userData = { door }; return G; }
 // gas you can see: a cartoon stink cue, three thin wavy strokes rising side by side over a soft pale haze. See-through, so it can fade.
 export function smellLine() { const tex = canvasTex(260, 420, (g, w, h) => {

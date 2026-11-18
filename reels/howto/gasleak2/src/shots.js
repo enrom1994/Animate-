@@ -75,7 +75,7 @@ shot(15.85, 18.0, (lt, t, u, w) => { const x = lerp(1.3, .45, io(pr(lt, 0, 1.6))
 shot(18.0, 19.95, (lt, t, u, w) => { const d = io(pr(lt, .4, 1.85)), fx = lerp(7.5, 4.3, d);
   w.cam([lerp(4.4, 4.8, io(u)), lerp(1.9, 1.7, u), lerp(5.4, 5.0, io(u))], [lerp(5.9, 4.9, io(u)), lerp(1.7, 1.1, io(u)), -.4], 48);
   w.act('sam', 4.9, 1.5, { view: 'q', face: 1, armL: [-.3, .2], armR: [2.6 + .3 * Math.sin(t * 12), .4], mouth: 'shout', brow: .7, eyes: [.6, -.7] });
-  w.act('friend', fx, -.42, d > 0 && d < 1 ? walkTo(t, [3, -.42], { mouth: 'o', brow: .6, eyes: [-.3, .2] }) : { view: 'q', face: -1, armL: [-.3, .2], armR: [.3, -.2], mouth: 'o', brow: .6 }, false, stairY(fx));
+  w.act('friend', fx, -1.0, d > 0 && d < 1 ? walkTo(t, [3, -.42], { mouth: 'o', brow: .6, eyes: [-.3, .2] }) : { view: 'q', face: -1, armL: [-.3, .2], armR: [.3, -.2], mouth: 'o', brow: .6 }, false, stairY(fx));
   w.smell(t, DOOR_IN, .7, 1.6, 1.4); return { focus: 3.6, blur: .4 }; });
 // 13 out of the front door : it swings open and they run down the path
 shot(19.95, 21.3, (lt, t, u, w) => { const op = out(pr(lt, 0, .3)), k = pr(lt, .15, 1.35);
