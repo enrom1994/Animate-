@@ -2,6 +2,8 @@
 
 Every fault reported on a film stays here and is checked on every later one (`STYLE.md` rule 14). Add a row; never remove one.
 
+Checks marked **auto** are run by `engine/check.mjs` before every full render (0 errors required): 6 (passing through), 14 (commented-out code), 17 (feet on the surface), 19 (camera inside a solid), 20 (on the treads), 23 (stepped by distance). 22, 24 and 25 are built into `engine/storybook.js`, so a film that uses it cannot repeat them. The rest are judged on the stills.
+
 | # | Reported on | The fault | The check on every film |
 |---|---|---|---|
 | 1 | ripcurrent | The video was too short (30 s). | 35 to 45 s; if the voiced script is shorter, add sourced content. |
