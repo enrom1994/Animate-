@@ -30,6 +30,7 @@ export const PALETTE = {
   0x8a5a2e: tex(woodTex('#6e4326', { planks: 3, seed: 5 }), 1), 0xb07a45: tex(woodTex('#9a6a3f', { planks: 3, seed: 7 }), 1),
   0xc9ccd4: METAL, 0x55525f: IRON, 0x2a2733: IRON, 0x1d1a26: IRON, 0xffd23f: BRASS, 0x3f86c9: tex(paintTex('#2f5a6e', { seed: 4 }), 1),
   0x6cbf62: tex(paintTex('#6e9a50', { seed: 9 }), .3), 0x6b6f7d: tex(asphaltTex(), .25), 0xd8c79a: tex(stoneTex('#cdbf9c', { n: 6, seed: 3, cobble: true }), 1.2),
+  0xf2e3c4: tex(brickTex('#a8543a', { seed: 5 }), .5), 0xbfe3d8: tex(plasterTex('#d7c9a0', { seed: 2, grime: .7 }), .4), 0xf3c9b5: tex(brickTex('#8a4a36', { seed: 11 }), .5), 0xe6dcc0: tex(plasterTex('#e2b97a', { seed: 8, grime: .7 }), .4),
   0xc9523f: lit(0xa8483a), 0x5a6f8a: lit(0x4f5f6e), 0x7a5a9a: lit(0x6a4a3e), 0x7a5230: lit(0x5a4030, { roughness: .9 }), 0x3f9a58: lit(0x5f8a48, { roughness: .9 }),
 };
 // the kitchen shared by the films: warm tiles for the checker floor, plaster for the painted back wall
@@ -54,13 +55,24 @@ export function kitchenWindow(K) { const cream = paintTex('#efe6d2', { seed: 1 }
     W0.add(slab(1.24, .05, .16, cream, 1, [0, -.5, .07])); }); }
 // the flat painted window cards on house fronts become real windows, set out from the wall so the glass shows (REGRESSIONS 22)
 export function houseWindows(root, w = 1.0, h = .9) { const frame = paintTex('#efe6d2', { seed: 1 }); let i = 0;
-  byGeo(root, 'PlaneGeometry', (p, o) => o.material.map && p.width === w && p.height === h).forEach(c => { const u = windowUnit(w * .78, h * .87, frame, ['#3f6b55', '#2f5a6e', '#7a3a32'][i++ % 3]); u.position.copy(c.position); u.position.z += .1; u.rotation.copy(c.rotation); c.parent.add(u); c.parent.remove(c); }); }
+  byGeo(root, 'PlaneGeometry', (p, o) => o.material.map && p.width === w && p.height === h).forEach(c => { const u = windowUnit(w * .78, h * .87, frame, ['#3f6b55', '#2f5a6e', '#7a3a32'][i++ % 3]); u.position.copy(c.position); u.position.addScaledVector(new THREE.Vector3(0, 0, 1).applyEuler(c.rotation), .1); u.rotation.copy(c.rotation);   /* out from the wall along the way the window faces, whichever way that is */ c.parent.add(u); c.parent.remove(c); }); }
 // a ball-on-a-stick tree top (a sphere bigger than 1 m, and ONLY a sphere: a roof is a cone) becomes a leafy canopy on a trunk
-export function leafyTrees(root, minR = 1) { const tr = rng(19);
-  byGeo(root, 'SphereGeometry', p => p.radius > minR).forEach(o => { const G2 = new THREE.Group(); G2.position.copy(o.position); const R = o.geometry.parameters.radius; G2.position.y += R * .35;
-    G2.add(part(new THREE.CylinderGeometry(R * .09, R * .13, R * 1.3, 8), new THREE.MeshStandardMaterial({ color: 0x5a4030, roughness: .9 }), [0, -R * .75, 0]));
+// only green balls between minR and maxR: a cloud or a far hedge is a sphere too
+export function leafyTrees(root, minR = 1, maxR = 2.5) { const tr = rng(19);
+  byGeo(root, 'SphereGeometry', (p, o) => { const c = o.material.color; return p.radius > minR && p.radius < maxR && c && c.g > c.r && c.g > c.b; }).forEach(o => { const G2 = new THREE.Group(); G2.position.copy(o.position); const R = o.geometry.parameters.radius; G2.position.y += R * .35;
+    const hasTrunk = o.parent.children.some(c => c.isMesh && c.geometry.type === 'CylinderGeometry' && Math.hypot(c.position.x - o.position.x, c.position.z - o.position.z) < R && c.position.y < o.position.y);   // a tree of several balls already stands on one trunk
+    if (!hasTrunk) G2.add(part(new THREE.CylinderGeometry(R * .09, R * .13, R * 1.3, 8), new THREE.MeshStandardMaterial({ color: 0x5a4030, roughness: .9 }), [0, -R * .75, 0]));
     const greens = (o.material.color && o.material.color.getHSL({}).l < .25) ? [0x3f5a3a, 0x4a6644, 0x354d33] : [0x6e9a50, 0x7aa85a, 0x5f8a48];
     for (let i = 0; i < 12; i++) G2.add(part(new THREE.IcosahedronGeometry(R * (.3 + tr() * .16), 2), new THREE.MeshStandardMaterial({ color: greens[i % 3], roughness: .9 }), [(tr() - .5) * R * .9, (tr() - .2) * R * .55, (tr() - .5) * R * .9]));
     o.parent.add(G2); o.parent.remove(o); }); }
 // apply the whole look to a built scene
 export function restyle(scene, extra = {}, special = () => null) { return reskin(scene, { ...PALETTE, ...extra }, { special }); }
+
+// a painted path (a flat decal) becomes a laid path: gravel and flags, with the decal's size and place
+export function pathFromDecal(root, w, h, color = '#a89a7e') { byGeo(root, 'PlaneGeometry', (p, o) => o.userData.noInk && p.width === w && p.height === h).forEach(o => {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w * .7, h), mat(stoneTex(color, { n: 4, seed: 8 }), [w * .7 / 1.2, h / 1.2])); m.rotation.copy(o.rotation); m.position.copy(o.position); m.position.y = .025; m.receiveShadow = true; o.parent.add(m); o.parent.remove(o); }); }
+// a painted pond becomes water: a dark glossy surface that catches the sky, edged with stones
+export function pondFromDecal(root, w, h, rx = .46, rz = .42) { byGeo(root, 'PlaneGeometry', (p, o) => o.userData.noInk && p.width === w && p.height === h).forEach(o => {
+    const g = new THREE.CircleGeometry(1, 48); const water = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color: 0x3d5a70, roughness: .08, metalness: .45, emissive: 0x1a2a38, emissiveIntensity: .4 })); water.rotation.x = -Math.PI / 2; water.scale.set(w * rx, h * rz, 1); water.position.copy(o.position); water.position.y = .03; o.parent.add(water);
+    const sr = rng(5); for (let i = 0; i < 34; i++) { const a = i / 34 * Math.PI * 2, st = part(new THREE.IcosahedronGeometry(.18 + sr() * .14, 0), new THREE.MeshStandardMaterial({ color: [0x8d8a80, 0x7a776e, 0x9a968a][i % 3], roughness: .9, flatShading: true }), [o.position.x + Math.cos(a) * w * rx, .06, o.position.z + Math.sin(a) * h * rz]); st.scale.y = .55; o.parent.add(st); }
+    o.parent.remove(o); }); }

@@ -106,12 +106,18 @@ window.audit = t => {
   window.renderAt(t); const { scene, cam, idx } = LAST, out = [], solids = [], surfaces = [], chars = [];
   scene.updateMatrixWorld(true);
   scene.traverse(o => { if (o.userData && o.userData.char && shown(o)) chars.push(o); if (!o.isMesh || !shown(o) || o.userData.card || o.userData.noInk) return; const m = o.material; if (m && (m.transparent && m.opacity < .9)) return;
-    surfaces.push(o); if (SOLID.has(o.geometry.type)) { const b = new THREE.Box3().setFromObject(o), s = b.getSize(new THREE.Vector3()); if (Math.min(s.x, s.y, s.z) > .12) solids.push([o, b]); } });
-  const inside = (p, shrink = .02) => solids.find(([o, b]) => b.clone().expandByScalar(-shrink).containsPoint(p));
+    surfaces.push(o); if (SOLID.has(o.geometry.type)) { if (!o.geometry.boundingBox) o.geometry.computeBoundingBox(); const lb = o.geometry.boundingBox, s = lb.getSize(new THREE.Vector3()).multiply(o.getWorldScale(new THREE.Vector3())); if (Math.min(s.x, s.y, s.z) > .12) solids.push([o, lb]); } });
+  // inside a solid, tested in the solid's own frame, so a turned house or car is not judged by the square box around it
+  const inside = (p, shrink = .02) => solids.find(([o, lb]) => { const q = o.worldToLocal(p.clone()), sc = o.getWorldScale(new THREE.Vector3()), b = lb.clone(); b.min.addScalar(shrink / Math.max(sc.x, 1e-3)); b.max.addScalar(-shrink / Math.max(sc.x, 1e-3)); if (!b.containsPoint(q)) return false;
+    const g = o.geometry.parameters || {}, r = Math.hypot(q.x, q.z), ty = o.geometry.type;   // round shapes by their real outline, not their box
+    if (ty === 'ConeGeometry') return r < g.radius * (.5 - q.y / g.height) - shrink;
+    if (ty === 'CylinderGeometry') return r < Math.max(g.radiusTop, g.radiusBottom) - shrink;
+    if (ty === 'SphereGeometry' || ty === 'IcosahedronGeometry') return q.length() < (g.radius || g.detail || 1) - shrink;
+    return true; });
   const ci = inside(cam.position); if (ci) out.push(['error', 'camera inside a solid: ' + label(ci[0])]);
   const ray = new THREE.Raycaster();
-  for (const g of chars) { if (g.children[0].rotation.z !== 0) continue; const P = g.position, hH = g.userData.hH, name = g.userData.char;
-    ray.set(new THREE.Vector3(P.x, P.y + .3, P.z), new THREE.Vector3(0, -1, 0)); ray.far = 3; const hit = ray.intersectObjects(surfaces, false)[0], gy = hit ? hit.point.y : 0, d = P.y - gy;
+  for (const g of chars) { const pose = g.userData.pose || {}; if (g.children[0].rotation.z !== 0 || pose.sit || pose.lie) continue;   /* lying down, or sitting in a seat: the feet and body rules do not apply */ const P = g.position, hH = g.userData.hH, name = g.userData.char;
+    ray.set(new THREE.Vector3(P.x, P.y + .3, P.z), new THREE.Vector3(0, -1, 0)); ray.far = 3; const hit = ray.intersectObjects(surfaces, false).find(h => h.face && h.face.normal.clone().transformDirection(h.object.matrixWorld).y > .2 || h.object.geometry.type === 'PlaneGeometry'), gy = hit ? hit.point.y : 0, d = P.y - gy;
     if (Math.abs(d) > .06) out.push([Math.abs(d) > .15 ? 'error' : 'warn', `${name}'s feet ${d > 0 ? 'float' : 'sink'} ${Math.abs(d).toFixed(2)} m ${d > 0 ? 'above' : 'into'} ${hit ? label(hit.object) : 'the ground'}`]);
     for (const h of [.5, 1.0]) { const s = inside(new THREE.Vector3(P.x, P.y + h * hH / 1.96, P.z), .04); if (s) { out.push(['error', `${name}'s body is inside ${label(s[0])}`]); break; } }
     const head = new THREE.Vector3(P.x, P.y + .615 * hH, P.z).project(cam), feet = new THREE.Vector3(P.x, P.y, P.z).project(cam);
@@ -120,3 +126,8 @@ window.audit = t => {
   return { shot: idx, issues: out };
 };
 window.SHOTCOUNT = SHOTS.length;
+
+// debugging aid for the checker: what the ray under each character hits
+window.__probe = () => { const { scene } = LAST, out = []; scene.updateMatrixWorld(true); const ray = new THREE.Raycaster(); const meshes = []; scene.traverse(o => { if (o.isMesh && !o.userData.card) meshes.push(o); });
+  scene.traverse(g => { if (g.userData && g.userData.char && g.visible) { const P = g.position; ray.set(new THREE.Vector3(P.x, P.y + .3, P.z), new THREE.Vector3(0, -1, 0)); ray.far = 3; out.push([g.userData.char, P.toArray().map(v => +v.toFixed(2)), ray.intersectObjects(meshes, false).slice(0, 4).map(h => [h.object.geometry.type, +h.point.y.toFixed(2), h.face ? +h.face.normal.y.toFixed(2) : null, h.object.material.side, h.object.visible])]); } });
+  const hill = meshes.filter(m => m.geometry.type === 'BufferGeometry').map(m => { m.geometry.computeBoundingBox(); return [m.geometry.boundingBox.min.toArray(), m.geometry.boundingBox.max.toArray(), m.material.side, m.material.type, m.position.toArray(), m.parent && m.parent.position.toArray()]; }); return [out, hill]; };

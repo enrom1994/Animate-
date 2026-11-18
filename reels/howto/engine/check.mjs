@@ -13,12 +13,13 @@ const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..')
 if (!FILM || !fs.existsSync(path.join(ROOT, FILM, 'src/shots.js'))) { console.log('usage: node engine/check.mjs <film> [step]'); process.exit(2); }
 const problems = [];
 // ---- 1. lint ----
-for (const f of fs.readdirSync(path.join(ROOT, FILM, 'src')).filter(f => f.endsWith('.js'))) {
-  fs.readFileSync(path.join(ROOT, FILM, 'src', f), 'utf8').split('\n').forEach((line, i) => {
+const SRC = [...fs.readdirSync(path.join(ROOT, FILM, 'src')).filter(f => f.endsWith('.js')).map(f => path.join(FILM, 'src', f)), ...fs.readdirSync(path.join(ROOT, 'engine')).filter(f => /\.m?js$/.test(f)).map(f => path.join('engine', f))];   // the film's code and the shared engine
+for (const f of SRC) {
+  fs.readFileSync(path.join(ROOT, f), 'utf8').split('\n').forEach((line, i) => {
     const at = `${f}:${i + 1}`;
     if (/\b(walkTo|runTo|walk|run)\(\s*t\s*[,+)]/.test(line)) problems.push(['error', 'lint', at, 'a walk or run stepped by the clock (t): step it by distance, ST.walk(metres) / ST.run(metres) (check 23)']);
     if (/leg[LR]:\s*[-.\d]*\s*\*\s*Math\.sin\(\s*t\s*\*/.test(line)) problems.push(['error', 'lint', at, 'legs swung by the clock (Math.sin(t * k)): tie the swing to distance covered (check 23)']);
-    const c = line.indexOf('//'); if (c > 0 && !/https?:\/\//.test(line) && /\S/.test(line.slice(0, c)) && /(w\.act|w\.cam|return\s*\{|\}\);|=>\s*\{)/.test(line.slice(c))) problems.push(['error', 'lint', at, 'code after a // comment on the same line is commented out (check 14); use /* */ or a new line']);
+    const c = line.indexOf('//'); if (c > 0 && !/https?:\/\//.test(line) && !/['"`][^'"`]*\/\//.test(line.slice(0, c + 2)) && /\S/.test(line.slice(0, c)) && /(w\.act|w\.cam|return\s*\{|\}\);|=>\s*\{|\bconst\s+\w|\blet\s+\w|;\s*\w+\s*\()/.test(line.slice(c))) problems.push(['error', 'lint', at, 'code after a // comment on the same line is commented out (check 14); use /* */ or a new line']);
   });
 }
 // ---- 2. audit ----
