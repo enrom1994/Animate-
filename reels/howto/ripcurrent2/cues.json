@@ -1,0 +1,54 @@
+{
+ "note": "cut times for engine/review.py; this film's sound is still mixed by its own mix.py",
+ "bed": [
+  "ambience/sea_waves_ambience_mixkit1189.mp3",
+  0.22
+ ],
+ "cuts": [
+  1.62,
+  3.3,
+  6.25,
+  9.45,
+  11.05,
+  12.52,
+  14.45,
+  17.65,
+  19.15,
+  21.65,
+  23.5,
+  25.38,
+  27.25,
+  28.72,
+  29.98,
+  31.5,
+  32.53,
+  36.98,
+  38.53
+ ],
+ "cues": [
+  [
+   1.76,
+   "foley/body_punch_quick_hit_thud_mixkit2153.mp3",
+   0.7,
+   1.0
+  ],
+  [
+   13.3,
+   "foley/body_punch_quick_hit_thud_mixkit2153.mp3",
+   0.6,
+   1.0
+  ],
+  [
+   28.92,
+   "foley/body_punch_quick_hit_thud_mixkit2153.mp3",
+   0.7,
+   1.0
+  ],
+  [
+   31.18,
+   "foley/impact_of_a_blow_thud_mixkit2150.mp3",
+   0.4,
+   1.0
+  ]
+ ]
+}

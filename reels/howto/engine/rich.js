@@ -123,3 +123,11 @@ export function coirTex() {
     for (let i = 0; i < 9000; i++) { g.strokeStyle = `rgba(${r() < .5 ? '60,40,20' : '190,150,100'},.35)`; g.lineWidth = 1.5; const x = r() * w, y = r() * h; g.beginPath(); g.moveTo(x, y); g.lineTo(x + (r() - .5) * 6, y + 6); g.stroke(); }
     g.strokeStyle = '#4a3420'; g.lineWidth = 26; g.strokeRect(13, 13, w - 26, h - 26); });
 }
+// sand: warm grains, faint ripples left by the wind, the odd shell and pebble
+export function sandTex(base = '#e8cf98', { seed = 14, wet = false } = {}) {
+  return paint(`sand${base}${seed}${wet}`, 1024, 1024, (g, b, w, h) => { const r = rng(seed * 61 + 5); g.fillStyle = base; g.fillRect(0, 0, w, h);
+    mottle(g, w, h, r, 'rgba(255,240,205,A)', 140, .08, .14); mottle(g, w, h, r, 'rgba(150,110,60,A)', 140, wet ? .1 : .05, .12);
+    for (let k = 0; k < 26; k++) { const y0 = r() * h, amp = 6 + r() * 8; g.strokeStyle = `rgba(150,110,60,${wet ? .05 : .12})`; g.lineWidth = 3; g.beginPath(); for (let x = 0; x <= w; x += 12) g.lineTo(x, y0 + Math.sin(x * .02 + k) * amp); g.stroke(); }
+    for (let i = 0; i < 30000; i++) { const v = r(); g.fillStyle = v < .5 ? 'rgba(120,85,45,.3)' : 'rgba(255,248,225,.45)'; g.fillRect(r() * w, r() * h, 2, 2); b.fillStyle = `rgb(${110 + r() * 60},${110 + r() * 60},${110 + r() * 60})`; b.fillRect(r() * w, r() * h, 2, 2); }
+    if (!wet) for (let i = 0; i < 18; i++) { const x = r() * w, y = r() * h; g.fillStyle = ['#f3e6d0', '#d9b8a0', '#9a8f84'][i % 3]; g.beginPath(); g.ellipse(x, y, 4 + r() * 5, 3 + r() * 3, r() * 3, 0, 7); g.fill(); } });
+}
