@@ -20,6 +20,7 @@
 // The same scene as the 3D test, drawn flat: a front elevation of two terraced houses, the pavement, the road,
 // the two neighbours, the jar and the car, each number on its object. One ink colour, a limited palette, paper grain.
 import { drawChar, LOOKS, POSE } from '/engine/char.js';
+import { car } from '/moneylook/stick/props2d.js';
 const c = document.getElementById('c'), g = c.getContext('2d'), INK = '#2e1d1c';
 let s = 7; const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
 const ink = (lw = 5) => { g.strokeStyle = INK; g.lineWidth = lw; g.lineJoin = 'round'; g.lineCap = 'round'; };
@@ -52,13 +53,10 @@ rect(0, 912, 720, 74, '#d9ccb2', 0); for (let x = 0; x < 720; x += 90) { ink(3);
 rect(0, 986, 720, 16, '#b8ab92', 4); rect(0, 1002, 720, 360, '#6b6966', 0);
 for (let i = 0; i < 4000; i++) { g.fillStyle = `rgba(${r() < .5 ? '30,30,30' : '200,200,195'},.25)`; g.fillRect(r() * 720, 1002 + r() * 360, 2, 2); }
 g.fillStyle = '#efe6d2'; for (let x = 20; x < 720; x += 150) g.fillRect(x, 1150, 80, 10);
-// the car at the kerb in front of the brick house, its price in the windscreen
-{ const x = 430, y = 880; g.beginPath(); g.moveTo(x, y + 70); g.lineTo(x + 20, y + 20); g.quadraticCurveTo(x + 60, y - 30, x + 140, y - 34); g.lineTo(x + 210, y - 30); g.quadraticCurveTo(x + 250, y + 10, x + 280, y + 22); g.lineTo(x + 290, y + 74); g.closePath(); g.fillStyle = '#3f5f8a'; g.fill(); ink(6); g.stroke();
-  rect(x + 70, y - 20, 70, 38, '#a9c4d4', 4, 6); rect(x + 150, y - 22, 60, 40, '#a9c4d4', 4, 6);
-  for (const wx of [x + 65, x + 225]) { g.beginPath(); g.arc(wx, y + 74, 30, 0, 7); g.fillStyle = '#2a2826'; g.fill(); ink(5); g.stroke(); g.beginPath(); g.arc(wx, y + 74, 13, 0, 7); g.fillStyle = '#c9ccd4'; g.fill(); g.stroke(); }
-  rect(x + 272, y + 30, 18, 14, '#fff1c4', 3, 4); }
+// the car at the kerb in front of the brick house, from the prop library
+car(g, 565, 958, 270);
 const tag = (x, y, w, h, big, small, col) => { g.save(); g.translate(x, y); g.rotate(-.04); rect(-w / 2, -h / 2, w, h, '#f6efe0', 5, 10); g.textAlign = 'center'; g.fillStyle = col; g.font = `800 ${h * .42}px Cap`; g.fillText(big, 0, h * .06); g.fillStyle = INK; g.font = `800 ${h * .24}px Cap`; g.fillText(small, 0, h * .36); g.restore(); };
-tag(588, 800, 190, 88, '$34,000', 'on finance', '#7a3a32');
+tag(598, 762, 190, 88, '$34,000', 'on finance', '#7a3a32');
 // the jar on the garden wall, its number above it
 { const x = 100, y = 840; g.beginPath(); g.roundRect(x - 30, y - 70, 60, 74, 10); g.fillStyle = 'rgba(200,225,232,.7)'; g.fill(); ink(5); g.stroke(); rect(x - 34, y - 84, 68, 16, '#c9a24a', 4, 4); for (let i = 0; i < 6; i++) { g.beginPath(); g.ellipse(x - 14 + (i % 3) * 14, y - 8 - Math.floor(i / 3) * 10, 12, 5, 0, 0, 7); g.fillStyle = '#d9a83a'; g.fill(); ink(3); g.stroke(); } }
 tag(100, 720, 180, 84, '$6,800', 'invested', '#2f6f73');
