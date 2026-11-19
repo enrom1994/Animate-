@@ -1,0 +1,74 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Same Paycheck: flat 2D look test</title>
+<style>
+  @font-face { font-family: 'Cap'; src: url('/node_modules/@fontsource/montserrat/files/montserrat-latin-800-normal.woff2') format('woff2'); font-weight: 800; }
+  html, body { margin: 0; background: #000; }
+  #stage { position: relative; width: 720px; height: 1280px; }
+  #cap { position: absolute; left: 0; right: 0; top: 938px; text-align: center; font: 800 54px/1.1 'Cap', sans-serif; color: #fff; -webkit-text-stroke: 9px #1d1a26; paint-order: stroke fill; letter-spacing: -0.5px; }
+  #cap b { color: #ffd23f; }
+</style>
+<script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js" } }</script>
+</head>
+<body>
+<div id="stage"><canvas id="c" width="720" height="1280"></canvas><div id="cap">same <b>paycheck</b></div></div>
+<script type="module">
+// The same scene as the 3D test, drawn flat: a front elevation of two terraced houses, the pavement, the road,
+// the two neighbours, the jar and the car, each number on its object. One ink colour, a limited palette, paper grain.
+import { drawChar, LOOKS, POSE } from '/engine/char.js';
+const c = document.getElementById('c'), g = c.getContext('2d'), INK = '#2e1d1c';
+let s = 7; const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
+const ink = (lw = 5) => { g.strokeStyle = INK; g.lineWidth = lw; g.lineJoin = 'round'; g.lineCap = 'round'; };
+const rect = (x, y, w, h, fill, lw = 5, rad = 0) => { g.beginPath(); g.roundRect(x, y, w, h, rad); g.fillStyle = fill; g.fill(); if (lw) { ink(lw); g.stroke(); } };
+// sky, sun haze, clouds
+{ const gr = g.createLinearGradient(0, 0, 0, 820); gr.addColorStop(0, '#9cc3d6'); gr.addColorStop(1, '#f4dfb8'); g.fillStyle = gr; g.fillRect(0, 0, 720, 1280); }
+g.translate(0, -78);   // the scene sits high: the caption band and the player's own text are below it
+for (const [x, y, k] of [[150, 170, 1], [560, 120, .8], [430, 260, .6]]) { g.fillStyle = 'rgba(255,248,236,.85)'; g.beginPath(); for (const [dx, dy, rr] of [[0, 0, 46], [44, 6, 36], [-42, 8, 34], [12, -24, 32]]) g.ellipse(x + dx * k, y + dy * k, rr * k * 1.3, rr * k, 0, 0, 7); g.fill(); }
+// the far town: soft rooftops and trees, one tone, no ink
+g.fillStyle = '#b8c8b4'; g.beginPath(); g.moveTo(0, 640); for (let x = 0; x <= 720; x += 60) { const h = 40 + r() * 50; g.lineTo(x, 640 - h); g.lineTo(x + 30, 640 - h - 26); g.lineTo(x + 60, 640 - h); } g.lineTo(720, 700); g.lineTo(0, 700); g.fill();
+g.fillStyle = '#9fb59a'; for (let i = 0; i < 9; i++) { g.beginPath(); g.arc(30 + i * 85, 650, 34 + r() * 14, 0, 7); g.fill(); }
+// the two houses: front elevations sharing a wall
+const house = (x0, w, wall, trim, shut, door, brick) => { const top = 360, base = 870;
+  g.beginPath(); g.moveTo(x0 - 16, top); g.lineTo(x0 + w / 2, top - 120); g.lineTo(x0 + w + 16, top); g.closePath(); g.fillStyle = '#9b4a36'; g.fill(); ink(6); g.stroke();
+  for (let i = 0; i < 6; i++) { g.strokeStyle = 'rgba(46,29,28,.25)'; g.lineWidth = 3; g.beginPath(); const y = top - 20 - i * 18, k = (i * 18 + 20) / 120; g.moveTo(x0 - 16 + k * (w / 2 + 16), y); g.lineTo(x0 + w + 16 - k * (w / 2 + 16), y); g.stroke(); }   // roof tile rows
+  rect(x0, top, w, base - top, wall, 0);
+  if (brick) for (let y = top + 6; y < base; y += 22) for (let x = x0 + ((y / 22) % 2 ? 0 : -18); x < x0 + w; x += 36) { g.fillStyle = `rgba(${r() < .5 ? '90,35,25' : '235,180,150'},${.12 + r() * .12})`; g.fillRect(Math.max(x0, x + 2), y, Math.min(32, x0 + w - x - 2), 18); }
+  else for (let i = 0; i < 160; i++) { g.fillStyle = `rgba(${r() < .5 ? '140,110,70' : '255,245,225'},.12)`; g.beginPath(); g.arc(x0 + r() * w, top + r() * (base - top), 6 + r() * 18, 0, 7); g.fill(); }
+  ink(6); g.strokeRect(x0, top, w, base - top);
+  const win = (x, y) => { rect(x - 44, y - 6, 18, 112, shut, 4, 3); rect(x + 26, y - 6, 18, 112, shut, 4, 3); rect(x - 26, y - 8, 52, 116, trim, 5, 3);
+    const gl = g.createLinearGradient(x - 20, y, x + 20, y + 100); gl.addColorStop(0, '#7f9fb4'); gl.addColorStop(1, '#4f6f84'); rect(x - 20, y, 40, 100, gl, 0);
+    g.fillStyle = 'rgba(255,255,255,.35)'; g.beginPath(); g.moveTo(x - 14, y + 4); g.lineTo(x - 4, y + 4); g.lineTo(x - 18, y + 46); g.lineTo(x - 20, y + 30); g.fill(); ink(4); g.beginPath(); g.moveTo(x, y); g.lineTo(x, y + 100); g.moveTo(x - 20, y + 42); g.lineTo(x + 20, y + 42); g.stroke(); rect(x - 32, y + 104, 64, 10, trim, 4, 2); };
+  win(x0 + w * .3, 410); win(x0 + w * .72, 410); win(x0 + w * .3, 660);
+  rect(x0 + w * .62, 670, 76, 200, door, 5, 6); g.fillStyle = '#d9a83a'; g.beginPath(); g.arc(x0 + w * .62 + 62, 775, 6, 0, 7); g.fill(); ink(3); g.stroke(); rect(x0 + w * .58, 866, 100, 12, '#cfc2a8', 4, 2); };
+house(40, 320, '#e9d3a6', '#f4ead6', '#3f6b55', '#2f6f73', false);
+house(360, 320, '#b8604a', '#f4ead6', '#7a3a32', '#7a3a32', true);
+// front gardens and a low hedge, then the pavement, kerb and road
+for (const x0 of [40, 360]) { g.fillStyle = '#7aa85a'; rect(x0, 878, 320, 34, '#7aa85a', 4, 4); for (let i = 0; i < 26; i++) { g.fillStyle = '#5f8a48'; g.beginPath(); g.arc(x0 + 8 + i * 12, 880, 9, 0, 7); g.fill(); } }
+rect(0, 912, 720, 74, '#d9ccb2', 0); for (let x = 0; x < 720; x += 90) { ink(3); g.strokeStyle = 'rgba(46,29,28,.35)'; g.beginPath(); g.moveTo(x, 912); g.lineTo(x - 20, 986); g.stroke(); }
+rect(0, 986, 720, 16, '#b8ab92', 4); rect(0, 1002, 720, 360, '#6b6966', 0);
+for (let i = 0; i < 4000; i++) { g.fillStyle = `rgba(${r() < .5 ? '30,30,30' : '200,200,195'},.25)`; g.fillRect(r() * 720, 1002 + r() * 360, 2, 2); }
+g.fillStyle = '#efe6d2'; for (let x = 20; x < 720; x += 150) g.fillRect(x, 1150, 80, 10);
+// the car at the kerb in front of the brick house, its price in the windscreen
+{ const x = 430, y = 880; g.beginPath(); g.moveTo(x, y + 70); g.lineTo(x + 20, y + 20); g.quadraticCurveTo(x + 60, y - 30, x + 140, y - 34); g.lineTo(x + 210, y - 30); g.quadraticCurveTo(x + 250, y + 10, x + 280, y + 22); g.lineTo(x + 290, y + 74); g.closePath(); g.fillStyle = '#3f5f8a'; g.fill(); ink(6); g.stroke();
+  rect(x + 70, y - 20, 70, 38, '#a9c4d4', 4, 6); rect(x + 150, y - 22, 60, 40, '#a9c4d4', 4, 6);
+  for (const wx of [x + 65, x + 225]) { g.beginPath(); g.arc(wx, y + 74, 30, 0, 7); g.fillStyle = '#2a2826'; g.fill(); ink(5); g.stroke(); g.beginPath(); g.arc(wx, y + 74, 13, 0, 7); g.fillStyle = '#c9ccd4'; g.fill(); g.stroke(); }
+  rect(x + 272, y + 30, 18, 14, '#fff1c4', 3, 4); }
+const tag = (x, y, w, h, big, small, col) => { g.save(); g.translate(x, y); g.rotate(-.04); rect(-w / 2, -h / 2, w, h, '#f6efe0', 5, 10); g.textAlign = 'center'; g.fillStyle = col; g.font = `800 ${h * .42}px Cap`; g.fillText(big, 0, h * .06); g.fillStyle = INK; g.font = `800 ${h * .24}px Cap`; g.fillText(small, 0, h * .36); g.restore(); };
+tag(588, 800, 190, 88, '$34,000', 'on finance', '#7a3a32');
+// the jar on the garden wall, its number above it
+{ const x = 100, y = 840; g.beginPath(); g.roundRect(x - 30, y - 70, 60, 74, 10); g.fillStyle = 'rgba(200,225,232,.7)'; g.fill(); ink(5); g.stroke(); rect(x - 34, y - 84, 68, 16, '#c9a24a', 4, 4); for (let i = 0; i < 6; i++) { g.beginPath(); g.ellipse(x - 14 + (i % 3) * 14, y - 8 - Math.floor(i / 3) * 10, 12, 5, 0, 0, 7); g.fillStyle = '#d9a83a'; g.fill(); ink(3); g.stroke(); } }
+tag(100, 720, 180, 84, '$6,800', 'invested', '#2f6f73');
+// the neighbours: the same character drawing as the 3D test, flat, with the warm line
+Object.assign(LOOKS, { saver: { skin: '#c98a5e', hair: '#2a1d18', top: '#2f6f73', bottom: '#3a3f55', hairStyle: 'swoop', ink: INK, lw: .8 }, spender: { skin: '#f0c49a', hair: '#8a5a2e', top: '#c9783f', bottom: '#27304a', hairStyle: 'cap', ink: INK, lw: .8 } });
+const person = (name, x, foot, p, k = .27) => { const cc = document.createElement('canvas'); cc.width = 1120; cc.height = 960; drawChar(cc.getContext('2d'), LOOKS[name], { ...POSE, ...p }); g.drawImage(cc, x - 560 * k, foot - 920 * k, 1120 * k, 960 * k); };
+person('saver', 245, 968, { view: 'q', face: 1, armL: [-.3, .2], armR: [.9, .9], mouth: 'smile', eyes: [.5, -.2] });
+person('spender', 395, 968, { view: 'q', face: -1, armL: [-1.2, -.9], armR: [.3, -.2], mouth: 'smile', eyes: [-.5, -.2] });
+g.setTransform(1, 0, 0, 1, 0, 0);
+// paper grain over everything
+for (let i = 0; i < 60000; i++) { g.fillStyle = `rgba(${r() < .5 ? '60,40,20' : '255,250,240'},.05)`; g.fillRect(r() * 720, r() * 1280, 2, 2); }
+await document.fonts.load("800 54px Cap"); window.done = true;
+</script>
+</body>
+</html>
