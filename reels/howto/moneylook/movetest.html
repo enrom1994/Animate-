@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Same Paycheck: 5-second moving test</title>
+<style>
+  @font-face { font-family: 'Cap'; src: url('/node_modules/@fontsource/montserrat/files/montserrat-latin-800-normal.woff2') format('woff2'); font-weight: 800; }
+  html, body { margin: 0; background: #000; }
+  #stage { position: relative; width: 720px; height: 1280px; }
+  #cap { position: absolute; left: 0; right: 0; top: 938px; text-align: center; font: 800 54px/1.1 'Cap', sans-serif; color: #fff; -webkit-text-stroke: 9px #1d1a26; paint-order: stroke fill; letter-spacing: -0.5px; }
+  #cap b { color: #ffd23f; }
+</style>
+<script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js" } }</script>
+</head>
+<body>
+<div id="stage"><canvas id="c" width="720" height="1280"></canvas><div id="cap"></div></div>
+<script src="/moneylook/stick/lib.js"></script>
+<script src="/moneylook/stick/chars.js"></script>
+<script type="module">
+// The 5-second moving test. Every frame is a function of time: window.renderAt(t).
+// The street is painted once, at twice the size, so the camera can push in without blur; the car, the jar, the tags, the people,
+// the sky and the caption are drawn each frame.
+import { car } from '/moneylook/stick/props2d.js';
+const c = document.getElementById('c'), g = c.getContext('2d'), INK = '#2e1d1c', capEl = document.getElementById('cap');
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v)), mixN = (a, b, u) => a + (b - a) * u, io = u => u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2, pr = (t, a, b) => clamp((t - a) / (b - a));
+let s = 7; const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
+const ink = (ctx, lw = 5) => { ctx.strokeStyle = INK; ctx.lineWidth = lw; ctx.lineJoin = 'round'; ctx.lineCap = 'round'; };
+const rect = (ctx, x, y, w, h, fill, lw = 5, rad = 0) => { ctx.beginPath(); ctx.roundRect(x, y, w, h, rad); ctx.fillStyle = fill; ctx.fill(); if (lw) { ink(ctx, lw); ctx.stroke(); } };
+await document.fonts.load("800 54px Cap");
+// ---- the street, painted once at 2x (scene units: 720 wide, the old frame's coordinates, already lifted 78 px) ----
+const K = 2, bg = document.createElement('canvas'); bg.width = 720 * K; bg.height = 1400 * K; { const b = bg.getContext('2d'); b.scale(K, K); b.translate(0, -78);
+  for (const [x, y, k] of [[150, 170, 1], [560, 120, .8], [430, 260, .6]]) { b.fillStyle = 'rgba(255,248,236,.85)'; b.beginPath(); for (const [dx, dy, rr] of [[0, 0, 46], [44, 6, 36], [-42, 8, 34], [12, -24, 32]]) b.ellipse(x + dx * k, y + dy * k, rr * k * 1.3, rr * k, 0, 0, 7); b.fill(); }
+  b.fillStyle = '#b8c8b4'; b.beginPath(); b.moveTo(0, 640); for (let x = 0; x <= 720; x += 60) { const h = 40 + r() * 50; b.lineTo(x, 640 - h); b.lineTo(x + 30, 640 - h - 26); b.lineTo(x + 60, 640 - h); } b.lineTo(720, 700); b.lineTo(0, 700); b.fill();
+  b.fillStyle = '#9fb59a'; for (let i = 0; i < 9; i++) { b.beginPath(); b.arc(30 + i * 85, 650, 34 + r() * 14, 0, 7); b.fill(); }
+  const house = (x0, w, wall, trim, shut, door, brick) => { const top = 360, base = 870;
+    b.beginPath(); b.moveTo(x0 - 16, top); b.lineTo(x0 + w / 2, top - 120); b.lineTo(x0 + w + 16, top); b.closePath(); b.fillStyle = '#9b4a36'; b.fill(); ink(b, 6); b.stroke();
+    for (let i = 0; i < 6; i++) { b.strokeStyle = 'rgba(46,29,28,.25)'; b.lineWidth = 3; b.beginPath(); const y = top - 20 - i * 18, k = (i * 18 + 20) / 120; b.moveTo(x0 - 16 + k * (w / 2 + 16), y); b.lineTo(x0 + w + 16 - k * (w / 2 + 16), y); b.stroke(); }
+    rect(b, x0, top, w, base - top, wall, 0);
+    if (brick) for (let y = top + 6; y < base; y += 22) for (let x = x0 + ((y / 22) % 2 ? 0 : -18); x < x0 + w; x += 36) { b.fillStyle = `rgba(${r() < .5 ? '90,35,25' : '235,180,150'},${.12 + r() * .12})`; b.fillRect(Math.max(x0, x + 2), y, Math.min(32, x0 + w - x - 2), 18); }
+    else for (let i = 0; i < 160; i++) { b.fillStyle = `rgba(${r() < .5 ? '140,110,70' : '255,245,225'},.12)`; b.beginPath(); b.arc(x0 + r() * w, top + r() * (base - top), 6 + r() * 18, 0, 7); b.fill(); }
+    ink(b, 6); b.strokeRect(x0, top, w, base - top);
+    const win = (x, y) => { rect(b, x - 44, y - 6, 18, 112, shut, 4, 3); rect(b, x + 26, y - 6, 18, 112, shut, 4, 3); rect(b, x - 26, y - 8, 52, 116, trim, 5, 3);
+      const gl = b.createLinearGradient(x - 20, y, x + 20, y + 100); gl.addColorStop(0, '#7f9fb4'); gl.addColorStop(1, '#4f6f84'); rect(b, x - 20, y, 40, 100, gl, 0);
+      b.fillStyle = 'rgba(255,255,255,.35)'; b.beginPath(); b.moveTo(x - 14, y + 4); b.lineTo(x - 4, y + 4); b.lineTo(x - 18, y + 46); b.lineTo(x - 20, y + 30); b.fill(); ink(b, 4); b.beginPath(); b.moveTo(x, y); b.lineTo(x, y + 100); b.moveTo(x - 20, y + 42); b.lineTo(x + 20, y + 42); b.stroke(); rect(b, x - 32, y + 104, 64, 10, trim, 4, 2); };
+    win(x0 + w * .3, 410); win(x0 + w * .72, 410); win(x0 + w * .3, 660);
+    rect(b, x0 + w * .62, 670, 76, 200, door, 5, 6); b.fillStyle = '#d9a83a'; b.beginPath(); b.arc(x0 + w * .62 + 62, 775, 6, 0, 7); b.fill(); ink(b, 3); b.stroke(); rect(b, x0 + w * .58, 866, 100, 12, '#cfc2a8', 4, 2); };
+  house(40, 320, '#e9d3a6', '#f4ead6', '#3f6b55', '#2f6f73', false); house(360, 320, '#b8604a', '#f4ead6', '#7a3a32', '#7a3a32', true);
+  for (const x0 of [40, 360]) { rect(b, x0, 878, 320, 34, '#7aa85a', 4, 4); for (let i = 0; i < 26; i++) { b.fillStyle = '#5f8a48'; b.beginPath(); b.arc(x0 + 8 + i * 12, 880, 9, 0, 7); b.fill(); } }
+  rect(b, 0, 912, 720, 74, '#d9ccb2', 0); for (let x = 0; x < 720; x += 90) { ink(b, 3); b.strokeStyle = 'rgba(46,29,28,.35)'; b.beginPath(); b.moveTo(x, 912); b.lineTo(x - 20, 986); b.stroke(); }
+  rect(b, 0, 986, 720, 16, '#b8ab92', 4); rect(b, 0, 1002, 720, 480, '#6b6966', 0);
+  for (let i = 0; i < 5000; i++) { b.fillStyle = `rgba(${r() < .5 ? '30,30,30' : '200,200,195'},.25)`; b.fillRect(r() * 720, 1002 + r() * 480, 2, 2); }
+  b.fillStyle = '#efe6d2'; for (let x = 20; x < 720; x += 150) b.fillRect(x, 1150, 80, 10); }
+// paper grain, once
+const grain = document.createElement('canvas'); grain.width = 720; grain.height = 1280; { const q = grain.getContext('2d'); for (let i = 0; i < 60000; i++) { q.fillStyle = `rgba(${r() < .5 ? '60,40,20' : '255,250,240'},.05)`; q.fillRect(r() * 720, r() * 1280, 2, 2); } }
+// ---- the things that change, in scene units (y already lifted) ----
+const Y = v => v - 78;
+const tag = (x, y, w, h, big, small, col, k = 1) => { if (k <= 0) return; g.save(); g.translate(x, y); g.rotate(-.04); const sc = k < 1 ? 1 + 2.2 * Math.pow(k - 1, 3) + 1.2 * Math.pow(k - 1, 2) : 1; g.scale(sc, sc);
+  rect(g, -w / 2, -h / 2, w, h, '#f6efe0', 5, 10); g.textAlign = 'center'; g.fillStyle = col; g.font = `800 ${h * .42}px Cap`; g.fillText(big, 0, h * .06); g.fillStyle = INK; g.font = `800 ${h * .24}px Cap`; g.fillText(small, 0, h * .36); g.restore(); };
+const money = v => '$' + Math.round(v / 100) * 100 .toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+const fmt = v => '$' + (Math.round(v / 100) * 100).toLocaleString('en-US');
+const lerpHex = (a, b, u) => { const p = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)), A = p(a), B = p(b); return '#' + A.map((v, i) => Math.round(v + (B[i] - v) * u).toString(16).padStart(2, '0')).join(''); };
+function oldCar(age) { const paint = lerpHex('#3f5f8a', '#7d8794', age); car(g, 565, Y(958), 270, { paint });
+  if (age > .3) { const a = clamp((age - .3) / .7); g.fillStyle = `rgba(122,62,30,${.75 * a})`; for (const [x, y, rr] of [[468, 935, 9], [490, 942, 6], [640, 938, 8], [520, 912, 5], [660, 905, 6]]) { g.beginPath(); g.ellipse(x, Y(y), rr * a + 2, (rr * .6) * a + 1, 0, 0, 7); g.fill(); }
+    ink(g, 3); g.beginPath(); g.moveTo(585, Y(900)); g.quadraticCurveTo(598, Y(912) + 6 * a, 612, Y(902)); g.stroke(); } }
+function jar(fill) { const x = 100, y = Y(840); g.beginPath(); g.roundRect(x - 30, y - 70, 60, 74, 10); g.fillStyle = 'rgba(200,225,232,.7)'; g.fill();
+  const n = Math.round(6 + fill * 18); for (let i = 0; i < n; i++) { g.beginPath(); g.ellipse(x - 14 + (i % 3) * 14, y - 8 - Math.floor(i / 3) * 8, 12, 5, 0, 0, 7); g.fillStyle = '#d9a83a'; g.fill(); ink(g, 2.5); g.stroke(); }
+  g.beginPath(); g.roundRect(x - 30, y - 70, 60, 74, 10); ink(g, 5); g.stroke(); rect(g, x - 34, y - 84, 68, 16, '#c9a24a', 4, 4); }
+const stick = (x, foot, o, extra) => { drawStick(g, { x, y: Y(foot), s: 250, hat: 'none', belt: false, shadow: true, ...o }); extra && extra(x, Y(foot), 250 * (o.flip || 1), 250, o.bob || 0); };
+const scarf = (x, foot, sx, s, bob) => { const y = foot - .6 * s + bob * s; g.beginPath(); g.roundRect(x - .14 * s, y - .03 * s, .28 * s, .07 * s, .03 * s); g.fillStyle = '#2f8a86'; g.fill(); ink(g, 4); g.stroke();
+  g.beginPath(); g.moveTo(x + .06 * sx, y + .03 * s); g.lineTo(x + .1 * sx, y + .2 * s); g.lineTo(x + .03 * sx, y + .21 * s); g.lineTo(x, y + .04 * s); g.closePath(); g.fillStyle = '#2f8a86'; g.fill(); g.stroke(); };
+const cap = (x, foot, sx, s, bob) => { const hx = x, hy = foot - .765 * s + bob * s, hr = .19 * s; g.beginPath(); g.arc(hx, hy - .02 * s, hr * 1.02, Math.PI * 1.05, Math.PI * 1.95); g.closePath(); g.fillStyle = '#d9772e'; g.fill(); ink(g, 4); g.stroke();
+  g.beginPath(); g.ellipse(hx + Math.sign(sx) * hr * .9, hy - hr * .28, hr * .55, hr * .14, 0, 0, 7); g.fillStyle = '#b8601f'; g.fill(); g.stroke(); };
+// the camera: centre (scene units) and zoom, keyed through the five seconds
+const KEYS = [[0, 590, 820, 1.75], [1.15, 560, 830, 1.7], [1.35, 560, 830, 1.7], [1.95, 170, 820, 1.7], [2.05, 170, 820, 1.7], [2.55, 360, 640, 1.0], [4.15, 360, 650, 1.04], [4.75, 360, 760, 1.14], [5, 360, 762, 1.15]];
+const camKey = t => { for (let i = 1; i < KEYS.length; i++) if (t <= KEYS[i][0]) { const [t0, ...a] = KEYS[i - 1], [t1, ...b] = KEYS[i], u = io(clamp((t - t0) / (t1 - t0))); return a.map((v, j) => mixN(v, b[j], u)); } return KEYS.at(-1).slice(1); };
+const camAt = t => { const [cx, cy, z] = camKey(t), h = 360 / z; return [clamp(cx, h, 720 - h), cy, z]; };   // the camera never looks past either end of the street
+const CAPS = [[0, 'a new <b>car</b>'], [1.3, 'or <b>invest</b> it'], [2.1, '<b>ten years</b> later'], [4.25, 'same <b>paycheck</b>']];
+window.renderAt = t => {
+  const [cx, cy, z] = camAt(t), age = io(pr(t, 2.5, 4.1)), days = pr(t, 2.5, 4.1);
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  { const gr = g.createLinearGradient(0, 0, 0, 1280); gr.addColorStop(0, '#9cc3d6'); gr.addColorStop(.62, '#f4dfb8'); g.fillStyle = gr; g.fillRect(0, 0, 720, 1280); }
+  g.setTransform(z, 0, 0, z, 360 - cx * z + (Math.sin(t * 1.7) * 2), 640 - cy * z + Math.sin(t * 2.3) * 2);   // the camera, with a little handheld drift
+  g.drawImage(bg, 0, 0, 720 * K, 1400 * K, 0, 0, 720, 1400);
+  oldCar(age); jar(age);
+  tag(585, Y(762), 180, 84, fmt(mixN(34000, 11000, age)), age > .02 ? 'worth now' : 'on finance', '#7a3a32', pr(t, .25, .55));
+  tag(118, Y(720), 172, 80, fmt(mixN(6800, 13400, age)), age > .02 ? 'worth now' : 'invested', '#2f6f73', pr(t, 1.45, 1.75));
+  const end = t > 4.2, b = Math.sin(t * 6);
+  stick(245, 960, { cols: ['#3f6f8a', '#3f6f8a'], bob: end ? -.04 * Math.abs(Math.sin(t * 9)) : .006 * b, arms: end ? { L: [2.6, -.3], R: [2.6, -.3] } : { L: [.35, -.15], R: [1.5 + .2 * Math.sin(t * 2), -.6] }, face: end ? { eyes: 'happy', mouth: 'grin' } : { mouth: 'smile', look: [.4, 0] } }, scarf);
+  stick(395, 960, { flip: -1, cols: ['#e7c65a', '#e7c65a'], bob: .006 * Math.sin(t * 6 + 1), arms: end ? { L: [.2, -.1], R: [.2, -.1] } : t < 1.3 ? { L: [.35, -.15], R: [2.4, -.2] } : { L: [.35, -.15], R: [1.6, -.5] }, face: end ? { eyes: 'wide', mouth: 'o', look: [-.4, .3] } : t < 1.3 ? { mouth: 'grin' } : { mouth: 'smile', look: [.4, 0] } }, cap);
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  if (days > 0 && days < 1) { const d = Math.sin(days * Math.PI * 10); g.fillStyle = `rgba(20,24,52,${.32 * Math.max(0, -d)})`; g.fillRect(0, 0, 720, 1280); }   // days and nights passing
+  g.drawImage(grain, 0, 0);
+  const cap_ = CAPS.filter(c => t >= c[0]).pop(); capEl.innerHTML = cap_ ? cap_[1] : '';
+};
+window.DURATION = 5; window.done = true;
+</script>
+</body>
+</html>
