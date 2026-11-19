@@ -5,5 +5,5 @@ let chromium; try { ({ chromium } = createRequire(import.meta.url)('playwright')
 const types = { '.html': 'text/html', '.js': 'text/javascript', '.woff2': 'font/woff2' };
 const server = http.createServer((req, res) => { const u = decodeURIComponent(req.url.split('?')[0]), p = path.join(u.startsWith('/node_modules/') ? KIT : ROOT, u); fs.readFile(p, (e, d) => { if (e) { res.writeHead(404); res.end(); return; } res.writeHead(200, { 'content-type': types[path.extname(p)] || 'application/octet-stream' }); res.end(d); }); }).listen(0);
 const b = await chromium.launch(), pg = await b.newPage({ viewport: { width: 720, height: 1280 } }); pg.on('pageerror', e => console.log('[pageerror]', e.message));
-await pg.goto(`http://localhost:${server.address().port}/moneylook/flat2d.html`); await pg.waitForFunction(() => window.done, null, { timeout: 30000 });
+await pg.goto(`http://localhost:${server.address().port}/moneylook/${process.argv[3] || 'flat2d.html'}`); await pg.waitForFunction(() => window.done, null, { timeout: 30000 });
 await pg.screenshot({ path: process.argv[2], clip: { x: 0, y: 0, width: 720, height: 1280 } }); await b.close(); server.close();
