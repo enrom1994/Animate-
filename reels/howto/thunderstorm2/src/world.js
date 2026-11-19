@@ -11,7 +11,7 @@ finish();
 import { park, room, bolt, burst, TREE, HOUSE, CAR, ROOM, hillY } from './set.js';
 export { TREE, HOUSE, CAR, ROOM, hillY };
 // places the shots use (x, z)
-export const SPOT = { tree: [TREE[0] - .5, TREE[2] + 1.7], field: [-1, -4.6], door: [9.36, 1.15], knob: [9.52, 1.0, 1.62], car: [CAR[0], CAR[2]], seat: [2.3, 4.36], wheel: [3.18, 1.66, 3.88], handle: [3.2, 1.0, 4.9],
+export const SPOT = { tree: [TREE[0] - .5, TREE[2] + 1.7], field: [-.2, -4.6], door: [9.36, 1.15], knob: [9.52, 1.0, 1.62], car: [CAR[0], CAR[2]], seat: [2.3, 4.36], wheel: [3.18, 1.66, 3.88], handle: [3.2, 1.0, 4.9],
   tent: [-14, .9], picnic: [-3.2, 3.2], pond: [4.2, -6.6], fence: [5, -2.4], room: [ROOM[0] - .95, ROOM[2] - .7] };
 export function makeWorld() {
   const scene = richStage({ sky: skyTex('#4f5a70', '#9aa3b4'), sun: [-3, 8, 6], shadow: 12, key: 1.4, fill: 1.3, keyCol: 0xdfe6f2 }), camera = new THREE.PerspectiveCamera(40, 9 / 16, .1, 400), P = park(), R = room(); scene.add(P, R);

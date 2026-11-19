@@ -116,6 +116,10 @@ window.audit = t => {
     return true; });
   const ci = inside(cam.position); if (ci) out.push(['error', 'camera inside a solid: ' + label(ci[0])]);
   const ray = new THREE.Raycaster();
+  // a body lying on the ground: every point along it, head to feet, must be above the ground under it (the grass once covered a lying Sam's head)
+  for (const g of chars) { const pose = g.userData.pose || {}, card = g.children[0]; if (!(pose.lie && pose.flat) || card.rotation.x > -1.4) continue;
+    const name = g.userData.char, len = g.userData.hH * .8;   /* feet to the top of the head */ for (let k = 0; k <= 6; k++) { const p = card.localToWorld(new THREE.Vector3(0, len * k / 6, 0)), r2 = new THREE.Raycaster(new THREE.Vector3(p.x, p.y + 1.5, p.z), new THREE.Vector3(0, -1, 0), 0, 3);
+      const h = r2.intersectObjects(surfaces, false).find(h => !h.object.userData.noInk); if (h && h.point.y > p.y + .015) { out.push(['error', `${name} lies under the ground: ${(h.point.y - p.y).toFixed(2)} m of ${label(h.object)} covers the body ${Math.round(k / 6 * 100)}% of the way to the head`]); break; } } }
   for (const g of chars) { const pose = g.userData.pose || {}; if (g.children[0].rotation.z !== 0 || pose.sit || pose.lie) continue;   /* lying down, or sitting in a seat: the feet and body rules do not apply */ const P = g.position, hH = g.userData.hH, name = g.userData.char;
     ray.set(new THREE.Vector3(P.x, P.y + .3, P.z), new THREE.Vector3(0, -1, 0)); ray.far = 3; const hit = ray.intersectObjects(surfaces, false).find(h => h.face && h.face.normal.clone().transformDirection(h.object.matrixWorld).y > .2 || h.object.geometry.type === 'PlaneGeometry'), gy = hit ? hit.point.y : 0, d = P.y - gy;
     if (Math.abs(d) > .06) out.push([Math.abs(d) > .15 ? 'error' : 'warn', `${name}'s feet ${d > 0 ? 'float' : 'sink'} ${Math.abs(d).toFixed(2)} m ${d > 0 ? 'above' : 'into'} ${hit ? label(hit.object) : 'the ground'}`]);
