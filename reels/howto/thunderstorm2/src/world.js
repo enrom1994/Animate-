@@ -6,6 +6,7 @@ import { makeChar } from '../../engine/char.js';
 import { richStage, skyTex, finish, restyle, cross, sunFollow, houseWindows, leafyTrees, byGeo, pathFromDecal, pondFromDecal } from '../../engine/storybook.js';
 import { slab, part, woodTex, plasterTex, wallpaperTex, tileTex, paintTex, stoneTex, mat } from '../../engine/rich.js';
 import { lit } from '../../engine/reskin.js';
+import { tree, upgradeCar, grass, puddles } from '../../engine/props3d.js';
 finish();
 import { park, room, bolt, burst, TREE, HOUSE, CAR, ROOM, hillY } from './set.js';
 export { TREE, HOUSE, CAR, ROOM, hillY };
@@ -18,9 +19,13 @@ export function makeWorld() {
   const strike = bolt(24, 8, 1), strike2 = bolt(24, 8, 4), far = bolt(24, 7, 7), jump = bolt(2.2, 1.6, 3), icon = bolt(1.2, .9, 5), star = burst(); scene.add(strike, strike2, far, jump, icon, star);
   const rings = decal(9, 9, (g, w, h) => { g.strokeStyle = '#ffe14d'; g.lineCap = 'round'; for (const [r, lw] of [[.14, 16], [.27, 13], [.4, 10]]) { g.lineWidth = lw; g.setLineDash([lw * 3, lw * 2.4]); g.beginPath(); g.arc(w / 2, h / 2, w * r, 0, 7); g.stroke(); } }, 60); scene.add(rings);
   const arrow = decal(1.6, 2.6, arrowDraw('#ffd23f')), arrow2 = decal(1.6, 2.6, arrowDraw('#ffd23f')); scene.add(arrow, arrow2);
+  const TREE3 = tree({ height: 3.7, spread: 1.7 }); let PUD;
   // ---- the storybook pass ----
   { const keep = o => { o.userData.keepFlat = true; }; byGeo(R, 'PlaneGeometry', p => p.width === 2.0 && p.height === 1.6).forEach(keep);   // the storm seen through the room's window stays bright
-    leafyTrees(P, 1.1);
+    // the hilltop tree: rebuilt with a trunk, branches and leaf clumps on the branch ends (the old ball canopy floated off the stump)
+    const T0 = P.children.find(o => o.isGroup && o.position.distanceTo(new THREE.Vector3(...TREE)) < .01); T0.clear(); T0.add(TREE3);
+    // the car: rebuilt in place, interior and sliding windows kept
+    upgradeCar(P.children.find(o => o.isGroup && o.position.distanceTo(new THREE.Vector3(...CAR)) < .01));
     // the hill's triangles were wound face-down: it was lit from below and rays from above passed through it. Turn them over.
     P.traverse(o => { if (o.isMesh && o.geometry.type === 'BufferGeometry' && o.geometry.index) { const ix = o.geometry.index.array; for (let i = 0; i < ix.length; i += 3) { const t = ix[i + 1]; ix[i + 1] = ix[i + 2]; ix[i + 2] = t; } o.geometry.index.needsUpdate = true; o.geometry.computeVertexNormals(); } });
     const fabric = (c, o = {}) => () => new THREE.MeshStandardMaterial({ color: c, roughness: .95, ...o });
@@ -34,6 +39,9 @@ export function makeWorld() {
     });
     houseWindows(P, .9, .9);
     pathFromDecal(P, 3, 40); pondFromDecal(P, 9, 5.5);
+    // the field: tufts of grass (clear of the path, the pond, the hill's crown and the house), and puddles where the rain lands
+    P.add(grass({ area: [-18, 16, -16, 10], n: 1800, avoid: [[-.5, -8, 1.4, 21], [7, -9, 4.6, 2.9], [HOUSE[0], HOUSE[2], 3.6, 3.2], [CAR[0], CAR[2], 2.4, 1.6], [-3.2, 3.2, 1.8, 1.6]], y: hillY }));
+    PUD = puddles([[-.4, -3.4, .55, .3], [.1, -6.2, .4, .25], [-1.6, -4.9, .5, .28], [2.4, -2.8, .45, .3], [-3.5, 1.2, .5, .3], [5.2, .9, .6, .32]]); P.add(PUD);
     // the front door sits in a frame (check 22): cream posts and a head round the slab
     byGeo(P, 'BoxGeometry', p => p.width === 1.0 && p.height === 2.0 && p.depth === .08).forEach(d => { const H = d.parent, fr = paintTex('#efe6d2', { seed: 1 }); for (const [w, h, x, y] of [[.12, 2.14, -.56, 1.07], [.12, 2.14, .56, 1.07], [1.24, .12, 0, 2.08]]) H.add(slab(w, h, .16, fr, 1, [d.position.x + x, y, d.position.z - .02])); });
     // the room: a patterned rug instead of a painted ellipse, a fabric lamp shade, a wooden rim round the clock
@@ -44,6 +52,7 @@ export function makeWorld() {
   const glass = P.userData.glass, props = { X, strike, strike2, far, jump, icon, star, rings, arrow, arrow2 };
   const W = worldKit(scene, camera, { sam, friend }, props, () => { glass.forEach(g => g.scale.y = 1); sam.tint(0xc8cfe0); friend.tint(0xc8cfe0); R.userData.pane.material.opacity = 0; });
   sunFollow(W, scene, [-3, 8, 6]);
+  { const r0 = W.reset; W.reset = t => { r0(t); TREE3.userData.sway(t, 1); PUD.userData.update(t); }; }   // the storm moves things: the tree in the wind, rain rings in the puddles
   const face = o => o.quaternion.copy(camera.quaternion);
   return { ...W, glass, strike2,
     // lightning down to a point; u runs 0..1 through the strike: it travels down, holds, blinks off once, comes back thinner and dies. Returns the flash for that moment.

@@ -10,7 +10,7 @@ const STRIKES = [[.55, .02], [2.4, .03], [4.05, .07], [5.35, .04], [7.55, .03], 
 const D = director(makeWorld, STRIKES), shot = (a, b, fn) => D.shot(a, b, (lt, t, u, w) => { const r = fn(lt, t, u, w) || {}, inRoom = w.camera.position.distanceTo(new THREE.Vector3(...ROOM)) < 12; return { ...r, look: { ...(inRoom ? LOOK : STORM), ...(r.look || {}) } }; }), io = ease.io, out = ease.out, anti = ease.anti;
 const RAIN = 1, blinkAt = t => (t % 2.9) > 2.8 ? 1 : 0;
 const scared = (t, o = {}) => ({ view: 'q', face: 1, armL: [-2.0 + Math.sin(t * 18) * .2, -.4], armR: [2.0 + Math.sin(t * 18 + 1) * .2, .4], mouth: 'shout', brow: .9, sweat: 1, ...o });
-const huddle = (t, o = {}) => ({ armL: [-2.3, -1.9], armR: [2.3, 1.9], squash: .9, mouth: 'grit', brow: .8, sweat: 1, bob: 3 * Math.sin(t * 9), ...o });
+const huddle = (t, o = {}) => ({ armL: [-2.3, -1.9], armR: [2.3, 1.9], crouch: .25, mouth: 'grit', brow: .8, sweat: 1, bob: 3 * Math.sin(t * 9), ...o });
 const at = (w, name, x, z, pose, full = false) => w.act(name, x, z, pose, full, hillY(x, z));
 const treeTop = [TREE[0] + .2, TREE[1] + 6.3, TREE[2] + .3];
 
@@ -38,17 +38,17 @@ shot(5.28, 7.08, (lt, t, u, w) => { const ju = pr(lt, .1, .55), [sx, sz] = SPOT.
 // 5  "Do not lie flat on the ground." : it feels low and safe
 shot(7.08, 9.15, (lt, t, u, w) => { const d = io(pr(lt, .08, .5)), [fx, fz] = SPOT.field;
   w.cam([lerp(fx + 2.6, fx + 1.4, io(u)), lerp(2.4, 2.9, u), lerp(fz + 4.8, fz + 4.2, u)], [fx + .2, .5, fz], 44);
-  at(w, 'sam', fx + .85 * d, fz, d <= 0 ? huddle(t) : { lie: 1, lieK: d, armL: [-.25, .15], armR: [.3, .2], legL: -.05, legR: .08, mouth: 'grit', brow: .8, blink: d > .9 ? .7 : 0, eyes: [.2, -.4], sweat: 1 });
+  at(w, 'sam', fx + .85 * d, fz, d <= 0 ? huddle(t) : { lie: 1, flat: true, lieK: d, armL: [-.6, .15], armR: [.6, -.15], legL: -.12, legR: .12, mouth: 'grit', brow: .8, blink: d > .9 ? .7 : 0, eyes: [.2, -.4], sweat: 1 });
   w.cross([fx + .1, 1.75, fz + .3], pr(lt, .5, .7), .26); return { focus: 4.8, blur: .4, rain: RAIN }; });
 // 6  "That only puts more of you in the path of the current running through it." : the strike is over there; the ground carries it here
 shot(9.15, 12.68, (lt, t, u, w) => { const su = pr(lt, .5, 1.0), ru = pr(lt, .6, 2.9), [fx, fz] = SPOT.field, hit = [fx + 2.6, fz - 2.2], jolt = ru > .42 && ru < .8;
   w.cam([lerp(fx - 1.6, fx + .2, io(u)), lerp(6.4, 5.0, io(u)), lerp(fz + 5.6, fz + 4.4, io(u))], [lerp(fx + 1.6, fx + .9, io(u)), 0, lerp(fz - 1.2, fz - .5, io(u))], 46);
-  at(w, 'sam', fx + .85, fz, { lie: 1, armL: jolt ? [-1.0, -.3] : [-.25, .15], armR: jolt ? [1.3, .5] : [.3, .2], legL: jolt ? -.45 : -.05, legR: jolt ? .5 : .08, mouth: jolt ? 'shout' : 'grit', brow: .9, eyes: [.2, -.4], blink: jolt ? 0 : .6, sweat: 1, bob: jolt ? 6 * Math.sin(lt * 60) : 0 });
+  at(w, 'sam', fx + .85, fz, { lie: 1, flat: true, armL: jolt ? [-1.3, -.3] : [-.6, .15], armR: jolt ? [1.3, .3] : [.6, -.15], legL: jolt ? -.45 : -.12, legR: jolt ? .45 : .12, mouth: jolt ? 'shout' : 'grit', brow: .9, eyes: [.2, -.4], blink: jolt ? 0 : .6, sweat: 1, bob: jolt ? 6 * Math.sin(lt * 60) : 0 });
   const f = w.bolt([hit[0], 0, hit[1]], su); w.ground(hit, ru, 1.5); return { focus: 8, blur: .25, rain: RAIN, flash: f + (jolt ? .12 : 0) }; });
 // 7  "And crouching down does not make you any safer." : the old advice, crossed out
 shot(12.68, 15.12, (lt, t, u, w) => { const c = anti(pr(lt, .05, .5)), [fx, fz] = SPOT.field;
   w.cam([lerp(fx - 2.6, fx + 1.8, io(u)), lerp(1.2, 1.5, u), lerp(fz + 4.4, fz + 3.6, u)], [fx, .8, fz], 42);
-  at(w, 'sam', fx, fz, huddle(t, { squash: lerp(1, .66, clamp(c)), eyes: [0, .6], blink: lt > .6 ? .7 : 0 }));
+  at(w, 'sam', fx, fz, huddle(t, { crouch: lerp(.25, 1, clamp(c)), eyes: [0, .6], blink: lt > .6 ? .7 : 0 }));
   w.cross([fx + .05, 1.75, fz + .3], pr(lt, 1.1, 1.3), .26); w.ground([fx - 3.5, fz - 2.5], pr(lt, 1.5, 2.44), 1.8); return { focus: 4, blur: .5, rain: RAIN }; });
 // 8  "If you can hear thunder," : a hand to the ear, a rumble a long way off
 shot(15.12, 16.38, (lt, t, u, w) => { const h = out(pr(lt, .1, .4)), [fx, fz] = SPOT.field, fl = pr(lt, .35, .7);
@@ -123,21 +123,21 @@ shot(33.42, 35.22, (lt, t, u, w) => { const [rx, rz] = SPOT.room, fr = io(pr(lt,
   w.indoors(fr, 0);
   w.act('sam', ROOM[0] + .75, ROOM[2] - .5, { view: 'q', face: 1, armL: [-.3, .2], armR: [lerp(.3, 2.2, out(pr(lt, .2, .5))), .5], mouth: fr > .9 ? 'smile' : 'o', brow: 0, eyes: [.7, -.6], blink: blinkAt(t) }); return { focus: 3.6, blur: .4, rain: 0 }; });
 // 23 "And if someone is hit, you can touch them." : to the friend on the ground, straight away
-shot(35.22, 37.26, (lt, t, u, w) => { const su = pr(lt, .06, .5), [fx, fz] = [SPOT.field[0] + 1.2, SPOT.field[1] + .2], fall = io(pr(lt, .22, .55)), k = out(pr(lt, .6, 1.3)), sx = lerp(fx - 4.4, fx - 1.95, k), kneel = k >= 1;
-  w.cam([lerp(fx - 1.5, fx - .7, io(u)), lerp(2.6, 2.1, io(u)), lerp(fz + 7.4, fz + 6.8, io(u))], [fx - .55, .7, fz], 46);
-  at(w, 'friend', fx + .9 * fall, fz, fall <= 0 ? scared(t, { face: -1 }) : { lie: 1, lieK: fall, armL: [-.25, .15], armR: [.3, .2], mouth: 'sad', brow: .6, blink: .8 });
-  if (lt > .55) at(w, 'sam', sx, fz + .15, kneel ? { view: 'side', face: 1, squash: .8, legL: .5, legR: 1.3, kneeL: -1.6, kneeR: -1.3, reach: [fx - .75, .5, fz + .05], reachWith: 'R', armL: [-.4, .3], mouth: 'o', brow: .8, eyes: [.6, .5], sweat: 1 } : runTo(ST.run(2.45 * k), [fx, fz]));
+shot(35.22, 37.26, (lt, t, u, w) => { const su = pr(lt, .06, .5), [fx, fz] = [SPOT.field[0] + 1.2, SPOT.field[1] + .2], fall = io(pr(lt, .22, .55)), k = out(pr(lt, .6, 1.3)), sx = lerp(fx - 4.4, fx - 1.25, k), kneel = k >= 1;
+  w.cam([lerp(fx - 1.6, fx - .9, io(u)), lerp(3.0, 3.3, io(u)), lerp(fz + 6.4, fz + 5.8, io(u))], [lerp(fx - 1.6, fx - .8, io(u)), .3, fz], 46);   /* high enough that the friend reads as lying on the ground, wide enough for both */
+  at(w, 'friend', fx + .9 * fall, fz, fall <= 0 ? scared(t, { face: -1 }) : { lie: 1, flat: true, lieK: fall, armL: [-.6, .15], armR: [.6, -.15], mouth: 'sad', brow: .6, blink: .8 });
+  if (lt > .55) at(w, 'sam', sx, fz + .15, kneel ? { view: 'side', face: 1, bob: -80, legL: .5, legR: 1.3, kneeL: -1.6, kneeR: -1.3, reach: [fx - .02, .2, fz + .02], reachWith: 'R', armL: [-.4, .3], mouth: 'o', brow: .8, eyes: [.6, .5], sweat: 1 } : runTo(ST.run(3.15 * k), [fx, fz]));
   const f = w.bolt([fx + .5, 0, fz - .8], su, w.strike2); return { focus: 5.6, blur: .4, rain: .8, flash: f }; });
 // 24 "They hold no charge." : a hand on the shoulder, and nothing jumps
 shot(37.26, 38.52, (lt, t, u, w) => { const [fx, fz] = [SPOT.field[0] + 1.2, SPOT.field[1] + .2], ok = lt > .7;
-  w.cam([lerp(fx - .9, fx - .5, u), lerp(2.0, 1.8, u), lerp(fz + 6.6, fz + 6.2, u)], [fx - .55, .8, fz], 44);
-  at(w, 'friend', fx + .9, fz, { lie: 1, armL: [-.25, .15], armR: [.3, .2], mouth: ok ? 'smile' : 'sad', brow: .3, blink: ok ? 0 : .7, eyes: [-.3, 0] });
-  at(w, 'sam', fx - 1.95, fz + .15, { view: 'side', face: 1, squash: .8, legL: .5, legR: 1.3, kneeL: -1.6, kneeR: -1.3, reach: [fx - .75, .5, fz + .05], reachWith: 'R', armL: [-.4, .3], mouth: ok ? 'smile' : 'o', brow: ok ? 0 : .6, eyes: [.6, .5] });
+  w.cam([lerp(fx - .9, fx - .7, u), lerp(3.2, 3.0, u), lerp(fz + 5.6, fz + 5.2, u)], [fx - .8, .35, fz], 44);
+  at(w, 'friend', fx + .9, fz, { lie: 1, flat: true, armL: [-.6, .15], armR: [.6, -.15], mouth: ok ? 'smile' : 'sad', brow: .3, blink: ok ? 0 : .7, eyes: [-.3, 0] });
+  at(w, 'sam', fx - 1.25, fz + .15, { view: 'side', face: 1, bob: -80, legL: .5, legR: 1.3, kneeL: -1.6, kneeR: -1.3, reach: [fx - .02, .2, fz + .02], reachWith: 'R', armL: [-.4, .3], mouth: ok ? 'smile' : 'o', brow: ok ? 0 : .6, eyes: [.6, .5] });
   if (lt > .12) w.sign([fx - .75, 1.45, fz + .3], 1); w.cross([fx - .75, 2.05, fz + .32], pr(lt, .3, .5), .22); return { focus: 4.6, blur: .5, rain: .7 }; });
 // 25 "Call for help." : phone out; the storm is still overhead, which is where the film began
 shot(38.52, 40.36, (lt, t, u, w) => { const [fx, fz] = [SPOT.field[0] + 1.2, SPOT.field[1] + .2], fl = pr(lt, 1.2, 1.7);
-  w.cam([lerp(fx - .5, fx - 1.0, io(u)), lerp(1.9, 3.4, io(u)), lerp(fz + 6.0, fz + 7.2, io(u))], [fx - .55, lerp(1.0, 1.5, u), fz], 46);
-  at(w, 'friend', fx + .9, fz, { lie: 1, armL: [-.25, .15], armR: [.3, .2], mouth: 'smile', brow: .2, eyes: [-.3, 0] });
+  w.cam([lerp(fx - .7, fx - 1.0, io(u)), lerp(3.0, 4.2, io(u)), lerp(fz + 5.6, fz + 7.4, io(u))], [fx - .8, lerp(.4, 1.2, u), fz], 46);
+  at(w, 'friend', fx + .9, fz, { lie: 1, flat: true, armL: [-.6, .15], armR: [.6, -.15], mouth: 'smile', brow: .2, eyes: [-.3, 0] });
   at(w, 'sam', fx - 1.95, fz + .15, { armL: [-.3, .2], armR: [1.9, 1.2], hold: 'phone', mouth: lt % .5 < .25 ? 'o' : 'shout', brow: .6, eyes: [.3, -.3], sweat: 1 });
   const f = w.bolt([-24, 0, -46], fl, w.props.far, 1.1); return { focus: 5, blur: .4, rain: .9, flash: f * .3 }; });
 export const SHOTS = D.SHOTS();
