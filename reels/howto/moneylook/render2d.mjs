@@ -4,10 +4,11 @@ import { createRequire } from 'node:module'; import http from 'node:http'; impor
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..'), KIT = path.resolve(ROOT, '../../.claude/kit');
 let chromium; try { ({ chromium } = createRequire(import.meta.url)('playwright')); } catch { ({ chromium } = createRequire(KIT + '/')('playwright')); }
 const types = { '.html': 'text/html', '.js': 'text/javascript', '.woff2': 'font/woff2' };
-const server = http.createServer((req, res) => { const u = decodeURIComponent(req.url.split('?')[0]), p = path.join(u.startsWith('/node_modules/') ? KIT : ROOT, u); fs.readFile(p, (e, d) => { if (e) { res.writeHead(404); res.end(); return; } res.writeHead(200, { 'content-type': types[path.extname(p)] || 'application/octet-stream' }); res.end(d); }); }).listen(0);
+const MONEY = path.resolve(ROOT, '../money');   // the money channel's films live in reels/money and are served under /money/
+const server = http.createServer((req, res) => { const u = decodeURIComponent(req.url.split('?')[0]), p = u.startsWith('/money/') ? path.join(MONEY, u.slice(7)) : path.join(u.startsWith('/node_modules/') ? KIT : ROOT, u); fs.readFile(p, (e, d) => { if (e) { res.writeHead(404); res.end(); return; } res.writeHead(200, { 'content-type': types[path.extname(p)] || 'application/octet-stream' }); res.end(d); }); }).listen(0);
 const [page, mode, a, b] = process.argv.slice(2);
 const br = await chromium.launch(), pg = await br.newPage({ viewport: { width: 720, height: 1280 } }); pg.on('pageerror', e => console.log('[pageerror]', e.message));
-await pg.goto(`http://localhost:${server.address().port}/moneylook/${page}`); await pg.waitForFunction(() => window.done && window.renderAt, null, { timeout: 30000 });
+await pg.goto(`http://localhost:${server.address().port}${page.startsWith('/') ? page : '/moneylook/' + page}`);   // a path from the root, or a page in moneylook/ await pg.waitForFunction(() => window.done && window.renderAt, null, { timeout: 30000 });
 const shot = () => pg.screenshot({ clip: { x: 0, y: 0, width: 720, height: 1280 }, type: 'png' });
 if (mode === 'stills') { fs.mkdirSync(b, { recursive: true }); for (const t of a.split(',').map(Number)) { await pg.evaluate(t => window.renderAt(t), t); fs.writeFileSync(path.join(b, `t_${t.toFixed(2)}.png`), await shot()); } }
 else { const fps = Number(b || 30), dur = await pg.evaluate(() => window.DURATION), T0 = Date.now();

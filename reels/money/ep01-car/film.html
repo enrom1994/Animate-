@@ -1,0 +1,144 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Ten Years On, ep. 1: the car payment</title>
+<style>
+  @font-face { font-family: 'Cap'; src: url('/node_modules/@fontsource/montserrat/files/montserrat-latin-800-normal.woff2') format('woff2'); font-weight: 800; }
+  html, body { margin: 0; background: #000; }
+  #stage { position: relative; width: 720px; height: 1280px; }
+  #cap { position: absolute; left: 0; right: 0; top: 938px; text-align: center; font: 800 54px/1.1 'Cap', sans-serif; color: #fff; -webkit-text-stroke: 9px #1d1a26; paint-order: stroke fill; letter-spacing: -0.5px; }
+  #cap b { color: #ffd23f; }
+</style>
+<script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js" } }</script>
+</head>
+<body>
+<div id="stage"><canvas id="c" width="720" height="1280"></canvas><div id="cap"></div></div>
+<script src="/moneylook/stick/lib.js"></script>
+<script src="/moneylook/stick/chars.js"></script>
+<script type="module">
+// Ten Years On, episode 1: the new car payment. Every frame is a function of time: window.renderAt(t). Times are seconds of audio/vo.wav.
+// The street is painted once, at twice the size, so the camera can push in without blur; the car, the jar, the tags, the people,
+// the sky and the caption are drawn each frame.
+import { car } from '/moneylook/stick/props2d.js';
+import { CAPTIONS, DURATION } from '/money/ep01-car/src/captions.js';
+const c = document.getElementById('c'), g = c.getContext('2d'), INK = '#2e1d1c', capEl = document.getElementById('cap');
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v)), mixN = (a, b, u) => a + (b - a) * u, io = u => u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2, pr = (t, a, b) => clamp((t - a) / (b - a));
+let s = 7; const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
+const ink = (ctx, lw = 5) => { ctx.strokeStyle = INK; ctx.lineWidth = lw; ctx.lineJoin = 'round'; ctx.lineCap = 'round'; };
+const rect = (ctx, x, y, w, h, fill, lw = 5, rad = 0) => { ctx.beginPath(); ctx.roundRect(x, y, w, h, rad); ctx.fillStyle = fill; ctx.fill(); if (lw) { ink(ctx, lw); ctx.stroke(); } };
+await document.fonts.load("800 54px Cap");
+// ---- the street, painted once at 2x (scene units: 720 wide, the old frame's coordinates, already lifted 78 px) ----
+const K = 2, bg = document.createElement('canvas'); bg.width = 720 * K; bg.height = 1400 * K; { const b = bg.getContext('2d'); b.scale(K, K); b.translate(0, -78);
+  for (const [x, y, k] of [[150, 170, 1], [560, 120, .8], [430, 260, .6]]) { b.fillStyle = 'rgba(255,248,236,.85)'; b.beginPath(); for (const [dx, dy, rr] of [[0, 0, 46], [44, 6, 36], [-42, 8, 34], [12, -24, 32]]) b.ellipse(x + dx * k, y + dy * k, rr * k * 1.3, rr * k, 0, 0, 7); b.fill(); }
+  b.fillStyle = '#b8c8b4'; b.beginPath(); b.moveTo(0, 640); for (let x = 0; x <= 720; x += 60) { const h = 40 + r() * 50; b.lineTo(x, 640 - h); b.lineTo(x + 30, 640 - h - 26); b.lineTo(x + 60, 640 - h); } b.lineTo(720, 700); b.lineTo(0, 700); b.fill();
+  b.fillStyle = '#9fb59a'; for (let i = 0; i < 9; i++) { b.beginPath(); b.arc(30 + i * 85, 650, 34 + r() * 14, 0, 7); b.fill(); }
+  const house = (x0, w, wall, trim, shut, door, brick) => { const top = 360, base = 870;
+    b.beginPath(); b.moveTo(x0 - 16, top); b.lineTo(x0 + w / 2, top - 120); b.lineTo(x0 + w + 16, top); b.closePath(); b.fillStyle = '#9b4a36'; b.fill(); ink(b, 6); b.stroke();
+    for (let i = 0; i < 6; i++) { b.strokeStyle = 'rgba(46,29,28,.25)'; b.lineWidth = 3; b.beginPath(); const y = top - 20 - i * 18, k = (i * 18 + 20) / 120; b.moveTo(x0 - 16 + k * (w / 2 + 16), y); b.lineTo(x0 + w + 16 - k * (w / 2 + 16), y); b.stroke(); }
+    rect(b, x0, top, w, base - top, wall, 0);
+    if (brick) for (let y = top + 6; y < base; y += 22) for (let x = x0 + ((y / 22) % 2 ? 0 : -18); x < x0 + w; x += 36) { b.fillStyle = `rgba(${r() < .5 ? '90,35,25' : '235,180,150'},${.12 + r() * .12})`; b.fillRect(Math.max(x0, x + 2), y, Math.min(32, x0 + w - x - 2), 18); }
+    else for (let i = 0; i < 160; i++) { b.fillStyle = `rgba(${r() < .5 ? '140,110,70' : '255,245,225'},.12)`; b.beginPath(); b.arc(x0 + r() * w, top + r() * (base - top), 6 + r() * 18, 0, 7); b.fill(); }
+    ink(b, 6); b.strokeRect(x0, top, w, base - top);
+    const win = (x, y) => { rect(b, x - 44, y - 6, 18, 112, shut, 4, 3); rect(b, x + 26, y - 6, 18, 112, shut, 4, 3); rect(b, x - 26, y - 8, 52, 116, trim, 5, 3);
+      const gl = b.createLinearGradient(x - 20, y, x + 20, y + 100); gl.addColorStop(0, '#7f9fb4'); gl.addColorStop(1, '#4f6f84'); rect(b, x - 20, y, 40, 100, gl, 0);
+      b.fillStyle = 'rgba(255,255,255,.35)'; b.beginPath(); b.moveTo(x - 14, y + 4); b.lineTo(x - 4, y + 4); b.lineTo(x - 18, y + 46); b.lineTo(x - 20, y + 30); b.fill(); ink(b, 4); b.beginPath(); b.moveTo(x, y); b.lineTo(x, y + 100); b.moveTo(x - 20, y + 42); b.lineTo(x + 20, y + 42); b.stroke(); rect(b, x - 32, y + 104, 64, 10, trim, 4, 2); };
+    win(x0 + w * .3, 410); win(x0 + w * .72, 410); win(x0 + w * .3, 660);
+    rect(b, x0 + w * .62, 670, 76, 200, door, 5, 6); b.fillStyle = '#d9a83a'; b.beginPath(); b.arc(x0 + w * .62 + 62, 775, 6, 0, 7); b.fill(); ink(b, 3); b.stroke(); rect(b, x0 + w * .58, 866, 100, 12, '#cfc2a8', 4, 2); };
+  house(40, 320, '#e9d3a6', '#f4ead6', '#3f6b55', '#2f6f73', false); house(360, 320, '#b8604a', '#f4ead6', '#7a3a32', '#7a3a32', true);
+  for (const x0 of [40, 360]) { rect(b, x0, 878, 320, 34, '#7aa85a', 4, 4); for (let i = 0; i < 26; i++) { b.fillStyle = '#5f8a48'; b.beginPath(); b.arc(x0 + 8 + i * 12, 880, 9, 0, 7); b.fill(); } }
+  rect(b, 0, 912, 720, 74, '#d9ccb2', 0); for (let x = 0; x < 720; x += 90) { ink(b, 3); b.strokeStyle = 'rgba(46,29,28,.35)'; b.beginPath(); b.moveTo(x, 912); b.lineTo(x - 20, 986); b.stroke(); }
+  rect(b, 0, 986, 720, 16, '#b8ab92', 4); rect(b, 0, 1002, 720, 480, '#6b6966', 0);
+  for (let i = 0; i < 5000; i++) { b.fillStyle = `rgba(${r() < .5 ? '30,30,30' : '200,200,195'},.25)`; b.fillRect(r() * 720, 1002 + r() * 480, 2, 2); }
+  b.fillStyle = '#efe6d2'; for (let x = 20; x < 720; x += 150) b.fillRect(x, 1150, 80, 10); }
+// paper grain, once
+const grain = document.createElement('canvas'); grain.width = 720; grain.height = 1280; { const q = grain.getContext('2d'); for (let i = 0; i < 60000; i++) { q.fillStyle = `rgba(${r() < .5 ? '60,40,20' : '255,250,240'},.05)`; q.fillRect(r() * 720, r() * 1280, 2, 2); } }
+// ---- the things that change, in scene units (raw y; Y() lifts it like the street) ----
+const Y = v => v - 78, out = u => 1 - Math.pow(1 - u, 3), pop = k => k <= 0 ? 0 : k >= 1 ? 1 : 1 + 2.2 * Math.pow(k - 1, 3) + 1.2 * Math.pow(k - 1, 2);
+const fmt = v => '$' + (Math.round(v / 100) * 100).toLocaleString('en-US');
+const lerpHex = (a, b, u) => { const p = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)), A = p(a), B = p(b); return '#' + A.map((v, i) => Math.round(v + (B[i] - v) * u).toString(16).padStart(2, '0')).join(''); };
+// a tag: the number on the thing. k 0..1 pops it in; big text, small text under it, optional note under that
+const tag = (x, y, w, h, big, small, col, k = 1, note = '') => { if (k <= 0) return; g.save(); g.translate(x, Y(y) + 4 * Math.sin(T_ * 2.2 + x * .01)); g.rotate(-.035); const sc = pop(k); g.scale(sc, sc);
+  rect(g, -w / 2, -h / 2, w, h + (note ? h * .26 : 0), '#f6efe0', 5, 10); g.textAlign = 'center'; g.fillStyle = col; g.font = `800 ${h * .42}px Cap`; g.fillText(big, 0, h * .06); g.fillStyle = INK; g.font = `800 ${h * .24}px Cap`; g.fillText(small, 0, h * .36);
+  if (note) { g.fillStyle = '#6b5a4a'; g.font = `800 ${h * .14}px Cap`; g.fillText(note, 0, h * .62); } g.restore(); };
+// a rubber stamp: lands with a thump, slightly rotated
+const stamp = (x, y, text, k) => { if (k <= 0) return; g.save(); g.translate(x, Y(y)); g.rotate(-.18); const sc = (k < 1 ? 2.2 - 1.2 * out(k) : 1) * 1.2; g.scale(sc, sc); g.globalAlpha = Math.min(1, k * 3);
+  g.strokeStyle = '#b8302a'; g.lineWidth = 6; g.beginPath(); g.roundRect(-92, -28, 184, 56, 8); g.stroke(); g.fillStyle = '#b8302a'; g.font = '800 34px Cap'; g.textAlign = 'center'; g.fillText(text, 0, 12); g.restore(); };
+// a paycheck: an envelope-shaped slip with PAY on it
+const paycheck = (x, y, k) => { if (k <= 0) return; g.save(); g.translate(x, Y(y)); g.scale(pop(k), pop(k)); rect(g, -62, -36, 124, 72, '#f2ead2', 5, 6); g.fillStyle = '#7aa85a'; g.fillRect(-52, -24, 30, 30); ink(g, 3); g.strokeRect(-52, -24, 30, 30);
+  g.fillStyle = INK; g.font = '800 22px Cap'; g.textAlign = 'left'; g.fillText('PAY', -12, -2); g.fillRect(-12, 12, 60, 4); g.fillRect(-52, 22, 100, 4); g.restore(); };
+const CARS = { theo: { x: 125, w: 250, base: 1000 }, max: { x: 585, w: 270, base: 1000 } };
+// the new car drives in during the hook and pulls up at the kerb (a small dip as it stops)
+const maxCarX = t => { const u = pr(t, .05, 2.2); return u >= 1 ? CARS.max.x : CARS.max.x + 520 * Math.pow(1 - u, 3); };
+const maxCarDip = t => { const d = t - 2.2; return d > 0 && d < .5 ? 5 * Math.sin(d * Math.PI / .5) : 0; };
+function cars(t, maxAge, theoAge) { car(g, CARS.theo.x, Y(CARS.theo.base), CARS.theo.w, { paint: lerpHex('#5f7a5a', '#7f8a7a', theoAge) }); g.save(); g.translate(0, maxCarDip(t)); car(g, maxCarX(t), Y(CARS.max.base), CARS.max.w, { paint: lerpHex('#2f5fa8', '#7d8794', maxAge) }); g.restore();
+  if (maxAge > .45) { const a = clamp((maxAge - .45) / .55); g.fillStyle = `rgba(122,62,30,${.7 * a})`; for (const [x, y, rr] of [[480, 975, 8], [500, 982, 5], [655, 978, 7], [690, 955, 5]]) { g.beginPath(); g.ellipse(x, Y(y), rr * a + 2, rr * .6 * a + 1, 0, 0, 7); g.fill(); } } }
+function jar(fill, x = 215, base = 876) { const y = Y(base), H = 84 + 40 * fill; g.beginPath(); g.roundRect(x - 34, y - H, 68, H + 4, 10); g.fillStyle = 'rgba(200,225,232,.7)'; g.fill();
+  const n = Math.round(2 + fill * 40); for (let i = 0; i < n; i++) { g.beginPath(); g.ellipse(x - 16 + (i % 3) * 16, y - 7 - Math.floor(i / 3) * 7.5, 13, 5, 0, 0, 7); g.fillStyle = '#d9a83a'; g.fill(); ink(g, 2.5); g.stroke(); }
+  g.beginPath(); g.roundRect(x - 34, y - H, 68, H + 4, 10); ink(g, 5); g.stroke(); rect(g, x - 38, y - H - 14, 76, 16, '#c9a24a', 4, 4); return y - H - 14; }
+const coin = (x0, y0, x1, y1, u) => { if (u <= 0 || u >= 1) return; const x = mixN(x0, x1, u), y = mixN(y0, y1, u) - 60 * Math.sin(Math.PI * u); g.save(); g.translate(x, Y(y)); g.scale(Math.cos(u * 14), 1); g.beginPath(); g.ellipse(0, 0, 13, 13, 0, 0, 7); g.fillStyle = '#e2b13c'; g.fill(); ink(g, 3); g.stroke(); g.restore(); };
+const stick = (x, foot, o, extra) => { drawStick(g, { x, y: Y(foot), s: 250, hat: 'none', belt: false, shadow: true, ...o }); extra && extra(x, Y(foot), 250 * (o.flip || 1), 250, o.bob || 0); };
+const scarf = (x, foot, sx, s, bob) => { const y = foot - .6 * s + bob * s; g.beginPath(); g.roundRect(x - .14 * s, y - .03 * s, .28 * s, .07 * s, .03 * s); g.fillStyle = '#2f8a86'; g.fill(); ink(g, 4); g.stroke();
+  g.beginPath(); g.moveTo(x + .06 * sx, y + .03 * s); g.lineTo(x + .1 * sx, y + .2 * s); g.lineTo(x + .03 * sx, y + .21 * s); g.lineTo(x, y + .04 * s); g.closePath(); g.fillStyle = '#2f8a86'; g.fill(); g.stroke(); };
+const cap = (x, foot, sx, s, bob) => { const hx = x, hy = foot - .765 * s + bob * s, hr = .19 * s; g.beginPath(); g.arc(hx, hy - .02 * s, hr * 1.02, Math.PI * 1.05, Math.PI * 1.95); g.closePath(); g.fillStyle = '#d9772e'; g.fill(); ink(g, 4); g.stroke();
+  g.beginPath(); g.ellipse(hx + Math.sign(sx) * hr * .9, hy - hr * .28, hr * .55, hr * .14, 0, 0, 7); g.fillStyle = '#b8601f'; g.fill(); g.stroke(); };
+const THEO = 305, MAX = 425, FOOT = 958;
+// the camera: [time, centre x, centre y (raw), zoom]; between keys it eases. Each beat's framing is held with a slow drift, then moves on the beat.
+const KEYS = [[0, 530, 880, 1.75], [5.1, 530, 870, 1.75], [5.45, 365, 800, 1.3], [7.2, 365, 795, 1.35], [7.5, 545, 850, 1.75], [8.35, 545, 850, 1.8], [8.65, 210, 860, 1.75], [11.2, 210, 860, 1.85],
+  [11.55, 360, 820, 1.12], [13.6, 360, 815, 1.16], [13.95, 215, 790, 1.85], [17.3, 230, 790, 1.95], [17.65, 560, 860, 1.75], [21.4, 560, 850, 1.85], [21.75, 360, 830, 1.0], [24.9, 360, 825, 1.04],
+  [25.25, 190, 770, 2.1], [27.5, 190, 765, 2.2], [27.9, 290, 790, 1.32], [32.9, 300, 790, 1.38], [33.3, 360, 790, 1.18], [37.7, 360, 795, 1.24]];
+// inside every held beat the camera keeps pushing in (about 12%) and drifting, so no beat sits still
+for (let i = 1; i < KEYS.length; i++) { const [t0, x0, y0, z0] = KEYS[i - 1], k = KEYS[i]; if (k[0] - t0 > .9) { k[3] = z0 * 1.12; k[1] = x0 + 14; k[2] = y0 - 8; } }
+KEYS[0] = [0, 600, 880, 1.6]; KEYS[1] = [5.1, 530, 870, 1.95];   // the hook follows the car in
+const camKey = t => { for (let i = 1; i < KEYS.length; i++) if (t <= KEYS[i][0]) { const [t0, ...a] = KEYS[i - 1], [t1, ...b] = KEYS[i], u = io(clamp((t - t0) / (t1 - t0))); return a.map((v, j) => mixN(v, b[j], u)); } return KEYS.at(-1).slice(1); };
+const camAt = t => { const [cx, cy, z] = camKey(t), h = 360 / z; return [clamp(cx, h, 720 - h), cy, z]; };
+const SWAP = { '17000': '17,000', '24000': '24,000', '580': '$580', 'theo': 'Theo', 'max': 'Max', "max's": "Max's", 'america': 'America' };
+const capText = s => s.replace(/(<b>)?([a-z0-9']+)(<\/b>)?/g, (m, a, w, b) => (a || '') + (SWAP[w] || w) + (b || ''));
+let T_ = 0;
+// the new car's gleam: a bright band sweeping across its paint while Max polishes it
+const gleam = (t, k) => { if (k <= 0 || k >= 1) return; const c = CARS.max, x = c.x - c.w / 2 + (c.w + 80) * k - 40; g.save(); g.beginPath(); g.rect(c.x - c.w / 2, Y(c.base) - .48 * c.w, c.w, .4 * c.w); g.clip(); g.globalCompositeOperation = 'lighter'; const gr = g.createLinearGradient(x - 30, 0, x + 30, 0); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(.5, 'rgba(255,255,255,.55)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.save(); g.translate(x, Y(c.base) - .28 * c.w); g.rotate(.35); g.fillRect(-30, -120, 60, 240); g.restore(); g.restore(); };
+window.renderAt = t => { T_ = t;
+  const [cx, cy, z] = camAt(t), jump = io(pr(t, 27.9, 32.4)), maxAge = .5 * io(pr(t, 17.8, 21.3)) + .45 * jump, theoAge = .35 + .25 * jump;
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  { const gr = g.createLinearGradient(0, 0, 0, 1280); gr.addColorStop(0, '#9cc3d6'); gr.addColorStop(.62, '#f4dfb8'); g.fillStyle = gr; g.fillRect(0, 0, 720, 1280); }
+  g.setTransform(z, 0, 0, z, 360 - cx * z + Math.sin(t * 1.7) * 2, 640 - Y(cy) * z + Math.sin(t * 2.3) * 2);
+  g.drawImage(bg, 0, 0, 720 * K, 1400 * K, 0, 0, 720, 1400);
+  // the hedges grow through the time jump
+  if (jump > 0) for (const x0 of [40, 360]) { g.fillStyle = '#5f8a48'; for (let i = 0; i < 26; i++) { g.beginPath(); g.arc(x0 + 8 + i * 12, Y(880) - 14 * jump * (.6 + .4 * Math.sin(i * 1.7)), 9 + 5 * jump, 0, 7); g.fill(); } }
+  // the jar: empty until Theo starts investing, filling through the months, then the years
+  const months = pr(t, 14.2, 17.2), fill = t < 14 ? 0 : t < 25 ? .45 * months : .45 + .25 * pr(t, 25.2, 26.4) + .3 * jump;
+  const jt = jar(fill);
+  // Theo drops a coin in each month (three coins in the shot)
+  for (let i = 0; i < 4; i++) coin(THEO - 30, 800, 215, 830, pr(t, 14.3 + i * .75, 14.9 + i * .75));
+  cars(t, maxAge, theoAge); gleam(t, pr(t, .3, 1.5)); gleam(t, pr(t, 3.3, 4.5)); gleam(t, pr(t, 7.6, 8.5));
+  // the people
+  const b = Math.sin(t * 6), cheer = t > 33.3 || (t > 26 && t < 27.7), proud = (t < 5.4) || (t > 7.4 && t < 8.6);
+  const theoReach = t > 14 && t < 17.4;
+  stick(THEO, FOOT, { cols: ['#3f6f8a', '#3f6f8a'], lean: .03 * Math.sin(t * 1.3), bob: cheer ? -.035 * Math.abs(Math.sin(t * 9)) : .014 * b,
+    arms: cheer ? { L: [2.6, -.3], R: [2.6, -.3] } : theoReach ? { L: [1.6 + .25 * Math.sin(t * 8.4), -.2], R: [.35, -.15] } : t > 8.6 && t < 11.4 ? { L: [.35, -.15], R: [1.4, -.5] } : { L: [.35, -.15], R: [.35, -.15] },
+    face: cheer ? { eyes: 'happy', mouth: 'grin' } : t > 8.6 && t < 11.4 ? { mouth: 'smile', look: [-.5, 0] } : { mouth: 'smile', look: [.3, 0] } }, scarf);
+  const worried = t > 18.5 && t < 21.6;
+  const maxX = MAX;   /* he waits on the pavement; the car comes to him (people are drawn over cars, so nobody stands where a car passes) */
+  stick(maxX, FOOT, { flip: -1, cols: ['#e7c65a', '#e7c65a'], lean: .03 * Math.sin(t * 1.1 + 1), bob: .014 * Math.sin(t * 6 + 1),
+    arms: proud ? { L: [.35, -.15], R: [t < 5.4 ? 1.7 + .5 * Math.sin(t * 7) : 2.5 + .15 * Math.sin(t * 9), -.2 - .3 * Math.max(0, Math.sin(t * 7))] } : worried ? { L: [2.2, -1.4], R: [.35, -.15] } : t > 33.3 ? { L: [.25, -.1], R: [.25, -.1] } : { L: [.35, -.15], R: [.35, -.15] },
+    face: proud ? { mouth: 'grin', look: [-.5, 0] } : worried ? { eyes: 'wide', mouth: 'o', look: [-.6, .3] } : t > 33.3 ? { eyes: 'wide', mouth: 'flat', look: [.5, 0] } : { mouth: 'smile', look: [.3, 0] } }, cap);
+  // the numbers, on the things
+  paycheck(THEO, 620, pr(t, 5.5, 5.85) * (t < 7.4 ? 1 : 0)); paycheck(MAX, 620, pr(t, 5.65, 6.0) * (t < 7.4 ? 1 : 0));
+  if (t > 5.9 && t < 7.4) { g.fillStyle = INK; g.font = '800 64px Cap'; g.textAlign = 'center'; g.fillText('=', 365, Y(640)); }
+  if (t < 5.45 || (t > 7.3 && t < 8.6) || (t > 11.4 && t < 13.85)) tag(585, 800, 180, 84, '$787', 'a month', '#7a3a32', t < 5.45 ? pr(t, 2.7, 3.1) : 1);
+  if (t > 8.5 && t < 13.85) tag(150, 800, 170, 80, '$580', 'a month', '#3f6b55', pr(t, 10.3, 10.7));
+  if (t > 11.4 && t < 13.85) tag(365, 640, 210, 96, '$205', 'a month apart', '#b8601f', pr(t, 11.7, 12.1));
+  if (t > 14 && t < 25.1) tag(215, Y(jt) + 78 - 60 > 0 ? jt + 78 - 66 : 700, 170, 80, '$205', `month ${Math.max(1, Math.round(1 + 69 * months))}`, '#2f6f73', pr(t, 14.1, 14.4));
+  if (t > 17.5 && t < 21.7) tag(585, 800, 190, 84, fmt(mixN(50000, 22500, io(pr(t, 18.6, 21.2)))), `worth · year ${Math.max(1, Math.round(1 + 4 * pr(t, 18.6, 21.2)))}`, '#7a3a32', pr(t, 17.7, 18.0));
+  stamp(158, 955, 'PAID OFF', t < 25.1 ? pr(t, 22.6, 22.85) : 0); stamp(562, 955, 'PAID OFF', t < 25.1 ? pr(t, 23.6, 23.85) : 0);
+  if (t > 25.1) { const v = t < 27.8 ? mixN(14350, 17660, io(pr(t, 25.4, 26.6))) : mixN(17660, 23620, jump); const big = t > 27.8 ? 1.25 : 1; tag(t > 27.8 ? 200 : 215, jt + 78 - 66 * big, 190 * big, 86 * big, fmt(v), t < 27.8 ? (v < 17000 ? 'paid in' : 'after 6 years') : 'ten years on', '#2f6f73', pr(t, 25.2, 25.5), t > 27.8 ? '7% a year · not guaranteed' : ''); }
+  if (t > 33.4) tag(500, 660, 200, 92, '$205', 'a month', '#b8601f', pr(t, 34.3, 34.7));
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  const days = pr(t, 28.0, 32.4); if (days > 0 && days < 1) { const d = Math.sin(days * Math.PI * 12); g.fillStyle = `rgba(20,24,52,${.3 * Math.max(0, -d)})`; g.fillRect(0, 0, 720, 1280); }
+  g.drawImage(grain, 0, 0);
+  const c_ = CAPTIONS.filter(c => t >= c[0]).pop(); capEl.innerHTML = c_ && (c_[2] == null || t < c_[2]) ? capText(c_[1]) : '';
+};
+window.DURATION = DURATION; window.done = true;
+</script>
+</body>
+</html>

@@ -104,3 +104,6 @@ id,type,name
 803,ambience,construction place machinery ambience
 810,foley,tape measure extend
 2958,impact,collapsing structure
+1993,foley,clinking coins
+2003,foley,coins sound
+1989,foley,money bag drop
