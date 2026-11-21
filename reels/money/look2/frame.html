@@ -1,0 +1,85 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Ten Years On: toon look test</title>
+<style>
+  @font-face { font-family: 'Cap'; src: url('/node_modules/@fontsource/montserrat/files/montserrat-latin-800-normal.woff2') format('woff2'); font-weight: 800; }
+  html,body{margin:0;background:#000} canvas{display:block;width:720px;height:1280px}
+  #cap { position: absolute; left: 0; top: 938px; width: 720px; text-align: center; font: 800 54px/1.1 'Cap', sans-serif; color: #fff; -webkit-text-stroke: 9px #1d1a26; paint-order: stroke fill; }
+  #cap b { color: #ffd23f; }
+</style></head>
+<body><div style="position:relative;width:720px;height:1280px"><canvas id="c" width="1080" height="1920"></canvas><div id="cap"><b>787</b> dollars a</div></div>
+<script type="module">
+// Look test: the convenience-store counter at night, in the scifi-toon style (boiling ink line, flat fills, hard shadows, big eyes).
+// Our own character: Max (orange cap, hi-vis vest over a grey tee), on a night shift, with his car payment on the counter.
+import { INK, init, frame, push, pop, translate, rotate, scale, shape, fillOnly, stroke, ell, arc, spline, rr, rect, noodle, quad, dot, text, bands } from './toon.js';
+import { eye, mouth, hand, sweat } from './faces.js';
+import { hash } from './lib.js';
+await document.fonts.load("800 54px Cap");
+const g = init(document.getElementById('c'));
+const C = { wall: '#6f8489', wallS: '#5a6e74', ceil: '#a9b8b8', light: '#f4fbf6', counter: '#c9b896', counterS: '#a8977a', counterF: '#7d6e56', night: '#23304f', night2: '#2f3f63',
+  skin: '#e9b98f', skinS: '#cf9a6f', cap: '#e8742e', capS: '#c45a1c', vest: '#f08a24', vestS: '#cf6c10', strip: '#dfe4e6', tee: '#7d8086', teeS: '#63666c', shelf: '#6b5a4a' };
+window.renderAt = t => {
+  frame(t);
+  g.fillStyle = C.wall; g.fillRect(0, 0, 1080, 1920);
+  for (let i = 0; i < 40; i++) fillOnly(ell(hash(i) * 1080, 620 + hash(i * 3.3) * 700, 20 + hash(i * 7) * 60, 10 + hash(i * 9) * 30, 14), 'rgba(40,50,45,.10)', { boil: .2 });
+  // ceiling with fluorescent tubes (one flickers)
+  fillOnly(rect(-20, 0, 1120, 300), C.ceil, { boil: 0 });
+  for (let i = 0; i < 6; i++) stroke([[-20, 60 + i * 44], [1100, 60 + i * 44]], 3, { line: '#aab6b5' });
+  for (const [x, y, on] of [[120, 120, 1], [620, 160, (Math.floor(t * 9) % 7 === 0) ? .4 : 1]]) { shape(rr(x, y, 340, 44, 10), { fill: on > .5 ? C.light : '#cfd8d4', lw: 6 }); if (on > .5) shape(rr(x - 30, y + 44, 400, 30, 14), { fill: 'rgba(240,255,245,.18)', stroke: false }); }
+  // night window strip with a gas pump and a street light outside
+  shape(rect(-20, 300, 1120, 300), { fill: C.night, lw: 7, shade: () => { fillOnly(rect(-20, 520, 1120, 80), C.night2, { boil: 0 }); fillOnly(ell(860, 360, 60, 60), 'rgba(255,230,150,.12)', { boil: 0 }); } });
+  shape(rect(820, 360, 14, 200), { fill: '#3a4566', lw: 5 }); shape(ell(830, 352, 26, 14), { fill: '#ffe9a8', lw: 5 });
+  shape(rr(120, 400, 110, 170, 10), { fill: '#c8433a', lw: 6, shade: () => fillOnly(rr(140, 420, 70, 50, 6), '#ffe9a8', { boil: .3 }) }); stroke(spline([[230, 450], [270, 470], [262, 540]], false), 6);
+  for (const x of [380, 700]) stroke([[x, 300], [x, 600]], 9);
+  // the back wall: shelves of snacks, a cigarette-style rack (cards, generic), a coffee machine
+  for (let r = 0; r < 3; r++) { const y = 690 + r * 150; fillOnly(rect(-20, y + 110, 640, 18), C.shelf, { boil: .3 }); stroke([[-20, y + 110], [620, y + 110]], 6);
+    for (let i = 0; i < 9; i++) { const x = 10 + i * 68, h = 70 + hash(i + r * 9) * 30, col = ['#d9433a', '#f2c14e', '#4f8fd6', '#7ab55c', '#e8742e', '#b45fc4'][(i + r * 2) % 6]; shape(rr(x, y + 110 - h, 56, h, 6), { fill: col, lw: 5, shade: () => fillOnly(rect(x + 36, y + 110 - h, 30, h), 'rgba(0,0,0,.18)', { boil: .3 }) }); fillOnly(rr(x + 10, y + 120 - h, 36, 18, 4), 'rgba(255,255,255,.7)', { boil: .3 }); } }
+  shape(rr(690, 650, 330, 420, 16), { fill: '#3f4a5a', lw: 7, shade: () => { for (let r = 0; r < 4; r++) for (let i = 0; i < 4; i++) fillOnly(rr(712 + i * 76, 676 + r * 96, 60, 80, 4), ['#e9e2c8', '#c8433a', '#e9e2c8', '#2f6f73'][(i + r) % 4], { boil: .3 }); } });
+  // Max behind the counter: hi-vis vest over a grey tee, arms on the counter, head hung
+  const ox = 540, oy = 1290;
+  push(); translate(ox, oy);
+  shape(spline([[-190, 40], [-170, -150], [-90, -230], [90, -230], [170, -150], [190, 40]]), { fill: C.tee, lw: 7, shade: () => fillOnly(spline([[60, -230], [190, -150], [200, 60], [80, 60]]), C.teeS, { boil: .4 }) });
+  for (const s of [-1, 1]) { shape(spline([[s * 30, -228], [s * 150, -170], [s * 180, 40], [s * 50, 40], [s * 40, -120]]), { fill: C.vest, lw: 7, shade: () => fillOnly(rect(s > 0 ? 100 : -200, -230, 100, 280), C.vestS, { boil: .4 }) });
+    shape(rect(s > 0 ? 58 : -170, -110, 112, 26), { fill: C.strip, lw: 5 }); shape(rect(s > 0 ? 58 : -170, -40, 112, 26), { fill: C.strip, lw: 5 }); }
+  // arms forward onto the counter, hands flat
+  // neck and the big round head, hung forward
+  shape(rr(-36, -290, 72, 80, 20), { fill: C.skin, lw: 6, shade: () => fillOnly(rect(-40, -290, 80, 30), C.skinS, { boil: .3 }) });
+  push(); translate(0, -470); rotate(-.05);
+  shape(ell(0, 0, 200, 190, 80), { fill: C.skin, lw: 8, shade: () => { fillOnly(spline([[60, -200], [230, -40], [210, 140], [80, 210], [150, 40]]), C.skinS, { boil: .3 }); } });
+  for (const s of [-1, 1]) shape(ell(s * 196, 14, 26, 36, 18), { fill: C.skin, lw: 6, shade: () => fillOnly(ell(s * 192, 16, 10, 18, 12), C.skinS, { boil: .3 }) });
+  // the cap: crown, front panel shading, a long bill, a button
+  shape(spline([[-196, -40], [-180, -140], [-90, -200], [60, -206], [170, -150], [200, -40], [0, -64]]), { fill: C.cap, lw: 7, shade: () => fillOnly(spline([[60, -206], [200, -150], [210, -30], [90, -50]]), C.capS, { boil: .4 }) });
+  shape(spline([[-210, -48], [-60, -86], [120, -80], [250, -30], [240, -6], [100, -40], [-80, -42], [-214, -24]]), { fill: C.capS, lw: 7 });
+  dot(-10, -196, 9, INK);
+  // tired eyes, inner brows up, a small frown, a sweat drop
+  const lid = .52 + .05 * Math.sin(t * 1.3);
+  eye(-70, 40, 58, 62, { lid, look: [.15, .55], pupil: 8, skin: C.skin, lw: 7 }); eye(70, 40, 58, 62, { lid, look: [.15, .55], pupil: 8, skin: C.skin, lw: 7 });
+  stroke(spline([[-130, -8], [-80, -24], [-30, -6]], false), 9); stroke(spline([[30, -6], [80, -24], [130, -8]], false), 9);
+  for (const [ex] of [[-70], [70]]) stroke(arc(ex, 108, 40, 12, Math.PI * .2, Math.PI * .8, 10), 4);
+  shape(spline([[-4, 64], [14, 96], [0, 112], [-16, 104]]), { fill: C.skin, lw: 6 });
+  mouth(0, 150, 70, { o: 0, sm: -.6, lw: 7 });
+  sweat(178, -60 + (t * 30 % 40), 1.3);
+  pop(); pop();
+  // the counter, worn, in front of him
+  shape(rect(-20, 1300, 1120, 120), { fill: C.counter, lw: 7, shade: () => { for (const [a, b] of [[[120, 1330], [240, 1350]], [[700, 1320], [790, 1360]], [[420, 1380], [470, 1365]]]) stroke([a, b], 3, { line: '#9c8a6a' }); fillOnly(rect(-20, 1400, 1120, 20), C.counterS, { boil: .3 }); } });
+  shape(rect(-20, 1420, 1120, 520), { fill: C.counterF, lw: 7, shade: () => { for (let i = 0; i < 6; i++) stroke([[-20 + i * 200, 1420], [-20 + i * 200, 1940]], 5); fillOnly(rect(-20, 1420, 1120, 50), 'rgba(0,0,0,.2)', { boil: .3 }); } });
+  // on the counter: the car payment slip, a card, the car key, a coffee
+  push(); translate(330, 1356); rotate(-.08); shape(rect(-120, -40, 240, 92), { fill: '#f4efe0', lw: 6 }); text('CAR PAYMENT', 0, -12, { font: '800 30px Cap', fill: INK }); text('$787 / mo', 0, 26, { font: '800 34px Cap', fill: '#b8302a' }); pop();
+  push(); translate(590, 1362); rotate(.06); shape(rr(-70, -40, 140, 84, 12), { fill: '#2f6f73', lw: 6, shade: () => { fillOnly(rect(-70, -22, 140, 16), '#1d1a26', { boil: .3 }); fillOnly(rr(-52, 10, 30, 22, 4), '#e2b13c', { boil: .3 }); } }); pop();
+  push(); translate(760, 1358); rotate(-.3); shape(rr(-34, -22, 68, 44, 18), { fill: '#2d2a33', lw: 6, shade: () => fillOnly(ell(10, 0, 10, 10, 12), '#c8433a', { boil: .3 }) }); shape(ell(-50, 0, 20, 20, 16), { fill: 'rgba(0,0,0,0)', lw: 6 }); pop();
+  shape(spline([[880, 1250], [960, 1250], [950, 1356], [890, 1356]]), { fill: '#f4efe0', lw: 6, shade: () => fillOnly(rect(870, 1280, 100, 30), '#8a5a3a', { boil: .3 }) });
+  for (let i = 0; i < 2; i++) stroke(spline([[905 + i * 22, 1236], [895 + i * 22, 1210], [912 + i * 22, 1188]], false), 4, { line: '#cfd8d4' });
+  // a hot dog roller at the back left of the counter, under a glass hood
+  shape(rr(-30, 1170, 230, 130, 10), { fill: '#9aa3ad', lw: 6, shade: () => fillOnly(rect(-30, 1270, 230, 30), '#7a838d', { boil: .3 }) });
+  for (let i = 0; i < 4; i++) shape(rr(-10, 1196 + i * 18, 190, 16, 8), { fill: '#c9663a', lw: 4 });
+  shape(spline([[-34, 1176], [0, 1110], [190, 1104], [214, 1176]]), { fill: 'rgba(210,235,240,.25)', lw: 5 });
+  // Max's arms: short grey sleeves, forearms resting on the counter, hands flat
+  push(); translate(540, 1290);
+  for (const s of [-1, 1]) { shape(noodle([s * 160, -180], [s * 175, -60], s * 10, 62, 56), { fill: C.tee, lw: 7, shade: () => fillOnly(rect(s > 0 ? 160 : -240, -200, 80, 160), C.teeS, { boil: .3 }) });
+    shape(noodle([s * 175, -70], [s * 95, 55], s * -20, 48, 42), { fill: C.skin, lw: 7, shade: () => fillOnly(rect(s > 0 ? 140 : -200, -80, 60, 140), C.skinS, { boil: .3 }) });
+    hand(s * 70, 62, s > 0 ? Math.PI : 0, 30, C.skin); }
+  pop();
+  // the night: the room is lit only by the tubes, so the corners fall into a flat cool shade
+  fillOnly([[-20, -20], [1100, -20], [1100, 1940], [-20, 1940], [-20, -20], [90, 640], [90, 1300], [990, 1300], [990, 640], [90, 640]], 'rgba(20,30,55,.22)', { boil: 0 });
+};
+window.done = true; window.renderAt(0);
+</script></body></html>

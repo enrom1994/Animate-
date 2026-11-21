@@ -9,7 +9,7 @@ const server = http.createServer((req, res) => { const u = decodeURIComponent(re
 const [page, mode, a, b] = process.argv.slice(2);
 const br = await chromium.launch(), pg = await br.newPage({ viewport: { width: 720, height: 1280 } }); pg.on('pageerror', e => console.log('[pageerror]', e.message));
 await pg.goto(`http://localhost:${server.address().port}${page.startsWith('/') ? page : '/moneylook/' + page}`);   // a path from the root, or a page in moneylook/ await pg.waitForFunction(() => window.done && window.renderAt, null, { timeout: 30000 });
-const shot = () => pg.screenshot({ clip: { x: 0, y: 0, width: 720, height: 1280 }, type: 'png' });
+const shot = () => pg.screenshot({ clip: { x: 0, y: 0, width: 720, height: 1280 }, type: 'png', scale: 'css' });
 if (mode === 'stills') { fs.mkdirSync(b, { recursive: true }); for (const t of a.split(',').map(Number)) { await pg.evaluate(t => window.renderAt(t), t); fs.writeFileSync(path.join(b, `t_${t.toFixed(2)}.png`), await shot()); } }
 else { const fps = Number(b || 30), dur = await pg.evaluate(() => window.DURATION), T0 = Date.now();
   const ff = spawn('ffmpeg', ['-y', '-v', 'error', '-f', 'image2pipe', '-framerate', String(fps), '-c:v', 'png', '-i', '-', '-vf', 'scale=1080:1920:flags=lanczos', '-c:v', 'libx264', '-crf', '17', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', a], { stdio: ['pipe', 'inherit', 'inherit'] });
