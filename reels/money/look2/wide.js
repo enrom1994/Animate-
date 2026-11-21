@@ -2,8 +2,11 @@
 // The establishing shot: the neighbourhood at night from high above, drawn in the same toon line as the close-ups, with the
 // tilt-shift grammar (high oblique view, a sharp band across the middle, blur above and below, time-lapse traffic in steps).
 // Everything is laid out in metres (scale.js) and projected: screen x = x*P, screen y = z*P*cos - height*P*sin.
-import { INK, init, frame, push, pop, translate, scale, shape, fillOnly, stroke, ell, spline, rr, rect, dot, text } from './toon.js';
+import { AUDIT, INK, init, frame, push, pop, translate, scale, shape, fillOnly, stroke, ell, spline, rr, rect, dot, text } from './toon.js';
 import { M } from './scale.js';
+import { view as meshView, draw as meshDraw } from './props/mesh.js';
+import { car as carModel } from './props/props.js';
+const CAR_MODELS = new Map(), carOf = col => { if (!CAR_MODELS.has(col)) CAR_MODELS.set(col, carModel(col).faces); return CAR_MODELS.get(col); };
 import { hash } from './lib.js';
 let cv, g; export function setupWide(canvas) { cv = canvas; g = init(canvas); }
 const buf = document.createElement('canvas'); buf.width = 1080; buf.height = 1920;
@@ -67,6 +70,7 @@ function maxInWindow(a, b, z, t) {
   shape([F(cx - .38, .95), F(cx - .34, 1.27), F(cx + .34, 1.27), F(cx + .38, .95)], { fill: '#f08a24', lw: 3, shade: () => { fillOnly([F(cx - .06, .95), F(cx + .06, .95), F(cx + .06, 1.25), F(cx - .06, 1.25)], '#7d8086', { boil: .2 }); fillOnly([F(cx - .3, 1.05), F(cx + .3, 1.05), F(cx + .3, 1.1), F(cx - .3, 1.1)], '#dfe4e6', { boil: .2 }); } });
   // the big round head with the orange cap, tired eyes
   shape(ell(hx, hy, P * .27, P * .26, 30), { fill: '#e9b98f', lw: 3 });
+  if (view.focus === 'max') AUDIT.subject('Max (in the window)', [hx - P * .27, hy - P * .28, hx + P * .27, hy + P * .26], 60);
   shape([[hx - P * .27, hy - P * .02], [hx - P * .22, hy - P * .2], [hx, hy - P * .28], [hx + P * .22, hy - P * .2], [hx + P * .27, hy - P * .02]], { fill: '#e8742e', lw: 3 });
   shape([[hx - P * .2, hy - P * .04], [hx + P * .38, hy - P * .06], [hx + P * .36, hy + P * .0], [hx - P * .2, hy + P * .0]], { fill: '#c45a1c', lw: 3 });
   for (const s of [-1, 1]) { shape(ell(hx + s * P * .09, hy + P * .06, P * .07, P * .075, 14), { fill: '#fff', lw: 2.5 }); dot(hx + s * P * .09 + P * .01, hy + P * .09, P * .018); stroke([[hx + s * P * .15, hy + P * .02], [hx + s * P * .03, hy + P * .0]], 3); }
@@ -76,17 +80,14 @@ function maxInWindow(a, b, z, t) {
 // roof clutter: AC units on flat roofs
 const acUnit = (x, z, h) => { shape([pj(x, z, h + .9), pj(x + 1.4, z, h + .9), pj(x + 1.4, z + 1.2, h + .9), pj(x, z + 1.2, h + .9)], { fill: '#9aa3ad', lw: 3 }); shape([pj(x, z + 1.2, h), pj(x + 1.4, z + 1.2, h), pj(x + 1.4, z + 1.2, h + .9), pj(x, z + 1.2, h + .9)], { fill: '#7a838d', lw: 3 }); const [a, b] = pj(x + .7, z + .6, h + .9); dot(a, b, view.P * .35, '#4a525c'); };
 // a car, real size (4.3 x 1.8 x 1.5 m), drawn from above at an angle along x or z, headlights on
-function car(x, z, dir, col, t, lights = true) { const L = M.car.l, Wd = M.car.w, H = M.car.h, along = dir === 'x' || dir === '-x';
-  const hx = along ? L / 2 : Wd / 2, hz = along ? Wd / 2 : L / 2;
-  shape([pj(x - hx, z - hz, .4), pj(x + hx, z - hz, .4), pj(x + hx, z + hz, .4), pj(x - hx, z + hz, .4)], { fill: col, lw: 3 });                // body
-  shape([pj(x - hx, z + hz, 0), pj(x + hx, z + hz, 0), pj(x + hx, z + hz, .9), pj(x - hx, z + hz, .9)], { fill: col, lw: 3, shade: () => fillOnly([pj(x - hx, z + hz, 0), pj(x + hx, z + hz, 0), pj(x + hx, z + hz, .35), pj(x - hx, z + hz, .35)], 'rgba(0,0,0,.35)', { boil: 0 }) });
-  const cx = along ? L * .18 : Wd * .4, cz = along ? Wd * .4 : L * .18;   // the cabin and its glass
-  shape([pj(x - cx, z - cz, H), pj(x + cx, z - cz, H), pj(x + cx, z + cz, H), pj(x - cx, z + cz, H)], { fill: '#aac0d0', lw: 3 });
-  // headlight beams on the road ahead
-  const s = dir === 'x' ? 1 : dir === '-x' ? -1 : dir === 'z' ? 1 : -1;
-  if (!lights) return;
-  if (along) fillOnly([pj(x + s * hx, z - .6, 0), pj(x + s * (hx + 9), z - 2.2, 0), pj(x + s * (hx + 9), z + 2.2, 0), pj(x + s * hx, z + .6, 0)], 'rgba(255,240,190,.22)', { boil: 0 });
-  else fillOnly([pj(x - .6, z + s * hz, 0), pj(x - 2.2, z + s * (hz + 9), 0), pj(x + 2.2, z + s * (hz + 9), 0), pj(x + .6, z + s * hz, 0)], 'rgba(255,240,190,.22)', { boil: 0 });
+// a car: the 3D model from the prop library (4.3 x 1.5 x 1.8 m), drawn from this scene's camera; headlight beams on the road when lit
+function car(x, z, dir, col, t, lights = true) {
+  meshView({ yaw: 0, pitch: Math.PI / 2 - view.pitch, P: view.P, ox: 540, oy: 960, cx: view.cx, cy: 0, cz: view.cz });
+  const rot = dir === 'x' ? 0 : dir === '-x' ? Math.PI : dir === 'z' ? -Math.PI / 2 : Math.PI / 2;
+  if (lights) { const s = dir === 'x' || dir === 'z' ? 1 : -1, hl = M.car.l / 2;
+    if (dir === 'x' || dir === '-x') fillOnly([pj(x + s * hl, z - .6, 0), pj(x + s * (hl + 9), z - 2.2, 0), pj(x + s * (hl + 9), z + 2.2, 0), pj(x + s * hl, z + .6, 0)], 'rgba(255,240,190,.22)', { boil: 0 });
+    else fillOnly([pj(x - .6, z + s * hl, 0), pj(x - 2.2, z + s * (hl + 9), 0), pj(x + 2.2, z + s * (hl + 9), 0), pj(x + .6, z + s * hl, 0)], 'rgba(255,240,190,.22)', { boil: 0 }); }
+  meshDraw(carOf(col), [x, 0, z], rot, { lw: Math.max(1.5, Math.min(4, view.P * .12)), boil: .2 });
 }
 const streetLight = (x, z) => { const [a, b] = pj(x, z, 0), [c, d] = pj(x, z, M.streetlight); fillOnly(ell(a, b, view.P * 5, view.P * 5 * COS(), 24), 'rgba(255,225,150,.16)', { boil: 0 }); stroke([[a, b], [c, d]], 3); dot(c, d, view.P * .45, '#ffe9a8'); };
 // ---- the town: a street grid; blocks filled with buildings, yards and trees; the store on its corner lot ----

@@ -1,7 +1,7 @@
 
 // Look test: the convenience-store counter at night, in the scifi-toon style (boiling ink line, flat fills, hard shadows, big eyes).
 // Our own character: Max (orange cap, hi-vis vest over a grey tee), on a night shift, with his car payment on the counter.
-import { INK, init, frame, push, pop, translate, rotate, scale, shape, fillOnly, stroke, ell, arc, spline, rr, rect, noodle, quad, dot, text, bands } from './toon.js';
+import { AUDIT, tx, INK, init, frame, push, pop, translate, rotate, scale, shape, fillOnly, stroke, ell, arc, spline, rr, rect, noodle, quad, dot, text, bands } from './toon.js';
 import { eye, mouth, hand, sweat } from './faces.js';
 import { hash } from './lib.js';
 let g; export function setupCounter(canvas) { g = init(canvas); }
@@ -60,6 +60,7 @@ export function drawCounter(t, act = {}) {
   // neck and the big round head, hung forward
   shape(rr(-36, -290, 72, 80, 20), { fill: C.skin, lw: 6, shade: () => fillOnly(rect(-40, -290, 80, 30), C.skinS, { boil: .3 }) });
   push(); translate(0, -470 + 18 * A.sigh); rotate(A.tilt);
+  { const [a0, b0] = tx(-200, -190), [a1, b1] = tx(200, 190); AUDIT.subject('Max (at the counter)', [a0, b0, a1, b1], 120); }
   shape(ell(0, 0, 200, 190, 80), { fill: C.skin, lw: 8, shade: () => { fillOnly(spline([[60, -200], [230, -40], [210, 140], [80, 210], [150, 40]]), C.skinS, { boil: .3 }); } });
   for (const s of [-1, 1]) shape(ell(s * 196, 14, 26, 36, 18), { fill: C.skin, lw: 6, shade: () => fillOnly(ell(s * 192, 16, 10, 18, 12), C.skinS, { boil: .3 }) });
   // the cap: crown, front panel shading, a long bill, a button
@@ -79,7 +80,7 @@ export function drawCounter(t, act = {}) {
   shape(rect(-20, 1300, 1120, 120), { fill: C.counter, lw: 7, shade: () => { for (const [a, b] of [[[120, 1330], [240, 1350]], [[700, 1320], [790, 1360]], [[420, 1380], [470, 1365]]]) stroke([a, b], 3, { line: '#9c8a6a' }); fillOnly(rect(-20, 1400, 1120, 20), C.counterS, { boil: .3 }); } });
   shape(rect(-20, 1420, 1120, 520), { fill: C.counterF, lw: 7, shade: () => { for (let i = 0; i < 6; i++) stroke([[-20 + i * 200, 1420], [-20 + i * 200, 1940]], 5); fillOnly(rect(-20, 1420, 1120, 50), 'rgba(0,0,0,.2)', { boil: .3 }); } });
   // on the counter: the car payment slip, a card, the car key, a coffee
-  push(); translate(330, 1356); rotate(-.08); shape(rect(-120, -40, 240, 92), { fill: '#f4efe0', lw: 6 }); text('CAR PAYMENT', 0, -12, { font: '800 30px Cap', fill: INK }); text('$787 / mo', 0, 26, { font: '800 34px Cap', fill: '#b8302a' }); pop();
+  push(); translate(250, 1362); rotate(-.06); shape(rect(-120, -40, 240, 92), { fill: '#f4efe0', lw: 6 }); text('CAR PAYMENT', 0, -12, { font: '800 30px Cap', fill: INK }); text('$787 / mo', 0, 26, { font: '800 34px Cap', fill: '#b8302a' }); pop();
   push(); translate(590, 1362); rotate(.06); shape(rr(-70, -40, 140, 84, 12), { fill: '#2f6f73', lw: 6, shade: () => { fillOnly(rect(-70, -22, 140, 16), '#1d1a26', { boil: .3 }); fillOnly(rr(-52, 10, 30, 22, 4), '#e2b13c', { boil: .3 }); } }); pop();
   push(); translate(760, 1358); rotate(-.3); shape(rr(-34, -22, 68, 44, 18), { fill: '#2d2a33', lw: 6, shade: () => fillOnly(ell(10, 0, 10, 10, 12), '#c8433a', { boil: .3 }) }); shape(ell(-50, 0, 20, 20, 16), { fill: 'rgba(0,0,0,0)', lw: 6 }); pop();
   shape(spline([[880, 1250], [960, 1250], [950, 1356], [890, 1356]]), { fill: '#f4efe0', lw: 6, shade: () => fillOnly(rect(870, 1280, 100, 30), '#8a5a3a', { boil: .3 }) });

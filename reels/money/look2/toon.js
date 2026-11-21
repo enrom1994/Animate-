@@ -113,6 +113,9 @@ function pathOf(s, closed) {
   for (let i = 1; i < s.length; i++) P.lineTo(s[i][0], s[i][1]);
   if (closed) P.closePath(); return P;
 }
+// ---- the audit log: when AUDIT.on, every opaque shape and every text label records its box on screen, in draw order ----
+export const AUDIT = { on: false, log: [], subject(name, bb, minH = 70) { if (this.on) this.log.push({ k: 'subject', name, bb, minH }); } };
+const bbox = s => { let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; for (const [x, y] of s) { if (x < x0) x0 = x; if (y < y0) y0 = y; if (x > x1) x1 = x; if (y > y1) y1 = y; } return [x0, y0, x1, y1]; };
 // Main draw: returns a Path2D (reusable for clip / stroke)
 export function shape(pts, o = {}) {
   const closed = o.closed !== false, id = S.sid++;
@@ -123,6 +126,7 @@ export function shape(pts, o = {}) {
   g.setTransform(1, 0, 0, 1, 0, 0);
   if (o.alpha != null) g.globalAlpha = o.alpha;
   if (o.fill && closed) { g.fillStyle = o.fill; g.fill(P); }
+  if (AUDIT.on && o.fill && closed && o.alpha == null && !/rgba|transparent/.test(o.fill)) AUDIT.log.push({ k: 'shape', bb: bbox(s) });
   if (o.shade) { g.save(); g.clip(P); o.shade(); g.restore(); }
   if (o.stroke !== false && o.line !== null) outline(P, o.lw ?? S.lw, o.line ?? INK);
   if (o.alpha != null) g.globalAlpha = 1;
@@ -142,7 +146,10 @@ export function text(str, x, y, { font = '800 40px "Baloo 2"', fill = INK, align
   g.translate(x, y); if (rot) g.rotate(rot); if (mirrored()) g.scale(-1, 1);
   g.font = font; g.textAlign = align; g.textBaseline = base;
   if (outlineW) { g.lineWidth = outlineW; g.lineJoin = 'round'; g.strokeStyle = outlineCol; g.strokeText(str, 0, 0); }
-  g.fillStyle = fill; g.fillText(str, 0, 0); g.restore();
+  g.fillStyle = fill; g.fillText(str, 0, 0);
+  if (AUDIT.on) { const m = g.measureText(str), w = m.width, h = m.actualBoundingBoxAscent + m.actualBoundingBoxDescent, ax = align === 'center' ? -w / 2 : align === 'right' ? -w : 0, ay = base === 'middle' ? -h / 2 : -h;
+    const T = g.getTransform(), cs = [[ax, ay], [ax + w, ay], [ax + w, ay + h], [ax, ay + h]].map(([x, y]) => [T.a * x + T.c * y + T.e, T.b * x + T.d * y + T.f]); AUDIT.log.push({ k: 'text', str, bb: bbox(cs) }); }
+  g.restore();
 }
 
 // —— screen-space helpers ——

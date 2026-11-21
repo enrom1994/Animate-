@@ -14,3 +14,11 @@ the film against its section 5 before a full render.
   the camera). A fix belongs there, so every film gets it.
 - **Then the standing checks** in `reels/howto/REGRESSIONS.md`, and a still of every shot looked at full size before the render.
   Clear the stills folder before each contact sheet.
+
+## "Ten Years On" money films (`reels/money/`)
+
+- **Props come from the prop library** (`reels/money/look2/props/`): 3D models in real metres, drawn from the scene's camera, so size
+  and angle are right by construction. A new object is added there first and checked on `props/sheet.html` (three angles beside a
+  1.75 m person) before it appears in a film. Sizes for anything else come from `look2/scale.js`. Never size a prop by eye.
+- **The gate:** `node reels/howto/moneylook/check2d.mjs /money/<scene>.html` must report 0 errors before a render: no label covered
+  or cut off by the frame, no character (while he is the shot's subject) too small or cut off.
