@@ -5,6 +5,8 @@ The voice, a bed, a whoosh on every cut and the cues in <film>/cues.json. Every 
 <film>/tools/warp.json. SFX=0 or VOICE=0 writes one stem alone (OUT=path), to measure the balance."""
 import array, json, os, subprocess, sys
 FILM = os.path.realpath(sys.argv[1]); LIB = os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../../.claude/kit/sfx/library'))
+UI = os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../../.claude/skills/real-sfx/vendor/node_modules/uisfx/sounds'))   # the CC0 interface pack: a cue file 'uisfx/<pack>/<name>.mp3'
+PATH = lambda fn: os.path.join(UI, fn[6:]) if fn.startswith('uisfx/') else os.path.join(LIB, fn)
 C = json.load(open(os.path.join(FILM, 'cues.json'))); WARP = json.load(open(os.path.join(FILM, 'tools/warp.json'))); DUR = WARP[-1][1]
 SFX, VOICE = float(os.environ.get('SFX', C.get('sfx', .4))), float(os.environ.get('VOICE', 1))   # effects sit about 10 dB under the voice
 def T(r):
@@ -12,7 +14,7 @@ def T(r):
         if r <= r1: return n0 + (n1 - n0) * (r - r0) / (r1 - r0)
     return DUR
 def attack(fn):   # seconds until the sound first reaches half its peak, so that moment sits on the mark
-    raw = subprocess.run(['ffmpeg', '-v', 'error', '-t', '1.5', '-i', os.path.join(LIB, fn), '-f', 's16le', '-ac', '1', '-ar', '8000', '-'], capture_output=True, check=True).stdout
+    raw = subprocess.run(['ffmpeg', '-v', 'error', '-t', '1.5', '-i', PATH(fn), '-f', 's16le', '-ac', '1', '-ar', '8000', '-'], capture_output=True, check=True).stdout
     a = array.array('h', raw); pk = max(1, max(abs(x) for x in a)); return next(i for i, x in enumerate(a) if abs(x) >= pk * .5) / 8000
 WH = ['whoosh/quick_air_woosh_mixkit2605.mp3', 'whoosh/air_woosh_mixkit1489.mp3', 'whoosh/transition_windy_swoosh_mixkit1474.mp3', 'whoosh/cinematic_whoosh_fast_transition_mixkit1492.mp3']
 # a cue is [time, file, gain, length]; add "loop" as a fifth item for a sound that runs for that long (a fire, a pan frying): it loops, fades in and out, and starts exactly on its time
@@ -22,7 +24,7 @@ ins, f, lab = ['-i', os.path.join(FILM, 'audio/vo.wav')], [f'[0:a]aresample=4800
 for i, (t, fn, g, ln, hit) in enumerate(cues, 1):
     if hit and fn not in ATT: ATT[fn] = attack(fn)
     t = T(t) - (ATT[fn] if hit else 0)
-    ins += ['-stream_loop', '-1', '-t', str(ln), '-i', os.path.join(LIB, fn)] if not hit else ['-t', str(ln), '-i', os.path.join(LIB, fn)]
+    ins += ['-stream_loop', '-1', '-t', str(ln), '-i', PATH(fn)] if not hit else ['-t', str(ln), '-i', PATH(fn)]
     long = ln > 6
     fade = (f'afade=t=in:d=0.4,afade=t=out:st={ln - 1.2:.2f}:d=1.2' if long else f'afade=t=in:d=0.12,afade=t=out:st={max(0, ln - .35):.2f}:d=0.35') if not hit else f'afade=t=out:st={max(0, ln - .3):.2f}:d=0.3'
     f.append(f'[{i}:a]aresample=48000,aformat=channel_layouts=stereo,{fade},volume={g * SFX},adelay={int(max(0, t) * 1000)}:all=1[c{i}]'); lab.append(f'[c{i}]')
