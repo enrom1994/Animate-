@@ -4,7 +4,7 @@
 // size on screen is right by construction. Screens are drawn in millimetres on the glass: u across from the left, v down from the top.
 import { phone } from './props/props.js';
 import { MAXC } from './max.js';
-import { AUDIT, push, pop, translate, rotate, scale, shape, fillOnly, stroke, text, ell, rr, noodle, getM, setM } from './toon.js';
+import { AUDIT, push, pop, translate, rotate, scale, shape, fillOnly, stroke, text, ell, rr, noodle, spline, getM, setM } from './toon.js';
 const PH = phone(), [PW, PHH] = PH.size, SW = 64, SH = 140;   // body and screen sizes (m and mm)
 const ink = '#1d1a26', teal = '#2f6f73', red = '#b8302a', cream = '#fbf6ea', paper = '#f4f1ea';
 const F = (px, w = 800) => `${w} ${px}px Cap`;   // font sizes are millimetres on the glass
@@ -58,29 +58,56 @@ export const SCREENS = { checkout, payments, lock };
 // ---- the phone in his hands ----
 // at: screen point of the phone's centre; k: pixels per metre there (cam.P); rot: a little handheld roll; screen(t) draws the glass;
 // tap: { u, v, k } the right thumb reaching to a point on the glass (k 0 = at rest on the corner, 1 = on the point)
+// skin with a toon shadow: the shape fills dark, then light again shifted up-left (toward the light), leaving a shadow crescent low-right
+function skinShape(pts, o = {}) { const d = o.d ?? 2.6; return shape(pts, { fill: MAXC.skinS, lw: o.lw, shade: () => { fillOnly(pts.map(([x, y]) => [x - d * .7, y - d]), MAXC.skin, { boil: .2 }); o.inner && o.inner(); } }); }   // inner: drawn clipped to the skin (a watch band)
+const nrm = (x, y) => { const l = Math.hypot(x, y) || 1; return [x / l, y / l]; };
+const add = (p, v, k = 1) => [p[0] + v[0] * k, p[1] + v[1] * k];
+// the left hand cradles the phone: the palm under its lower half, three fingertips wrapping round the right edge, the thumb along the
+// left edge, the wrist running down out of frame with his gold watch on it. In mm, phone centre at 0, 0 (edges at x +-36, y +-75).
+function leftHandBack(lw) {
+  skinShape(spline([[-38, 215], [-50, 150], [-52, 96], [-44, 52], [-24, 40], [12, 58], [30, 76], [26, 104], [10, 132], [0, 215]]), { lw, d: 4, inner: () => {   // palm and wrist behind the phone
+    shape([[-70, 120], [30, 115], [30, 129], [-70, 134]], { fill: '#d9a83a', lw, shade: () => fillOnly([[-70, 128], [30, 124], [30, 130], [-70, 135]], '#b0822a', { boil: .2 }) }); } });   // the gold watch band round the wrist
+  shape(rr(-28, 112, 20, 26, 5), { fill: '#d9a83a', lw }); shape(rr(-25, 115, 14, 20, 4), { fill: '#f3ead2', lw: lw * .5 });     // its face, turned to us
+}
+function leftHandFront(lw) {
+  for (const [y, len] of [[-12, 12], [6, 13], [24, 12.5], [42, 10.5]]) {   // fingertips round the right edge, the little finger shortest
+    skinShape(spline([[34, y - 6.5], [34 + len - 3, y - 6.2], [34 + len + 1, y - 2], [34 + len + 1, y + 3], [34 + len - 3, y + 6.8], [34, y + 6.6]]), { lw, d: 1.6 });
+    stroke([[34 + 2.2, y - 4], [34 + 2.6, y + 4]], lw * .45, { line: 'rgba(29,26,38,.55)' }); }   // where the finger bends round the edge
+  skinShape(spline([[-58, 92], [-50, 58], [-40, 20], [-33, 0], [-26, -2], [-25, 10], [-31, 38], [-38, 70], [-42, 96]], true), { lw, d: 2 });   // the thumb up the left edge
+  shape(spline([[-32.5, 4], [-28.5, 2], [-27, 7], [-29, 14], [-33, 13]]), { fill: '#f3c7a6', lw: lw * .5 });                                 // its nail
+  stroke([[-44, 64], [-36, 62]], lw * .45, { line: 'rgba(29,26,38,.55)' });                                                                   // the knuckle crease
+}
+// the right hand points: the index finger out to the tip, the other fingers curled, the thumb tucked; it comes up from the lower right
+function rightHand(tip, lw) {
+  const dir = nrm(-.42, -1), per = [-dir[1], dir[0]], K = add(tip, dir, -46), C = add(add(K, dir, -18), per, -6);   // K: the index knuckle; C: the back of the hand
+  skinShape([add(C, per, -24), add(add(C, dir, -120), per, -26), add(add(C, dir, -120), per, 30), add(C, per, 26)].map(p => p), { lw, d: 3.5 });   // forearm
+  const fist = []; for (let i = 0; i < 24; i++) { const a = i / 24 * Math.PI * 2, r = [24 + 3 * Math.cos(a), 29]; fist.push(add(add(C, per, Math.cos(a) * r[0]), dir, Math.sin(a) * r[1])); }
+  skinShape(fist, { lw, d: 3.2 });                                                                                                          // back of the hand
+  skinShape(noodle(add(add(C, per, -24), dir, -14), add(add(K, per, -14), dir, 2), 5, 18, 14), { lw, d: 2 });                                  // the thumb, tucked along the side
+  const base = add(add(K, per, -2), dir, -4);
+  skinShape(noodle(base, tip, -2, 17, 14.5), { lw, d: 2 });                                                                                  // the index finger
+  const nb = add(tip, dir, -5.5); shape([add(add(nb, per, -4.6), dir, 3.6), add(add(nb, per, 4.6), dir, 3.6), add(add(nb, per, 4), dir, -3.4), add(add(nb, per, -4), dir, -3.4)], { fill: '#f3c7a6', lw: lw * .5 });   // its nail
+  stroke([add(add(K, dir, 14), per, -6), add(add(K, dir, 14), per, 5)], lw * .45, { line: 'rgba(29,26,38,.55)' });                                // middle joint crease
+}
+// ---- the phone in his hands ----
+// at: screen point of the phone's centre; k: pixels per metre there (cam.P); rot: a little handheld roll; screen() draws the glass;
+// tap: { u, v, k } his right index finger reaching to a point on the glass (k 0 = resting below the phone, 1 = on the point)
 export function drawPovPhone({ at = [540, 760], k = 5800, rot = 0, screen, glass = '#f4f1ea', tap = null, over = null } = {}) {
-  const mm = k / 1000, lwk = 7 * Math.min(1.6, k / 4600), skin = MAXC.skin;
-  push(); translate(at[0], at[1]); rotate(rot);
-  // the left hand behind the phone: palm outside the left edge, fingers curled round the back, thumb along the bezel
-  const L = (x, y) => [x * mm, y * mm];
-  shape(noodle(L(-150, 330), L(-46, 52), -20, 70 * mm * .5, 58 * mm * .5), { fill: skin, lw: lwk });   // forearm, up from below the frame
-  shape(ell(...L(-41, 40), 13 * mm, 24 * mm, 20), { fill: skin, lw: lwk });                                  // palm and curled fingers at the edge
+  const mm = k / 1000, lw = 6.5 * Math.min(1.5, k / 4600);
+  push(); translate(at[0], at[1]); rotate(rot); scale(mm);
+  leftHandBack(lw);
   // the body (8 mm deep: its lower edge shows), then the glass
-  shape(rr(-PW * 500, -PHH * 500 + 2.4 * mm, PW * 1000, PHH * 1000, 9 * mm), { fill: '#141317', lw: lwk * .7 });
-  shape(rr(-PW * 500, -PHH * 500, PW * 1000, PHH * 1000, 9 * mm), { fill: '#26242a', lw: lwk * .7 });
-  push(); scale(mm); translate(-SW / 2, -SH / 2);
+  shape(rr(-PW * 500, -PHH * 500 + 2.4, PW * 1000, PHH * 1000, 9), { fill: '#141317', lw: lw * .8 });
+  shape(rr(-PW * 500, -PHH * 500, PW * 1000, PHH * 1000, 9), { fill: '#26242a', lw: lw * .8 });
+  push(); translate(-SW / 2, -SH / 2);
   shape(rr(0, 0, SW, SH, 6), { fill: glass, lw: 2, line: '#0d0c10', boil: .1 });
   screen && screen();
   fillOnly(rr(22, 2.2, 20, 4.4, 2.2), '#0d0c10', { boil: 0 });   // the camera notch
   if (over) over();
   pop();
-  shape(noodle(L(-40, 52), L(-33, 14), 3, 11 * mm, 9 * mm), { fill: skin, lw: lwk });                        // left thumb up the bezel
-  // the right hand: palm below the right corner, the thumb reaching onto the glass
-  const rest = [30, 70], tgt = tap ? [tap.u - 32, tap.v - 70] : rest, q = tap ? tap.k : 0, tip = [rest[0] + (tgt[0] - rest[0]) * q, rest[1] + (tgt[1] - rest[1]) * q];
-  shape(noodle(L(160, 340), L(46, 86), 18, 72 * mm * .5, 60 * mm * .5), { fill: skin, lw: lwk });          // forearm
-  shape(ell(...L(40, 82), 17 * mm, 21 * mm, 20), { fill: skin, lw: lwk });                                   // palm under the corner
-  shape(noodle(L(38, 76), L(...tip), -6 * (1 - q * .5), 13 * mm, 10.5 * mm), { fill: skin, lw: lwk });        // thumb
-  const ang = Math.atan2(tip[1] - 76, tip[0] - 38); shape(ell(...L(tip[0] - Math.cos(ang) * 2.2, tip[1] - Math.sin(ang) * 2.2), 3 * mm, 2.4 * mm, 10), { fill: '#f6d2b8', lw: lwk * .5 });   // nail
+  leftHandFront(lw);
+  const rest = [44, 112], q = tap ? tap.k : 0, tgt = tap ? [tap.u - 32, tap.v - 70] : rest;
+  rightHand([rest[0] + (tgt[0] - rest[0]) * q, rest[1] + (tgt[1] - rest[1]) * q], lw);
   pop();
 }
 export { checkout, payments, alert, lock };
