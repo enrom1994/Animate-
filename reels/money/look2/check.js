@@ -22,7 +22,7 @@ export function auditFrame(log, W = 1080, H = 1920, { moving = false, capBox = n
       for (let j = i - 1; j >= 0; j--) { const f = log[j]; if (f.k !== 'shape' || f.layer !== e.layer) continue;
         const b = f.bb; if (cx < b[0] || cx > b[2] || cy < b[1] || cy > b[3]) continue;   // the nearest shape under its centre is what it sits on
         if (area(b) > W * H * .2 || b[3] - b[1] > th * 10) break;   // a wall, the ground, a whole page: not a box made for this label
-        const pad = Math.max(10, th * .25), gap = Math.min(e.bb[0] - b[0], b[2] - e.bb[2]);
+        const pad = Math.max(4, th * .3), gap = Math.min(e.bb[0] - b[0], b[2] - e.bb[2]);
         if (gap < pad) out.push(['error', `label "${e.str}" overflows its box (${gap < 0 ? Math.round(-gap) + ' px past the edge' : Math.round(gap) + ' px from the edge, needs ' + Math.round(pad)})`]);
         break; } }
     if (e.k === 'subject' && onScreen(e.bb)) { const h = e.bb[3] - e.bb[1], vis = inter(e.bb, fr) / (area(e.bb) || 1);
