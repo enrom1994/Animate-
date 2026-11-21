@@ -34,8 +34,9 @@ const THEO_X = 21.3, THEO_Z = -6.9, TCAR = [24.0, -8.8], MAX_X = 8.0, MAX_Z = -6
 const FRAME_THEO = { look: [22.5, 1.1, -7.2], L: 9.5, down: .1, F: 2300 }, FRAME_MAX = { look: [9.2, 1.1, -7.2], L: 9.5, down: .1, F: 2300 };
 const CLOSE_THEO = { look: [THEO_X + .3, 1.2, THEO_Z], L: 5, down: .1, F: 2300 };
 // ---- the people and cars, as extras the town draws in depth ----
+let FOCUS = true;   // is the camera close on the people? (in the wide town shots they are scenery, not the subject)
 const person = (draw, name) => (sx, sy, kpx) => { const k = kpx * UNIT, lw0 = INKS.lwScale; INKS.lwScale = lw0 * clamp(k, .3, 1); push(); translate(sx, sy); scale(k); draw(); pop(); INKS.lwScale = lw0;
-  AUDIT.subject(name, [sx - 200 * k, sy - 670 * k, sx + 200 * k, sy - 270 * k], 60); };
+  if (FOCUS) AUDIT.subject(name, [sx - 200 * k, sy - 670 * k, sx + 200 * k, sy - 270 * k], 60); };
 const COUPE = coupe('#c8302a').faces, COUPE_OLD = coupe('#8f3a33').faces, HATCH = hatch('#7d8f86').faces;
 const theoEx = (t, act = {}) => ({ x: THEO_X, z: THEO_Z, h: ORIGIN_H, fn: person(() => theoStanding(t, THEO.C, act), 'Theo') });
 const maxEx = (t, act = {}) => ({ x: MAX_X, z: MAX_Z, h: ORIGIN_H, fn: person(() => maxStanding(t, { outfit: 'flash', act }), 'Max') });
@@ -80,7 +81,7 @@ function storeToTheo(t) {   // 0 - 7.45: one move, inside the store to Theo's fr
     const down = v < .08 ? mix(.30, .14, ss(v / .08)) : mix(.14, .75, ss(pr(v, .25, 1)));
     st = { look: mix3(MAXC, MID, ss(pr(v, .28, 1))), L, down, F: lmix(2070, 2600, v) }; }
   else { const u = io(pr(t, 5.8, 7.45)); st = { look: mix3(MID, CLOSE_THEO.look, ss(u)), L: lmix(70, CLOSE_THEO.L, u), down: mix(.75, CLOSE_THEO.down, u), F: lmix(2600, CLOSE_THEO.F, u) }; }
-  const cam = { ...camOf(st), act, focus: t < 4.6 ? 'max' : null };
+  const cam = { ...camOf(st), act, focus: t < 4.6 ? 'max' : null }; FOCUS = st.L < 15;
   if (insideStore(eyeOf(cam))) { frame(t); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#141b30'; g.fillRect(0, 0, 1080, 1920); drawStore(t, cam, act); return; }
   drawWide(t, { ...cam, extras: [theoEx(t, { look: [0, 0] })] }, { tilt: st.L > 30 });
   const k = pr(t, 4.9, 5.2) * (1 - pr(t, 6.3, 6.6));   // who lives where, as the camera hangs over the town
@@ -90,7 +91,7 @@ const maxShot = (t, st, { old = false, act = {} } = {}) => () => drawWide(t, { .
 const theoShot = (t, st, { old = false, act = {} } = {}) => () => drawWide(t, { ...camOf(st), extras: [theoEx(t, act), ...carsEx(old)] }, { tilt: false });
 const push_ = (st, u, L1) => ({ ...st, L: lmix(st.L, L1, u) });
 window.renderAt = t => {
-  AUDIT.subjects = 0;
+  AUDIT.subjects = 0; FOCUS = true;
   if (t < 7.45) storeToTheo(t);
   else if (t < 8.5) {   // whip pan along the street from Theo's yard to Max next door: his new coupe
     const u = io(pr(t, 7.45, 7.8)), st = { look: mix3(CLOSE_THEO.look, FRAME_MAX.look, u), L: lmix(CLOSE_THEO.L, FRAME_MAX.L, u), down: .12, F: 2300 };
@@ -122,13 +123,14 @@ window.renderAt = t => {
     card(540, 300, 'THEO ALSO HAS', money(17660 * ss(pr(t, 25.4, 26.8))), { col: '#2f6f73', w: 620, bigPx: 120, s: pop_(t, 25.3) }); }
   else {   // ten years on: rise over the town, the money keeps growing; same paycheck
     const u = io(pr(t, 27.9, 33.0)), st = { look: mix3(push_(FRAME_THEO, 1, 10).look, [14, 0, -10], ss(u)), L: lmix(10, 230, u), down: mix(.12, .8, ss(u)), F: lmix(2300, 2900, u) };
-    drawWide(t, { ...camOf(st), extras: [theoEx(t, { smile: .6 }), maxEx(t), ...carsEx(true)] }, { tilt: u > .5 });
+    FOCUS = st.L < 15; drawWide(t, { ...camOf(st), extras: [theoEx(t, { smile: .6 }), maxEx(t), ...carsEx(true)] }, { tilt: u > .5 });
     const [a, b] = pin(22, -16, 9), [c, d] = pin(6, -16, 11), k = ss(pr(t, 28.3, 28.7));
     card(clamp(a, 330, 750), Math.max(b, 330), t < 32.6 ? 'TEN YEARS ON · 7% A YEAR' : 'THEO', money(t < 28.6 ? 17660 : mix(17660, 23621, ss(pr(t, 28.6, 31.4)))), { col: '#2f6f73', w: 640, bigPx: 110, s: k });
-    if (t > 32.7) { card(clamp(c, 330, 750), Math.max(d, 330) + 0, 'MAX', 'NEW CAR', { col: '#b8302a', w: 460, bigPx: 80, s: pop_(t, 32.8) }); card(540, 1700, 'SAME PAYCHECK', 'ONE PAYMENT APART', { w: 760, bigPx: 64, s: pop_(t, 34.2) }); } }
+    if (t > 32.7) { card(clamp(c, 330, 750), Math.max(d, 330) + 250, 'MAX', 'NEW CAR', { col: '#b8302a', w: 460, bigPx: 80, s: pop_(t, 32.8) }); card(540, 1700, 'SAME PAYCHECK', 'ONE PAYMENT APART', { w: 760, bigPx: 64, s: pop_(t, 34.2) }); } }
   const c = CAPTIONS.find(([a, , b]) => t >= a && t < b); capEl.innerHTML = c ? c[1] : '';
 };
+const MOVES = [[3.9, 7.8], [17.45, 17.8], [27.9, 33.0]];   // the camera is sweeping: things pass the frame edge and under the caption
 window.audit = t => { AUDIT.on = true; AUDIT.log = []; window.renderAt(t); AUDIT.on = false;
-  return auditFrame(AUDIT.log, 1080, 1920, { moving: false, capBox: capEl.innerHTML ? [60, 1395, 1020, 1500] : null }); };
+  return auditFrame(AUDIT.log, 1080, 1920, { moving: MOVES.some(([a, b]) => t >= a && t <= b), capBox: capEl.innerHTML ? [60, 1395, 1020, 1500] : null }); };
 window.DURATION = DURATION; window.done = true; window.renderAt(0);
 </script></body></html>

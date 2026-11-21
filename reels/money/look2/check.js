@@ -10,7 +10,7 @@ export function auditFrame(log, W = 1080, H = 1920, { moving = false, capBox = n
   const onScreen = b => b[2] > 0 && b[0] < W && b[3] > 0 && b[1] < H;
   log.forEach((e, i) => {
     const fr = e.clip || [0, 0, W, H];   // a split-screen half is its own frame
-    if (capBox && (e.k === 'subject' || (e.k === 'text' && !e.scenery)) && inter(e.bb, capBox) / (area(e.bb) || 1) > .1) out.push(['error', `${e.k === 'subject' ? e.name : `label "${e.str}"`} is under the caption`]);
+    if (capBox && (e.k === 'subject' || (e.k === 'text' && !e.scenery)) && inter(e.bb, capBox) / (area(e.bb) || 1) > .1) out.push([moving && e.k === 'text' ? 'warn' : 'error', `${e.k === 'subject' ? e.name : `label "${e.str}"`} is under the caption`]);
     if (e.k === 'text' && !e.scenery && onScreen(e.bb)) { const A = area(e.bb) || 1, vis = inter(e.bb, fr) / A;
       if (vis < .98) out.push([moving ? 'warn' : 'error', `label "${e.str}" is cut off by the frame edge (${Math.round(vis * 100)}% visible)${moving ? ' while the camera moves' : ''}`]);
       if (e.bb[3] - e.bb[1] < 22) out.push(['warn', `label "${e.str}" is ${Math.round(e.bb[3] - e.bb[1])} px tall: too small to read on a phone`]);
