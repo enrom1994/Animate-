@@ -13,6 +13,7 @@ const shot = () => pg.screenshot({ clip: { x: 0, y: 0, width: 720, height: 1280 
 if (mode === 'stills') { fs.mkdirSync(b, { recursive: true }); for (const t of a.split(',').map(Number)) { await pg.evaluate(t => window.renderAt(t), t); fs.writeFileSync(path.join(b, `t_${t.toFixed(2)}.png`), await shot()); } }
 else { const fps = Number(b || 30), dur = await pg.evaluate(() => window.DURATION), T0 = Date.now();
   const ff = spawn('ffmpeg', ['-y', '-v', 'error', '-f', 'image2pipe', '-framerate', String(fps), '-c:v', 'png', '-i', '-', '-vf', 'scale=1080:1920:flags=lanczos', '-c:v', 'libx264', '-crf', '17', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', a], { stdio: ['pipe', 'inherit', 'inherit'] });
-  for (let n = 0; n < Math.round(dur * fps); n++) { await pg.evaluate(t => window.renderAt(t), n / fps); const buf = await shot(); if (!ff.stdin.write(buf)) await new Promise(r => ff.stdin.once('drain', r)); }
-  ff.stdin.end(); await new Promise(r => ff.on('close', r)); console.log(`${Math.round(dur * fps)} frames, ${((Date.now() - T0) / Math.round(dur * fps)).toFixed(0)} ms a frame`); }
+  const N = Math.round(dur * fps), [F0, F1] = (process.env.RANGE || `0:${N}`).split(':').map(Number);   // RANGE=a:b renders frames a..b-1 (to split a render across processes)
+  for (let n = F0; n < Math.min(F1, N); n++) { await pg.evaluate(t => window.renderAt(t), n / fps); const buf = await shot(); if (!ff.stdin.write(buf)) await new Promise(r => ff.stdin.once('drain', r)); }
+  ff.stdin.end(); await new Promise(r => ff.on('close', r)); console.log(`${Math.min(F1, N) - F0} frames, ${((Date.now() - T0) / (Math.min(F1, N) - F0)).toFixed(0)} ms a frame`); }
 await br.close(); server.close();

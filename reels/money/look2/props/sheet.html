@@ -1,7 +1,7 @@
 <!doctype html>
 <html><head><meta charset="utf-8"><title>Ten Years On: prop sheet</title>
 <style>@font-face { font-family: "Cap"; src: url("/node_modules/@fontsource/montserrat/files/montserrat-latin-800-normal.woff2") format("woff2"); font-weight: 800; } html,body{margin:0;background:#efe6d2} canvas{display:block}</style></head>
-<body><canvas id="c" width="1800" height="4150"></canvas>
+<body><canvas id="c" width="1800" height="5100"></canvas>
 <script type="module">
 // The prop sheet: every prop from three camera angles (front-on, three-quarter, high oblique), each beside a 1.75 m person
 // drawn at the same scale, with its real size written under it. If a prop looks wrong at any angle, it is wrong in the films.
@@ -10,7 +10,7 @@ import { CAM, view, proj, draw } from './mesh.js';
 import { ALL } from './props.js';
 await document.fonts.load("800 30px Cap");
 const cv = document.getElementById('c'), g = init(cv); frame(0);
-g.fillStyle = '#efe6d2'; g.fillRect(0, 0, 1800, 4150);
+g.fillStyle = '#efe6d2'; g.fillRect(0, 0, 1800, 5100);
 const VIEWS = [['eye level', 0, .1], ['three-quarter', -.6, .42], ['high oblique', -.45, .95]];
 // a 1.75 m person for scale: a flat card facing the camera, standing at a point on the ground
 function person(x, z) { const [fx, fy] = proj(x, 0, z), [hx, hy] = proj(x, 1.75, z), H = fy - hy;

@@ -35,11 +35,12 @@ const FRONT = (() => { const f = [], Z0 = S.z1 - .25, Z1 = S.z1, W = '#c8543f';
   return f; })();
 const GLASSES = BAYS.map(([a, b, lo, hi]) => [[a, lo, S.z1 - .12], [b, lo, S.z1 - .12], [b, hi, S.z1 - .12], [a, hi, S.z1 - .12]]);
 // the camera position for a scene camera (the town's convention: pitch PI/2 looks straight along -z, smaller looks down)
+export const insideStore = e => e[0] > STORE.x0 && e[0] < STORE.x1 && e[1] < STORE.h && e[2] > STORE.z0 && e[2] < STORE.z1;   // the camera is in the shop
 export const eyeOf = cam => [cam.cx, (cam.cy || 0) + (cam.dist || 1e6) * Math.cos(cam.pitch), cam.cz + (cam.dist || 1e6) * Math.sin(cam.pitch)];
 // draw the store from the scene camera: cam = { pitch, P, cx, cy, cz, dist, focus }
 export function drawStore(t, cam, act = {}) {
   meshView({ yaw: 0, pitch: Math.PI / 2 - cam.pitch, P: cam.P, ox: 540, oy: 960, cx: cam.cx, cy: cam.cy || 0, cz: cam.cz, dist: cam.dist || 0 });
-  const eye = eyeOf(cam), outside = eye[2] > S.z1 + .02, sp = (x, y, z) => proj(x, y, z), pm = (x, y, z) => { const a = sp(x, y, z), b = sp(x + 1, y, z); return b[0] - a[0]; };
+  const eye = eyeOf(cam), outside = !insideStore(eye), sp = (x, y, z) => proj(x, y, z), pm = (x, y, z) => { const a = sp(x, y, z), b = sp(x + 1, y, z); return b[0] - a[0]; };
   const lw = Math.max(1.5, Math.min(5, pm(S.counterX, 1, S.counterZ) * .02)), opt = { lw, boil: .3 };
   for (const s of SHELL) draw(s, [0, 0, 0], 0, opt);
   for (const [a, b] of TILES) { const A = sp(...a), B = sp(...b); if (A[2] > .05 - (cam.dist || 1e6) || B[2] > .05 - (cam.dist || 1e6)) shape([A, B].map(p => [p[0], p[1]]), { closed: false, lw: 1.2, line: 'rgba(60,70,70,.28)', boil: 0 }); }

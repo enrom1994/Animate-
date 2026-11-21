@@ -5,7 +5,7 @@
 import { AUDIT, INK, init, frame, push, pop, translate, scale, shape, fillOnly, stroke, ell, spline, rr, rect, dot, text } from './toon.js';
 import { M } from './scale.js';
 import { view as meshView, draw as meshDraw } from './props/mesh.js';
-import { car as carModel } from './props/props.js';
+import { car as carModel, house as houseModel } from './props/props.js';
 import { drawStore, eyeOf } from './store.js';
 const CAR_MODELS = new Map(), carOf = col => { if (!CAR_MODELS.has(col)) CAR_MODELS.set(col, carModel(col).faces); return CAR_MODELS.get(col); };
 import { hash } from './lib.js';
@@ -74,14 +74,14 @@ const acUnit = (x, z, h) => { if (view.dist && eyeOf(view)[1] < h + .3) return; 
   shape([pj(x, z, h + .9), pj(x + 1.4, z, h + .9), pj(x + 1.4, z + 1.2, h + .9), pj(x, z + 1.2, h + .9)], { fill: '#9aa3ad', lw: 3 }); shape([pj(x, z + 1.2, h), pj(x + 1.4, z + 1.2, h), pj(x + 1.4, z + 1.2, h + .9), pj(x, z + 1.2, h + .9)], { fill: '#7a838d', lw: 3 }); const [a, b] = pj(x + .7, z + .6, h + .9); dot(a, b, sc(x, z, h) * .35, '#4a525c'); };
 // a car, real size (4.3 x 1.8 x 1.5 m), drawn from above at an angle along x or z, headlights on
 // a car: the 3D model from the prop library (4.3 x 1.5 x 1.8 m), drawn from this scene's camera; headlight beams on the road when lit
-function car(x, z, dir, col, t, lights = true) {
+function car(x, z, dir, col, t, lights = true, model = null) {
   if (z > (view.near ?? 1e9) - 2.5) return;   // behind the camera
   meshView({ yaw: 0, pitch: Math.PI / 2 - view.pitch, P: view.P, ox: 540, oy: 960, cx: view.cx, cy: view.cy, cz: view.cz, dist: view.dist });
   const rot = dir === 'x' ? 0 : dir === '-x' ? Math.PI : dir === 'z' ? -Math.PI / 2 : Math.PI / 2;
   if (lights) { const s = dir === 'x' || dir === 'z' ? 1 : -1, hl = M.car.l / 2;
     if (dir === 'x' || dir === '-x') fillOnly([pj(x + s * hl, z - .6, 0), pj(x + s * (hl + 9), z - 2.2, 0), pj(x + s * (hl + 9), z + 2.2, 0), pj(x + s * hl, z + .6, 0)], 'rgba(255,240,190,.22)', { boil: 0 });
     else fillOnly([pj(x - .6, z + s * hl, 0), pj(x - 2.2, z + s * (hl + 9), 0), pj(x + 2.2, z + s * (hl + 9), 0), pj(x + .6, z + s * hl, 0)], 'rgba(255,240,190,.22)', { boil: 0 }); }
-  meshDraw(carOf(col), [x, 0, z], rot, { lw: Math.max(1.5, Math.min(4, sc(x, z) * .12)), boil: .2 });
+  meshDraw(model || carOf(col), [x, 0, z], rot, { lw: Math.max(1.5, Math.min(4, sc(x, z) * .12)), boil: .2 });
 }
 const streetLight = (x, z) => { if (z > (view.near ?? 1e9) - 1) return; const k = sc(x, z), [a, b] = pj(x, z, 0), [c, d] = pj(x, z, M.streetlight); fillOnly(ell(a, b, k * 5, k * 5 * COS(), 24), 'rgba(255,225,150,.16)', { boil: 0 }); stroke([[a, b], [c, d]], 3); dot(c, d, k * .45, '#ffe9a8'); };
 // ---- the town: a street grid; blocks filled with buildings, yards and trees; the store on its corner lot ----
@@ -95,12 +95,19 @@ for (let bi = 0; bi < XS.length - 1; bi++) for (let bj = 0; bj < ZS.length - 1; 
   // a row of buildings along the front of the block, another along the back, yards between
   for (const [za, zb] of [[z1 - 13, z1], [z0, z0 + 12]]) { let x = x0; while (x < x1 - 6) { const w = 8 + rnd() * 10, x2 = Math.min(x1, x + w), h = M.storey * (1 + Math.floor(rnd() * 3)); BLD.push([x, za, x2, zb, h, ['#8a7262', '#94786a', '#6f7684', '#80665c', '#7a7f6a'][Math.floor(rnd() * 5)], 'house', ['#5b6170', '#6e4a42', '#4f5a4c', '#5a4e62', '#6a6a6a'][Math.floor(rnd() * 5)], rnd() < .55]); x = x2 + 1.5 + rnd() * 3; } }
 }
-BLD.push([-8, 14, 14, 27, 4.5, C.store, 'store']); BLD.push([-30, 10, -17, 22, 6, '#7a7f6a', 'house', '#4f5a4c', true]); BLD.push([18, 10, 28, 24, 3, '#6f7684', 'house', '#5b6170', false]);
+BLD.push([-8, 14, 14, 27, 4.5, C.store, 'store']); BLD.push([-30, 10, -17, 22, 6, '#7a7f6a', 'house', '#4f5a4c', true]);
+// the two neighbours' houses, side by side on the street behind the store (fronts toward +z, the street at z = 0)
+export const HOMES = {
+  max: { x: 6, z: -16, w: 12, d: 9, model: houseModel({ w: 12, d: 9, storeys: 2, wall: '#e8e2d0', roof: '#3a3d48', door: '#c8302a', garage: true, lit: [1, 1, 1, 1, 1, 1] }) },
+  theo: { x: 22, z: -16, w: 10, d: 9, model: houseModel({ w: 10, d: 9, storeys: 1, wall: '#c9b79a', roof: '#6e4a42', door: '#2f6f73', lit: [1, 0, 1, 1, 0, 1] }) } };
+for (let i = BLD.length - 1; i >= 0; i--) { const b = BLD[i]; if (b[6] === 'house' && b[3] > -22 && b[1] < -4 && b[2] > -2 && b[0] < 29) BLD.splice(i, 1); }   // clear their lots
+for (const [k, H] of Object.entries(HOMES)) BLD.push([H.x - H.w / 2, H.z - H.d / 2, H.x + H.w / 2, H.z + H.d / 2, 5, null, 'mesh', H.model, k]);
 BLD.sort((a, b) => a[3] - b[3]);   // far rows first, so nearer fronts overlap them
 const TREES = Array.from({ length: 60 }, (_, i) => [XS[0] + hash(i * 3.1) * (XS[3] - XS[0]), ZS[0] + hash(i * 7.3) * (ZS[5] - ZS[0])]).filter(([x, z]) => !ZS.some(zz => Math.abs(z - zz) < PW + 1) && !XS.some(xx => Math.abs(x - xx) < PW + 1) && !BLD.some(b => x > b[0] - 2 && x < b[2] + 2 && z > b[1] - 2 && z < b[3] + 2) && !(x > -14 && x < 22 && z > 2 && z < 32));
 const LANES = [...ZS.flatMap(z => [{ z: z - 2, dir: 'x', v: 11 }, { z: z + 2, dir: '-x', v: 9 }]), ...XS.flatMap(x => [{ x: x + 2, dir: 'z', v: 10 }, { x: x - 2, dir: '-z', v: 8 }])];
 const CARS2 = Array.from({ length: 110 }, (_, i) => ({ lane: LANES[i % LANES.length], off: hash(i * 5.3) * 240, col: ['#c8433a', '#e8e2d0', '#4f7fc4', '#2d2a33', '#d9a83a', '#6f8a7a'][i % 6] }));
 let T_ = 0;
+export const town = { pj: (...a) => pj(...a), sc: (...a) => sc(...a), view };
 export function drawWide(t, cam = null, { tilt = true } = {}) { T_ = t;
   frame(t); const ts = Math.floor(t * 8) / 8;   // the time-lapse step
   view.pitch = .78; view.P = 12.5 - t * .25; view.cx = 2 + t * .7; view.cy = 0; view.cz = 14 - t * .4; view.dist = 0; view.near = undefined; if (cam) Object.assign(view, cam);
@@ -116,24 +123,29 @@ export function drawWide(t, cam = null, { tilt = true } = {}) { T_ = t;
   fillOnly([pj(-14, 26.5), pj(22, 26.5), pj(22, 39), pj(-14, 39)], C.lot, { boil: 0 });
   for (let i = 0; i <= 12; i++) stroke([pj(-13 + i * M.parking.w, 33.5), pj(-13 + i * M.parking.w, 33.5 + M.parking.l)], 2, { line: '#d9d4b8' });
   fillOnly([pj(-7, 27.2, 0), pj(13, 27.2, 0), pj(15, 32, 0), pj(-9, 32, 0)], 'rgba(255,230,160,.2)', { boil: 0 });
+  for (const H of Object.values(HOMES)) { const dx = H === HOMES.max ? H.x + 4.1 : H.x + 2.5; fillOnly([pj(dx - 1.7, H.z + H.d / 2), pj(dx + 1.7, H.z + H.d / 2), pj(dx + 1.7, -5.5), pj(dx - 1.7, -5.5)], '#5a5d66', { boil: 0 });   // the driveway
+    const px = H.x - H.w / 2 + (H === HOMES.max ? 2.0 : 3.6); fillOnly([pj(px - .6, H.z + H.d / 2 + 1.3), pj(px + .6, H.z + H.d / 2 + 1.3), pj(px + .6, -5.5), pj(px - .6, -5.5)], '#8a857a', { boil: 0 }); }   // the path to the door
   // trees and streetlights behind everything that stands
   for (const [x, z] of TREES) { if (z > (view.near ?? 1e9)) continue; const [a, b] = pj(x, z, 4), k = sc(x, z, 4); shape(ell(a, b, k * 2.4, k * 2.0, 20), { fill: '#24402e', lw: 3 }); }
   for (const x of XS) for (const z of ZS) { streetLight(x + PW, z + PW); }
   // buildings, far to near; the cars on a street drawn just after the row in front of it, so nearer buildings cover them
   let ci = 0; const streets = [...ZS].sort((a, b) => a - b);
-  const drawCarsOn = z => { if (z > (view.near ?? 1e9)) return; for (const c of CARS2) { const L = c.lane; if (L.z == null || Math.abs(L.z - z) > 3) continue; const d = ((ts * L.v + c.off) % 240) - 120; car(L.dir === 'x' ? view.cx + d : view.cx - d, L.z, L.dir, c.col, t); } };
+  const drawCarsOn = z => { if (z > (view.near ?? 1e9)) return; if (view.dist && view.dist < 40 && z > view.cz - 1) return; /* a low camera: no traffic between it and the subject */ for (const c of CARS2) { const L = c.lane; if (L.z == null || Math.abs(L.z - z) > 3) continue; const d = ((ts * L.v + c.off) % 240) - 120; car(L.dir === 'x' ? view.cx + d : view.cx - d, L.z, L.dir, c.col, t); } };
   let si = 0;
   const near = view.near ?? 1e9;   // the camera's own position: buildings behind it are not in the picture
   // the cross-street traffic, sorted by depth and drawn among the buildings, so a building nearer the camera covers it
-  const XC = []; for (const c of CARS2) { const L = c.lane; if (L.x == null) continue; const d = ((ts * L.v + c.off) % 240) - 120, zz = L.dir === 'z' ? view.cz + d : view.cz - d; if (zz <= near) XC.push([L.x, zz, L.dir, c.col, t]); }
+  const XC = []; for (const c of CARS2) { const L = c.lane; if (L.x == null) continue; const d = ((ts * L.v + c.off) % 240) - 120, zz = L.dir === 'z' ? view.cz + d : view.cz - d; if (zz <= near && !(view.dist && view.dist < 40 && zz > view.cz - 1)) XC.push([L.x, zz, L.dir, c.col, t]); }
   XC.sort((a, b) => a[1] - b[1]); let xi = 0;
-  for (const b of BLD) { if (b[1] > near) continue; while (si < streets.length && streets[si] + PW < b[1]) drawCarsOn(streets[si++]); while (xi < XC.length && XC[xi][1] < b[1]) car(...XC[xi++]);
+  const EX = (view.extras || []).filter(e => e.z <= near - .3).sort((a, b) => a.z - b.z); let ei = 0;   // people and parked cars, in depth among the buildings
+  const drawEx = e => e.car ? car(e.x, e.z, e.dir || 'z', e.col, t, false, e.car) : e.fn(...pj(e.x, e.z, e.h ?? 0), sc(e.x, e.z, e.h ?? 0));
+  for (const b of BLD) { if (b[1] > near) continue; while (si < streets.length && streets[si] + PW < b[1]) drawCarsOn(streets[si++]); while (xi < XC.length && XC[xi][1] < b[1]) car(...XC[xi++]); while (ei < EX.length && EX[ei].z < b[3]) drawEx(EX[ei++]);
+    if (b[6] === 'mesh') { meshView({ yaw: 0, pitch: Math.PI / 2 - view.pitch, P: view.P, ox: 540, oy: 960, cx: view.cx, cy: view.cy, cz: view.cz, dist: view.dist }); meshDraw(b[7].faces, [(b[0] + b[2]) / 2, 0, (b[1] + b[3]) / 2], 0, { lw: Math.max(1.5, Math.min(4, sc((b[0] + b[2]) / 2, b[3]) * .1)), boil: .25 }); continue; }
     if (b[6] === 'store') { drawStore(t, view, view.act || {}); storeFront(b[0], b[2], b[3], b[4]); storeSign(b[0], b[2], b[3], b[4]); for (const [x, z] of [[-5, 16], [0, 18], [6, 16], [10, 20]]) acUnit(x, z, 4.5); }
     else { building(b[0], b[1], b[2], b[3], b[4], b[5], '#5a4f46', b[7], { lit: .45, seed: Math.round(b[0] * 7 + b[1]) }); if (b[8]) { const zm = (b[1] + b[3]) / 2; stroke([pj(b[0] + .5, zm, b[4]), pj(b[2] - .5, zm, b[4])], 4); for (let x = b[0] + 2; x < b[2] - 1; x += 2.2) stroke([pj(x, b[1] + .5, b[4]), pj(x, zm - .4, b[4])], 2, { line: 'rgba(0,0,0,.25)' }); } else acUnit(b[0] + 1.5, b[1] + 2, b[4]); } }
   while (si < streets.length) drawCarsOn(streets[si++]);
   // parked cars in the store's bays (real size), and the cross-street traffic on top
   for (const [i, col] of [[1, '#c8433a'], [3, '#3f5f8a'], [4, '#e8e2d0'], [8, '#2d2a33'], [10, '#6f8a7a']]) car(-13 + (i + .5) * M.parking.w, 33.5 + M.parking.l / 2, 'z', col, t, false);   // parked: lights off
-  while (xi < XC.length) car(...XC[xi++]);
+  while (xi < XC.length) car(...XC[xi++]); while (ei < EX.length) drawEx(EX[ei++]);
   if (!tilt) return;
   // tilt-shift: keep the middle band sharp, blur above and below, saturate a little
   buf.getContext('2d').drawImage(cv, 0, 0);

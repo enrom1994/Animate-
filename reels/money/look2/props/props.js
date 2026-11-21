@@ -73,6 +73,49 @@ export function phone() {   // a smartphone 0.072 x 0.15 x 0.008, standing
   const f = [...box(-.036, 0, -.004, .036, .15, .004, '#26242a'), panel(-.032, .005, .032, .145, .0041, '#3f6f8a', { glow: true })];
   return { faces: f, size: [.072, .15, .008], name: 'phone' };
 }
+
+// a sports coupe, 4.5 x 1.3 x 1.9 m, nose toward +x: low, gold rims, a rear wing (the spender's car)
+export function coupe(paint = '#c8302a') {
+  const prof = [[-2.25, .28], [2.25, .28], [2.3, .5], [2.2, .66], [.9, .84], [.05, 1.27], [-1.0, 1.3], [-1.9, .95], [-2.25, .88], [-2.3, .5]];
+  const f = [...extrude(prof, -.93, .93, paint, i => i === 4 || i === 6 ? GLASS : null)];
+  for (const s of [1, -1]) { const z = s * .935;
+    f.push(poly([[.8, .88], [.08, 1.23], [-.95, 1.26], [-1.55, .92]].map(([x, y]) => [x, y, z]), GLASS, [0, 0, s]));
+    f.push(poly([[.05, .36, z], [.07, .36, z], [.07, .86, z], [.05, .86, z]], TRIM, [0, 0, s], { lw: 1.5 }), poly([[-.4, .7, z], [-.2, .7, z], [-.2, .73, z], [-.4, .73, z]], TRIM, [0, 0, s], { lw: 1.5 }));
+    f.push(poly([[1.0, .3, z], [1.9, .3, z], [1.9, .38, z], [1.0, .38, z]], '#1d1b1f', [0, 0, s]));   // side skirt
+    for (const x of [1.45, -1.45]) { f.push(...cyl('z', [x, .34, 0], .34, s * .8, s * 1.0, TYRE, 14)); f.push(...cyl('z', [x, .34, 0], .25, s * 1.005, s * 1.015, '#e3b23c', 12)); }
+    f.push(poly([[2.24, .55, s * .5], [2.24, .55, s * .82], [2.18, .64, s * .82], [2.18, .64, s * .5]], '#fff4d0', [1, 0, 0], { glow: true }));
+    f.push(poly([[-2.27, .7, s * .35], [-2.27, .7, s * .85], [-2.24, .8, s * .85], [-2.24, .8, s * .35]], '#c42a24', [-1, 0, 0], { glow: true }));
+    f.push(...box(-2.05, .93, s * .55, -1.98, 1.06, s * .62, TRIM));   // wing posts
+    f.push(...box(.4, .86, s * .93, .55, .95, s * 1.03, paint)); }
+  f.push(...box(-2.25, 1.06, -.88, -1.85, 1.1, .88, '#1d1b1f'));   // the wing
+  f.push(poly([[2.31, .32, -.7], [2.31, .32, .7], [2.31, .46, .7], [2.31, .46, -.7]], '#1d1b1f', [1, 0, 0]));
+  return { faces: f, size: [4.6, 1.3, 1.9], name: 'sports coupe' };
+}
+// ---- houses ----
+// a house, front toward +z: w wide, d deep, storeys of 2.8 m, a gabled roof with the ridge along x, lit windows, a porch;
+// garage: a garage door on the right. Windows and doors are real size (door 0.9 x 2.05, windows 1.2 x 1.3)
+let HP = 90000; const part = faces => { const id = HP++; faces.forEach(q => q.part = id); return faces; };
+export function house({ w = 10, d = 9, storeys = 1, wall = '#c9b79a', roof = '#6e4a42', trim = '#efe6d2', door = '#2f6f73', garage = false, lit = [1, 0, 1, 1, 0, 1] } = {}) {
+  const h = storeys * 2.8, rh = 2.4, o = .45, f = [...box(-w / 2, 0, -d / 2, w / 2, h, d / 2, { all: wall, front: wall })];
+  const Z = d / 2 + o, R = [[-w / 2 - o, h, Z], [w / 2 + o, h, Z], [w / 2 + o, h + rh, 0], [-w / 2 - o, h + rh, 0]];
+  f.push(...part([{ pts: R, col: roof }, { pts: [[w / 2 + o, h, -Z], [-w / 2 - o, h, -Z], [-w / 2 - o, h + rh, 0], [w / 2 + o, h + rh, 0]], col: roof },
+    { pts: [[w / 2, h, Z - o], [w / 2, h, -Z + o], [w / 2, h + rh * (1 - o / Z), 0]], col: wall }, { pts: [[-w / 2, h, -Z + o], [-w / 2, h, Z - o], [-w / 2, h + rh * (1 - o / Z), 0]], col: wall }]));
+  f.push(...box(-w / 2 - o, h - .12, Z - .08, w / 2 + o, h, Z, trim));   // fascia board
+  const fz = d / 2 + .001, win = (x, y, on) => { f.push(panel(x - .66, y - .06, x + .66, y + 1.36, fz, trim), panel(x - .6, y, x + .6, y + 1.3, fz + .002, on ? '#ffd98a' : '#3a4258', { glow: on })); f.push(panel(x - .02, y, x + .02, y + 1.3, fz + .004, trim, { lw: 1.5 })); };
+  const gw = garage ? 3.0 : 0, dx = garage ? -w / 2 + 2.2 : -.0;
+  let li = 0; for (let st = 0; st < storeys; st++) { const y = st * 2.8 + .95;
+    for (const x of (st === 0 ? (garage ? [-w / 2 + 4.4, -w / 2 + 6.2].filter(x => x < w / 2 - gw - .6) : [-w / 2 + 1.6, w / 2 - 1.6, w / 2 - 3.4]) : [-w / 2 + 1.6, -w / 2 + 3.6, w / 2 - 1.6, w / 2 - 3.6])) win(x, y, lit[li++ % lit.length]); }
+  const doorX = garage ? -w / 2 + 2.0 : -w / 2 + 3.6;
+  f.push(panel(doorX - .55, 0, doorX + .55, 2.2, fz, trim), panel(doorX - .45, 0, doorX + .45, 2.05, fz + .002, door), panel(doorX - .25, 1.3, doorX + .25, 1.8, fz + .004, '#ffd98a', { glow: true }));
+  f.push(...box(doorX - 1.1, 0, d / 2, doorX + 1.1, .18, d / 2 + 1.3, '#a9a295'));                                   // the porch step
+  f.push(...box(doorX - 1.15, 2.5, d / 2, doorX + 1.15, 2.6, d / 2 + 1.35, roof), ...box(doorX - 1.05, .18, d / 2 + 1.18, doorX - .95, 2.5, d / 2 + 1.28, trim), ...box(doorX + .95, .18, d / 2 + 1.18, doorX + 1.05, 2.5, d / 2 + 1.28, trim));
+  f.push(panel(doorX + .7, 1.6, doorX + .85, 1.75, fz + .006, '#ffe9a8', { glow: true }));   // porch light
+  if (garage) { const gx = w / 2 - gw / 2 - .4; f.push(panel(gx - gw / 2 - .08, 0, gx + gw / 2 + .08, 2.38, fz, trim), panel(gx - gw / 2, 0, gx + gw / 2, 2.3, fz + .002, '#e8e2d0'));
+    for (let i = 1; i < 5; i++) f.push(panel(gx - gw / 2, i * .46 - .02, gx + gw / 2, i * .46 + .02, fz + .004, '#b9b4a8', { lw: 1.5 })); }
+  f.push(...box(w / 2 - 2.6, h + .6, -1.2, w / 2 - 1.9, h + rh + .3, -.5, '#8a3a2e'));   // chimney
+  return { faces: f, size: [w + 2 * o, h + rh, d + 1.35], name: garage ? `house with garage (${storeys} storey)` : `house (${storeys} storey)` };
+}
+const houseBig = () => house({ w: 12, d: 9, storeys: 2, wall: '#e8e2d0', roof: '#3a3d48', door: '#c8302a', garage: true });
 // ---- paper ----
 // a car-loan payment statement, US letter (216 x 279 mm), lying flat; its print is drawn on the sheet's own plane from any camera
 export function bill() {
@@ -94,4 +137,4 @@ function billInk(at, rot) {   // print in millimetres on the sheet: u across fro
   fillOnly([[20, 226], [100, 226], [100, 230], [20, 230]], '#b9b4a8', { boil: 0 }); fillOnly([[20, 238], [80, 238], [80, 242], [20, 242]], '#b9b4a8', { boil: 0 });
   setM(m0);
 }
-export const ALL = [bill, car, counter, shelf, pylon, tv, sofa, table, fridge, door, phone];
+export const ALL = [house, houseBig, coupe, bill, car, counter, shelf, pylon, tv, sofa, table, fridge, door, phone];
