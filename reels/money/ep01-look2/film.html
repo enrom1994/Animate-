@@ -15,7 +15,7 @@
 // new coupe next door -> split screen (Max new / Theo used) -> $205 -> Theo invests -> whip pan: Max's car loses half ->
 // six years later, split, both paid off -> Theo's $17,660 -> rise over the town, ten years on, $23,621 -> same paycheck.
 import { setupWide, drawWide, town, HOMES } from '/money/look2/wide.js';
-import { drawStore, eyeOf, insideStore, STORE } from '/money/look2/store.js';
+import { drawStore, drawPovBill, POV_BILL, eyeOf, insideStore, STORE } from '/money/look2/store.js';
 import { AUDIT, S as INKS, frame, g, push, pop, translate, scale, shape, stroke, rr, text } from '/money/look2/toon.js';
 import { auditFrame } from '/money/look2/check.js';
 import { maxStanding, theoStanding, THEO } from '/money/look2/cast.js';
@@ -74,12 +74,22 @@ function expandBottom(u, drawTop, drawFull) {   // the bottom half grows to fill
 }
 function blurPan(px) { if (px < .5) return; hg.drawImage(cv, 0, 0); g.setTransform(1, 0, 0, 1, 0, 0); g.filter = `blur(${px}px)`; g.drawImage(half, 0, 0); g.filter = 'none'; }
 // ---- the shots ----
-const ACT0 = t => { const up = io(pr(t, 2.6, 2.95)), sigh = Math.sin(Math.PI * pr(t, 3.1, 3.8));
-  return { look: [mix(.15, 0, up), mix(.6, -.05, up)], lid: mix(.55, .32, up) + .1 * sigh, tilt: mix(-.05, .03, up), sigh, blink: t > 3.0 && t < 3.1, bling: true, shades: true, holdBill: true }; };
+const POV_END = 3.0;   // 0 - 3.0: through Max's eyes, the statement in his hands; then a hard cut to him at the counter
+const ACT0 = t => { const up = io(pr(t, 3.05, 3.35)), sigh = Math.sin(Math.PI * pr(t, 3.35, 3.9));
+  return { look: [mix(.15, 0, up), mix(.6, -.05, up)], lid: mix(.55, .32, up) + .1 * sigh, tilt: mix(-.05, .03, up), sigh, blink: t > 3.45 && t < 3.55, bling: true, shades: true }; };
+function povShot(t) {   // his eyes 1.62 m up behind the counter, looking down at the page; a slow push onto the amount, a little handheld sway
+  const u = ss(pr(t, 0, 2.75)), sway = [Math.sin(t * 1.7) * .004, Math.sin(t * 2.3 + 1) * .003];
+  const look = [POV_BILL[0] + sway[0], mix(POV_BILL[1] - .03, POV_BILL[1], u) + sway[1], mix(POV_BILL[2] - .03, POV_BILL[2], u)];   // a little below the page's middle, so the page sits high, clear of the caption
+  const eye = [STORE.counterX, 1.62, STORE.maxZ], L = Math.hypot(eye[1] - look[1], eye[2] - look[2]), down = Math.atan2(eye[1] - look[1], look[2] - eye[2]);
+  const cam = { ...camOf({ look, L, down, F: lmix(1900, 2500, u) }), yaw: Math.PI };
+  frame(t); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#141b30'; g.fillRect(0, 0, 1080, 1920);
+  const n0 = AUDIT.log.length; drawStore(t, cam, { pov: true }); AUDIT.log.length = n0;   // the shop behind, out of focus (not checked: it is a blur)
+  blurPan(9); drawPovBill(t, cam);
+}
 function storeToTheo(t) {   // 0 - 7.45: one move, inside the store to Theo's front yard
   const act = ACT0(t);
   let st;
-  if (t < 5.8) { const v = io(pr(t, 3.9, 5.8)), L = v > 0 ? lmix(2.3, 70, v) : mix(2.45, 2.3, ss(pr(t, 0, 3.9)));
+  if (t < 5.8) { const v = io(pr(t, 3.9, 5.8)), L = v > 0 ? lmix(2.3, 70, v) : mix(2.45, 2.3, ss(pr(t, POV_END, 3.9)));
     const down = v < .08 ? mix(.30, .14, ss(v / .08)) : mix(.14, .75, ss(pr(v, .25, 1)));
     st = { look: mix3(MAXC, MID, ss(pr(v, .28, 1))), L, down, F: lmix(2070, 2600, v) }; }
   else { const u = io(pr(t, 5.8, 7.45)); st = { look: mix3(MID, CLOSE_THEO.look, ss(u)), L: lmix(70, CLOSE_THEO.L, u), down: mix(.75, CLOSE_THEO.down, u), F: lmix(2600, CLOSE_THEO.F, u) }; }
@@ -94,7 +104,8 @@ const theoShot = (t, st, { old = false, act = {} } = {}) => () => drawWide(t, { 
 const push_ = (st, u, L1) => ({ ...st, L: lmix(st.L, L1, u) });
 window.renderAt = t => {
   AUDIT.subjects = 0; FOCUS = true;
-  if (t < 7.45) storeToTheo(t);
+  if (t < POV_END) povShot(t);
+  else if (t < 7.45) storeToTheo(t);
   else if (t < 8.5) {   // whip pan along the street from Theo's yard to Max next door: his new coupe
     const u = io(pr(t, 7.45, 7.8)), st = { look: mix3(CLOSE_THEO.look, FRAME_MAX.look, u), L: lmix(CLOSE_THEO.L, FRAME_MAX.L, u), down: .12, F: 2300 };
     drawWide(t, { ...camOf(st), extras: [theoEx(t), maxEx(t), ...carsEx()] }, { tilt: false }); blurPan(Math.sin(Math.PI * u) * 22);
@@ -127,8 +138,8 @@ window.renderAt = t => {
     const u = io(pr(t, 27.9, 33.0)), st = { look: mix3(push_(FRAME_THEO, 1, 10).look, [14, 0, -10], ss(u)), L: lmix(10, 230, u), down: mix(.12, .8, ss(u)), F: lmix(2300, 2900, u) };
     FOCUS = st.L < 15; drawWide(t, { ...camOf(st), extras: [theoEx(t, { smile: .6 }), maxEx(t), ...carsEx(true)] }, { tilt: u > .5 });
     const [a, b] = pin(22, -16, 9), [c, d] = pin(6, -16, 11), k = ss(pr(t, 28.3, 28.7));
-    card(clamp(a, 330, 750), Math.max(b, 330), t < 32.6 ? 'TEN YEARS ON · 7% A YEAR' : 'THEO', money(t < 28.6 ? 17660 : mix(17660, 23621, ss(pr(t, 28.6, 31.4)))), { col: '#2f6f73', w: 640, bigPx: 110, s: k });
-    if (t > 32.7) { card(clamp(c, 330, 750), Math.max(d, 330) + 250, 'MAX', 'NEW CAR', { col: '#b8302a', w: 460, bigPx: 80, s: pop_(t, 32.8) }); card(540, 1700, 'SAME PAYCHECK', 'ONE PAYMENT APART', { w: 760, bigPx: 64, s: pop_(t, 34.2) }); } }
+    card(clamp(a, 330, 750), Math.max(b, 330), t < 32.6 ? 'TEN YEARS ON · 7% A YEAR' : 'THEO', money(t < 28.6 ? 17660 : mix(17660, 23621, ss(pr(t, 28.6, 31.4)))), { col: '#2f6f73', w: 640, bigPx: 110, s: k * (1 - pr(t, 34.0, 34.25)) });   // the figure cards clear before the last line
+    if (t > 32.7) { card(clamp(c, 330, 750), Math.max(d, 330) + 250, 'MAX', 'NEW CAR', { col: '#b8302a', w: 460, bigPx: 80, s: pop_(t, 32.8) * (1 - pr(t, 34.0, 34.25)) }); card(540, 960, 'SAME PAYCHECK', 'ONE PAYMENT APART', { w: 760, bigPx: 80, s: pop_(t, 34.2) }); } }   // the last line alone, mid-frame, clear of the caption
   const c = CAPTIONS.find(([a, , b]) => t >= a && t < b); capEl.innerHTML = c ? c[1] : '';
 };
 const MOVES = [[3.9, 7.8], [17.45, 17.8], [27.9, 33.0]];   // the camera is sweeping: things pass the frame edge and under the caption

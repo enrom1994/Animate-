@@ -2,8 +2,9 @@
 // shop window, out to the street and up over the town without ever changing drawings. Metres; the shopfront faces +z at z = 27.
 import { view as meshView, proj, draw, box, panel } from './props/mesh.js';
 import { counter, shelf, fridge, bill } from './props/props.js';
-import { drawMax, UNIT, ORIGIN_H } from './max.js';
-import { push, pop, translate, scale, shape, fillOnly, text, ell } from './toon.js';
+import { drawMax, UNIT, ORIGIN_H, MAXC } from './max.js';
+import { hand } from './faces.js';
+import { push, pop, translate, scale, shape, fillOnly, text, ell, noodle } from './toon.js';
 export const STORE = { x0: -8, x1: 14, z0: 14, z1: 27, h: 4.5, counterX: 5.3, counterZ: 22.6, maxZ: 21.9 };
 const S = STORE, GLASS = 'rgba(200,232,240,.16)';
 const place = (faces, dx, dz, rot = 0) => faces.map(q => ({ ...q, pts: q.pts.map(([x, y, z]) => [dx + x * Math.cos(rot) + z * Math.sin(rot), y, dz - x * Math.sin(rot) + z * Math.cos(rot)]) }));
@@ -36,23 +37,23 @@ const FRONT = (() => { const f = [], Z0 = S.z1 - .25, Z1 = S.z1, W = '#c8543f';
 const GLASSES = BAYS.map(([a, b, lo, hi]) => [[a, lo, S.z1 - .12], [b, lo, S.z1 - .12], [b, hi, S.z1 - .12], [a, hi, S.z1 - .12]]);
 // the camera position for a scene camera (the town's convention: pitch PI/2 looks straight along -z, smaller looks down)
 export const insideStore = e => e[0] > STORE.x0 && e[0] < STORE.x1 && e[1] < STORE.h && e[2] > STORE.z0 && e[2] < STORE.z1;   // the camera is in the shop
-export const eyeOf = cam => [cam.cx, (cam.cy || 0) + (cam.dist || 1e6) * Math.cos(cam.pitch), cam.cz + (cam.dist || 1e6) * Math.sin(cam.pitch)];
-// draw the store from the scene camera: cam = { pitch, P, cx, cy, cz, dist, focus }
+export const eyeOf = cam => { const d = cam.dist || 1e6, y = cam.yaw || 0; return [cam.cx + d * Math.sin(cam.pitch) * Math.sin(y), (cam.cy || 0) + d * Math.cos(cam.pitch), cam.cz + d * Math.sin(cam.pitch) * Math.cos(y)]; };   // yaw PI: the camera looks toward +z (Max's own view, out to the shopfront)
+// draw the store from the scene camera: cam = { pitch, P, cx, cy, cz, dist, yaw, focus }; act.pov: through Max's eyes (no Max, nothing behind him)
 export function drawStore(t, cam, act = {}) {
-  meshView({ yaw: 0, pitch: Math.PI / 2 - cam.pitch, P: cam.P, ox: 540, oy: 960, cx: cam.cx, cy: cam.cy || 0, cz: cam.cz, dist: cam.dist || 0 });
-  const eye = eyeOf(cam), outside = !insideStore(eye), sp = (x, y, z) => proj(x, y, z), pm = (x, y, z) => { const a = sp(x, y, z), b = sp(x + 1, y, z); return b[0] - a[0]; };
+  meshView({ yaw: cam.yaw || 0, pitch: Math.PI / 2 - cam.pitch, P: cam.P, ox: 540, oy: 960, cx: cam.cx, cy: cam.cy || 0, cz: cam.cz, dist: cam.dist || 0 });
+  const eye = eyeOf(cam), outside = !insideStore(eye), sp = (x, y, z) => proj(x, y, z), pm = (x, y, z) => { const a = sp(x, y, z), b = sp(x + 1, y, z); return Math.abs(b[0] - a[0]); };
   const lw = Math.max(1.5, Math.min(5, pm(S.counterX, 1, S.counterZ) * .02)), opt = { lw, boil: .3 };
   for (const s of SHELL) draw(s, [0, 0, 0], 0, opt);
   for (const [a, b] of TILES) { const A = sp(...a), B = sp(...b); if (A[2] > .05 - (cam.dist || 1e6) || B[2] > .05 - (cam.dist || 1e6)) shape([A, B].map(p => [p[0], p[1]]), { closed: false, lw: 1.2, line: 'rgba(60,70,70,.28)', boil: 0 }); }
   draw(STOCK, [0, 0, 0], 0, opt);
   draw(BOARD, [0, 0, 0], 0, opt);
-  CELLS.forEach(([a, b, col], i) => { const x0 = S.counterX - 1.85 + i * 1.25, q = [sp(x0, 2.45, 21.01), sp(x0 + 1.15, 2.45, 21.01), sp(x0 + 1.15, 3.15, 21.01), sp(x0, 3.15, 21.01)].map(p => [p[0], p[1]]);
+  if (!act.pov) CELLS.forEach(([a, b, col], i) => { const x0 = S.counterX - 1.85 + i * 1.25, q = [sp(x0, 2.45, 21.01), sp(x0 + 1.15, 2.45, 21.01), sp(x0 + 1.15, 3.15, 21.01), sp(x0, 3.15, 21.01)].map(p => [p[0], p[1]]);
     shape(q, { fill: '#f6efd8', lw: Math.max(1.2, lw * .5) }); const w = q[1][0] - q[0][0], h = q[0][1] - q[3][1], cx = (q[0][0] + q[1][0]) / 2, cy = (q[0][1] + q[3][1]) / 2;
     shape([[q[3][0], q[3][1]], [q[2][0], q[2][1]], [q[2][0], q[3][1] + h * .3], [q[3][0], q[3][1] + h * .3]], { fill: col, stroke: false, boil: .2 });
     if (w > 120) { push(); translate(cx, cy); scale(w / 300); text(a, 0, -55, { font: '800 44px Cap', fill: '#fff', scenery: true }); text(b, 0, 30, { font: '800 52px Cap', fill: '#2e1d1c', scenery: true }); pop(); } });
   // Max behind the counter: his origin is 0.963 m above the floor at his spot
   const [mx, my] = sp(S.counterX, ORIGIN_H, S.maxZ), k = pm(S.counterX, ORIGIN_H, S.maxZ) * UNIT, actM = { ...act, subject: cam.focus === 'max', subjectName: 'Max (in the store)', minH: 60 };
-  drawMax(t, mx, my, k, actM, 'legs'); drawMax(t, mx, my, k, actM, 'upper');
+  if (!act.pov) { drawMax(t, mx, my, k, actM, 'legs'); drawMax(t, mx, my, k, actM, 'upper'); }
   draw(CTR, [0, 0, 0], 0, opt);
   // on the counter: the car payment letter, his card, the car key, a coffee
   const flat = (x0, z0, x1, z1, y = .952) => [sp(x0, y, z1), sp(x1, y, z1), sp(x1, y, z0), sp(x0, y, z0)].map(p => [p[0], p[1]]);
@@ -60,13 +61,31 @@ export function drawStore(t, cam, act = {}) {
   if (act.holdBill) {   // he holds the statement out to us over the counter, its top leaning back to face the camera
     const m = BILL.heldAt([S.counterX - .07, 1.37, S.counterZ + .12], .28, 0);
     held = { m, hands: [-1, 1].map(s => { const p = sp(...m([s * .1, 0, .02])); return [(p[0] - mx) / k, (p[1] - my) / k]; }) };   // gripping the sides
-  } else { draw(BILL.faces, BILL_AT, BILL_ROT, { lw: Math.max(1.2, lw * .5), boil: .15 }); BILL.ink(BILL_AT, BILL_ROT); }   // the car payment statement (prop library)
+  } else if (!act.pov) { draw(BILL.faces, BILL_AT, BILL_ROT, { lw: Math.max(1.2, lw * .5), boil: .15 }); BILL.ink(BILL_AT, BILL_ROT); }   // the car payment statement (prop library)
   const handY = (sp(S.counterX, .955, S.counterZ - .2)[1] - my) / k;   // his hands rest on the counter top, 20 cm in from its back edge
-  if (held) { const a = { ...actM, subject: false, hands: held.hands };
+  if (act.pov) {}
+  else if (held) { const a = { ...actM, subject: false, hands: held.hands };
     drawMax(t, mx, my, k, { ...a, only: 'limbs' }, 'arms'); draw(BILL.placed(held.m), [0, 0, 0], 0, { lw: Math.max(1.2, lw * .5), boil: .15 }); BILL.ink(held.m); drawMax(t, mx, my, k, { ...a, only: 'hands' }, 'arms'); }
   else drawMax(t, mx, my, k, { ...actM, subject: false, handY: Math.max(62, handY) }, 'arms');
   draw(LIGHTS, [0, 0, 0], 0, opt);
-  if (!outside) return;
+  if (!outside && !act.pov) return;   // from inside, the shopfront is only seen looking out (POV)
   for (const q of GLASSES) shape(q.map(p => sp(...p)).map(p => [p[0], p[1]]), { fill: GLASS, stroke: false, boil: 0 });   // the glass
   draw(FRONT, [0, 0, 0], 0, opt);
+}
+
+// Max's POV: the statement in his hands, 40 cm in front of his eyes, over the counter. Drawn on top of the (blurred) shop.
+export const POV_BILL = [STORE.counterX, 1.2, STORE.maxZ + .4];
+export function drawPovBill(t, cam, { lean = .78 } = {}) {
+  meshView({ yaw: cam.yaw || 0, pitch: Math.PI / 2 - cam.pitch, P: cam.P, ox: 540, oy: 960, cx: cam.cx, cy: cam.cy || 0, cz: cam.cz, dist: cam.dist || 0 });
+  const m = BILL.heldAt(POV_BILL, lean, Math.PI), sp = (...p) => proj(...m(p)), px = Math.hypot(...[0, 1].map(i => sp(.108, 0, 0)[i] - sp(-.108, 0, 0)[i])) / .216;
+  draw(BILL.placed(m), [0, 0, 0], 0, { lw: Math.max(2, px * .0016), boil: .15 }); BILL.ink(m);
+  const k = px * UNIT;   // his hands at true size: pixels per unit at the page
+  const lwk = 7 * Math.min(1.6, k), pt = (x, y) => [x, y];
+  for (const s of [-1, 1]) {   // a real grip: fingers behind the page, the palm just outside its edge, only the thumb on the front
+    const [hx, hy] = sp(s * .108, 0, .04), ox = hx + s * 34 * k, [ex, ey] = [hx + s * 300 * k, 1920 + 420 * k];
+    shape(noodle([ex, ey], [ox + s * 6 * k, hy + 40 * k], s * 24 * k, 70 * k, 58 * k), { fill: MAXC.skin, lw: lwk });                 // forearm, up out of the bottom of the frame
+    shape(ell(ox, hy + 4 * k, 40 * k, 62 * k, 20), { fill: MAXC.skin, lw: lwk });                                                     // the palm and the curled fingers behind the edge
+    shape(noodle([hx + s * 8 * k, hy + 26 * k], [hx - s * 40 * k, hy - 22 * k], s * -4 * k, 30 * k, 24 * k), { fill: MAXC.skin, lw: lwk });   // the thumb on the page
+    shape(ell(hx - s * 34 * k, hy - 16 * k, 9 * k, 7 * k, 10), { fill: '#f6d2b8', lw: lwk * .5 }); }                              // its nail
+
 }
