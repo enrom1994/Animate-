@@ -4,6 +4,7 @@
 //   warn   a label too small to read on a phone (under 22 px tall in a 1080 x 1920 frame)
 //   (scenery: true marks a background sign in the world: it may pass behind walls and out of frame like any object; not checked)
 //   a story label cut off while the camera is moving fast (moving: true) is a warning: it is sweeping through the frame, not framed badly
+//   error  a label that overflows its own box: text on a card or banner that runs past the box or into its border ($205 a month)
 //   error  a character too small to read (a registered subject under its minimum height), or cut off by the edge
 export function auditFrame(log, W = 1080, H = 1920, { moving = false, capBox = null } = {}) {   // capBox: the caption's box; nothing that matters may sit under it
   const out = [], area = b => Math.max(0, b[2] - b[0]) * Math.max(0, b[3] - b[1]), inter = (a, b) => area([Math.max(a[0], b[0]), Math.max(a[1], b[1]), Math.min(a[2], b[2]), Math.min(a[3], b[3])]);
@@ -15,7 +16,15 @@ export function auditFrame(log, W = 1080, H = 1920, { moving = false, capBox = n
       if (vis < .98) out.push([moving ? 'warn' : 'error', `label "${e.str}" is cut off by the frame edge (${Math.round(vis * 100)}% visible)${moving ? ' while the camera moves' : ''}`]);
       if (e.bb[3] - e.bb[1] < 22) out.push(['warn', `label "${e.str}" is ${Math.round(e.bb[3] - e.bb[1])} px tall: too small to read on a phone`]);
       let cov = 0; for (const f of log.slice(i + 1)) if (f.k === 'shape' && f.layer === e.layer) cov = Math.max(cov, inter(e.bb, f.bb) / A);
-      if (cov > .2) out.push(['error', `label "${e.str}" is covered by something drawn over it (${Math.round(cov * 100)}%)`]); }
+      if (cov > .2) out.push(['error', `label "${e.str}" is covered by something drawn over it (${Math.round(cov * 100)}%)`]); 
+      // its box: the last opaque shape drawn before it, in its layer, under its centre, if that is card-sized (not a wall, the ground or a page)
+      const cx = (e.bb[0] + e.bb[2]) / 2, cy = (e.bb[1] + e.bb[3]) / 2, th = e.bb[3] - e.bb[1];
+      for (let j = i - 1; j >= 0; j--) { const f = log[j]; if (f.k !== 'shape' || f.layer !== e.layer) continue;
+        const b = f.bb; if (cx < b[0] || cx > b[2] || cy < b[1] || cy > b[3]) continue;   // the nearest shape under its centre is what it sits on
+        if (area(b) > W * H * .2 || b[3] - b[1] > th * 10) break;   // a wall, the ground, a whole page: not a box made for this label
+        const pad = Math.max(10, th * .25), gap = Math.min(e.bb[0] - b[0], b[2] - e.bb[2]);
+        if (gap < pad) out.push(['error', `label "${e.str}" overflows its box (${gap < 0 ? Math.round(-gap) + ' px past the edge' : Math.round(gap) + ' px from the edge, needs ' + Math.round(pad)})`]);
+        break; } }
     if (e.k === 'subject' && onScreen(e.bb)) { const h = e.bb[3] - e.bb[1], vis = inter(e.bb, fr) / (area(e.bb) || 1);
       if (h < e.minH) out.push(['error', `${e.name} is ${Math.round(h)} px tall on screen: too small to read (needs ${e.minH})`]);
       if (vis < .9) out.push(['error', `${e.name} is cut off by the frame edge (${Math.round(vis * 100)}% visible)`]); } });

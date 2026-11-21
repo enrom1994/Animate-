@@ -42,8 +42,10 @@ const theoEx = (t, act = {}) => ({ x: THEO_X, z: THEO_Z, h: ORIGIN_H, fn: person
 const maxEx = (t, act = {}) => ({ x: MAX_X, z: MAX_Z, h: ORIGIN_H, fn: person(() => maxStanding(t, { outfit: 'flash', act }), 'Max') });
 const carsEx = (old = false) => [{ x: MCAR[0], z: MCAR[1], dir: 'x', car: old ? COUPE_OLD : COUPE }, { x: TCAR[0], z: TCAR[1], dir: 'x', car: HATCH }];
 // ---- story cards: a rounded card with a small heading and a big figure, pinned to a point on screen ----
+const textW = (str, font) => { g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.font = font; const w = g.measureText(str).width; g.restore(); return w; };
+const fitW = (w, ...items) => Math.max(w, ...items.map(([str, font, px]) => textW(str, font) + 2 * Math.max(30, px * .45)));   // a box never narrower than its text plus a margin
 function card(x, y, head, big, { col = '#2e1d1c', w = 520, bigPx = 96, tilt = 0, s = 1 } = {}) {
-  if (s <= .01) return; push(); translate(x, y); scale(s); if (tilt) { /* a stamp leans */ }
+  if (s <= .01) return; w = fitW(w, [head, '800 40px Cap', 40], [big, `800 ${bigPx}px Cap`, bigPx]); push(); translate(x, y); scale(s); if (tilt) { /* a stamp leans */ }
   shape(rr(-w / 2, -95, w, 190, 28), { fill: '#fbf6ea', lw: 8 });
   text(head, 0, -46, { font: '800 40px Cap', fill: '#6b5a4a' }); text(big, 0, 26, { font: `800 ${bigPx}px Cap`, fill: col }); pop(); }
 function stamp(x, y, word, s = 1) { if (s <= .01) return; push(); translate(x, y); scale(s); shape(rr(-230, -62, 460, 124, 16), { fill: '#fbf6ea', lw: 10, line: '#b8302a' }); text(word, 0, 4, { font: '800 76px Cap', fill: '#b8302a' }); pop(); }
@@ -73,7 +75,7 @@ function expandBottom(u, drawTop, drawFull) {   // the bottom half grows to fill
 function blurPan(px) { if (px < .5) return; hg.drawImage(cv, 0, 0); g.setTransform(1, 0, 0, 1, 0, 0); g.filter = `blur(${px}px)`; g.drawImage(half, 0, 0); g.filter = 'none'; }
 // ---- the shots ----
 const ACT0 = t => { const up = io(pr(t, 2.6, 2.95)), sigh = Math.sin(Math.PI * pr(t, 3.1, 3.8));
-  return { look: [mix(.15, 0, up), mix(.6, -.05, up)], lid: mix(.55, .32, up) + .1 * sigh, tilt: mix(-.05, .03, up), sigh, blink: t > 3.0 && t < 3.1, bling: true, shades: true }; };
+  return { look: [mix(.15, 0, up), mix(.6, -.05, up)], lid: mix(.55, .32, up) + .1 * sigh, tilt: mix(-.05, .03, up), sigh, blink: t > 3.0 && t < 3.1, bling: true, shades: true, holdBill: true }; };
 function storeToTheo(t) {   // 0 - 7.45: one move, inside the store to Theo's front yard
   const act = ACT0(t);
   let st;
@@ -101,7 +103,7 @@ window.renderAt = t => {
     split(t, () => { maxShot(t, FRAME_MAX)(); const [a, b] = pin(MCAR[0], MCAR[1], 2.4); card(a, b - 40, 'NEW', '$787/mo', { col: '#b8302a', s: .9 }); },
       () => { theoShot(t, FRAME_THEO, { act: { look: [-.3, 0] } })(); const [a, b] = pin(TCAR[0], TCAR[1], 2.4); card(a, b - 40, 'USED', '$580/mo', { col: '#2f6f73', s: .9 * pop_(t, 9.0) }); },
       { reveal: pr(t, 8.5, 8.85) });
-    const k = pop_(t, 11.6, .4); if (k > 0) { push(); translate(330, 960); scale(k); shape(rr(-300, -92, 600, 184, 30), { fill: '#ffd23f', lw: 10 }); text('$205 a month', 0, 4, { font: '800 84px Cap', fill: '#2e1d1c' }); pop(); } }
+    const k = pop_(t, 11.6, .4); if (k > 0) { push(); translate(360, 960); scale(k); const bw = fitW(600, ['$205 a month', '800 84px Cap', 84]); shape(rr(-bw / 2, -92, bw, 184, 30), { fill: '#ffd23f', lw: 10 }); text('$205 a month', 0, 4, { font: '800 84px Cap', fill: '#2e1d1c' }); pop(); } }
   else if (t < 17.45) {   // Theo puts the difference away, month after month
     const u = pr(t, 13.85, 14.25), st = push_(FRAME_THEO, ss(pr(t, 14.0, 17.4)), 9);
     if (u < 1) expandBottom(u, maxShot(t, FRAME_MAX), theoShot(t, st)); else theoShot(t, st, { act: { look: [.2, -.1] } })();

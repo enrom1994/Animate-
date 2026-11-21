@@ -121,16 +121,22 @@ const houseBig = () => house({ w: 12, d: 9, storeys: 2, wall: '#e8e2d0', roof: '
 export function bill() {
   const W = .216, D = .279, up = [0, 1, 0], f = [...box(-W / 2, 0, -D / 2, W / 2, .002, D / 2, '#f6f3ea')];
   f.push(poly([[-W / 2, .0021, -D / 2], [W / 2, .0021, -D / 2], [W / 2, .0021, -D / 2 + .04], [-W / 2, .0021, -D / 2 + .04]], '#2f6f73', up, { lw: 1.5 }));   // the lender's band
-  return { faces: f, size: [W, .002, D], name: 'payment statement (letter paper)', ink: (at = [0, 0, 0], rot = 0) => billInk(at, rot) };
+  const flatAt = (at, rot) => { const c = Math.cos(rot), s = Math.sin(rot); return ([x, y, z]) => [at[0] + x * c + z * s, at[1] + y, at[2] - x * s + z * c]; };
+  // held up: the page stands facing +z, its top leaning back by `lean` (radians), turned by `rot` about the vertical
+  const heldAt = (at, lean = .15, rot = 0) => { const cl = Math.cos(lean), sl = Math.sin(lean), c = Math.cos(rot), s = Math.sin(rot);
+    return ([x, y, z]) => { const X = x, Y = -z * cl + y * sl, Z = y * cl + z * sl; return [at[0] + X * c + Z * s, at[1] + Y, at[2] - X * s + Z * c]; }; };
+  return { faces: f, size: [W, .002, D], name: 'payment statement (letter paper)', flatAt, heldAt,
+    placed: m => { const o = m([0, 0, 0]); return f.map(q => ({ ...q, n: q.n && m(q.n).map((v, i) => v - o[i]), pts: q.pts.map(m) })); },   // the sheet's faces moved by a placement (a facing turns with it)
+    ink: (at = [0, 0, 0], rot = 0) => billInk(typeof at === 'function' ? at : flatAt(at, rot)) };
 }
-function billInk(at, rot) {   // print in millimetres on the sheet: u across from the left edge, v down from the top edge
-  const c = Math.cos(rot), s = Math.sin(rot), w = (u, v) => { const x = -.108 + u / 1000, z = -.1395 + v / 1000; return proj(at[0] + x * c + z * s, at[1] + .0022, at[2] - x * s + z * c); };
+function billInk(m) {   // print in millimetres on the sheet: u across from the left edge, v down from the top edge; m places a sheet point in the world
+  const w = (u, v) => proj(...m([-.108 + u / 1000, .0022, -.1395 + v / 1000]));
   const o = w(0, 0), a = w(1, 0), b = w(0, 1), m0 = getM(); setM([a[0] - o[0], a[1] - o[1], b[0] - o[0], b[1] - o[1], o[0], o[1]]);
   const big = Math.hypot(a[0] - o[0], a[1] - o[1]) * 216 > 150;   // print only when the sheet is big enough on screen to read
-  if (big) text('AUTO LOAN', 108, 21, { font: '800 19px Cap', fill: '#ffffff' });
-  if (big) text('MONTHLY PAYMENT DUE', 108, 60, { font: '800 13px Cap', fill: '#2e1d1c' });
-  shape([[22, 72], [194, 72], [194, 128], [22, 128]], { fill: '#fff7e6', lw: 2, boil: .15 });
-  if (big) text('$787.00', 108, 101, { font: '800 40px Cap', fill: '#b8302a' });
+  if (big) text('AUTO LOAN', 108, 21, { font: '800 24px Cap', fill: '#ffffff' });
+  if (big) text('PAYMENT DUE', 108, 57, { font: '800 20px Cap', fill: '#2e1d1c' });
+  shape([[12, 72], [204, 72], [204, 128], [12, 128]], { fill: '#fff7e6', lw: 2, boil: .15 });
+  if (big) text('$787.00', 108, 101, { font: '800 38px Cap', fill: '#b8302a' });
   for (let i = 0; i < 5; i++) fillOnly([[22, 144 + i * 11], [22 + (i % 2 ? 120 : 160), 144 + i * 11], [22 + (i % 2 ? 120 : 160), 148 + i * 11], [22, 148 + i * 11]], '#b9b4a8', { boil: 0 });   // fine print
   for (let u = 8; u < 210; u += 9) fillOnly([[u, 206], [u + 5, 206], [u + 5, 207.5], [u, 207.5]], '#9a958a', { boil: 0 });                                                     // the tear line
   for (let i = 0; i < 26; i++) { const x = 120 + i * 3.4, ww = i % 3 ? 1.4 : 2.4; fillOnly([[x, 226], [x + ww, 226], [x + ww, 262], [x, 262]], '#2e1d1c', { boil: 0 }); }     // barcode on the stub

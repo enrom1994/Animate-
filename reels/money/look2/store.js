@@ -56,13 +56,15 @@ export function drawStore(t, cam, act = {}) {
   draw(CTR, [0, 0, 0], 0, opt);
   // on the counter: the car payment letter, his card, the car key, a coffee
   const flat = (x0, z0, x1, z1, y = .952) => [sp(x0, y, z1), sp(x1, y, z1), sp(x1, y, z0), sp(x0, y, z0)].map(p => [p[0], p[1]]);
-  draw(BILL.faces, BILL_AT, BILL_ROT, { lw: Math.max(1.2, lw * .5), boil: .15 }); BILL.ink(BILL_AT, BILL_ROT);   // the car payment statement (prop library)
-  shape(flat(S.counterX + .1, S.counterZ + .02, S.counterX + .27, S.counterZ + .13), { fill: '#2f6f73', lw: Math.max(1.5, lw * .6) });
-  { const [a, b] = sp(S.counterX + .36, .952, S.counterZ + .22), r = pm(S.counterX + .36, .95, S.counterZ + .22); shape(ell(a, b, r * .035, r * .02, 12), { fill: '#3a3840', lw: Math.max(1.2, lw * .5) }); }
-  { const r = pm(S.counterX - 1.05, 1, S.counterZ), [a, b] = sp(S.counterX - 1.05, .952, S.counterZ), [c, d] = sp(S.counterX - 1.05, 1.07, S.counterZ);
-    shape([[a - r * .04, b], [a + r * .04, b], [c + r * .045, d], [c - r * .045, d]], { fill: '#f4efe0', lw: Math.max(1.5, lw * .6) }); shape(ell((a + c) / 2, d, r * .045, r * .015, 12), { fill: '#5a3a22', lw: Math.max(1.2, lw * .5) }); }
+  let held = null;
+  if (act.holdBill) {   // he holds the statement out to us over the counter, its top leaning back to face the camera
+    const m = BILL.heldAt([S.counterX - .07, 1.37, S.counterZ + .12], .28, 0);
+    held = { m, hands: [-1, 1].map(s => { const p = sp(...m([s * .1, 0, .02])); return [(p[0] - mx) / k, (p[1] - my) / k]; }) };   // gripping the sides
+  } else { draw(BILL.faces, BILL_AT, BILL_ROT, { lw: Math.max(1.2, lw * .5), boil: .15 }); BILL.ink(BILL_AT, BILL_ROT); }   // the car payment statement (prop library)
   const handY = (sp(S.counterX, .955, S.counterZ - .2)[1] - my) / k;   // his hands rest on the counter top, 20 cm in from its back edge
-  drawMax(t, mx, my, k, { ...actM, subject: false, handY: Math.max(62, handY) }, 'arms');
+  if (held) { const a = { ...actM, subject: false, hands: held.hands };
+    drawMax(t, mx, my, k, { ...a, only: 'limbs' }, 'arms'); draw(BILL.placed(held.m), [0, 0, 0], 0, { lw: Math.max(1.2, lw * .5), boil: .15 }); BILL.ink(held.m); drawMax(t, mx, my, k, { ...a, only: 'hands' }, 'arms'); }
+  else drawMax(t, mx, my, k, { ...actM, subject: false, handY: Math.max(62, handY) }, 'arms');
   draw(LIGHTS, [0, 0, 0], 0, opt);
   if (!outside) return;
   for (const q of GLASSES) shape(q.map(p => sp(...p)).map(p => [p[0], p[1]]), { fill: GLASS, stroke: false, boil: 0 });   // the glass

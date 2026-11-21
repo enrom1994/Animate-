@@ -56,12 +56,13 @@ export function maxLegs(L = LEG, shoe = 'plain') {   // L: trouser and shoe colo
   shape(rect(-190, 28, 380, 30), { fill: L.belt, lw: 5 }); shape(rect(-22, 26, 44, 34), { fill: '#c9ccd4', lw: 4 });       // belt and buckle
 }
 // the forearms resting on the counter, hands flat; drawn after the counter so the hands lie on it
-export function maxArms(handY = 62) {
-  const ey = -60 + (handY - 62) * .45;   // the elbows drop a little when the hands reach further
-  for (const s of [-1, 1]) { shape(noodle([s * 160, -180], [s * 175, ey], s * 10, 62, 56), { fill: C.tee, lw: 7, shade: () => fillOnly(rect(s > 0 ? 160 : -240, -200, 80, 160), C.teeS, { boil: .3 }) });
-    shape(noodle([s * 175, ey - 10], [s * 95, handY - 7], s * -20, 48, 42), { fill: C.skin, lw: 7, shade: () => fillOnly(rect(s > 0 ? 140 : -200, -80, 60, 140), C.skinS, { boil: .3 }) });
-    hand(s * 70, handY, s > 0 ? Math.PI : 0, 30, C.skin); }
+export function maxArms(handY = 62, hands = null, only = null) {   // only: 'limbs' (no hands) or 'hands', to put something between them   // hands: [[x, y] left, [x, y] right] in his units, to hold something up; else they rest at handY
+  const ey = hands ? -40 : -60 + (handY - 62) * .45;   // the elbows drop a little when the hands reach further (or tuck in to hold a page up)
+  for (const s of [-1, 1]) { const h = hands ? hands[s < 0 ? 0 : 1] : [s * 95, handY - 7], ex = hands ? s * 150 : s * 175;
+    if (only !== 'hands') { shape(noodle([s * 160, -180], [ex, ey], s * 10, 62, 56), { fill: C.tee, lw: 7, shade: () => fillOnly(rect(s > 0 ? 160 : -240, -200, 80, 160), C.teeS, { boil: .3 }) });
+    shape(noodle([ex, ey - 10], h, s * -20, 48, 42), { fill: C.skin, lw: 7, shade: () => fillOnly(rect(s > 0 ? 140 : -200, -80, 60, 140), C.skinS, { boil: .3 }) }); }
+    if (only !== 'limbs') hand(hands ? h[0] - s * 20 : s * 70, hands ? h[1] : handY, hands ? (s > 0 ? Math.PI : 0) - s * .5 : (s > 0 ? Math.PI : 0), 30, C.skin); }
 }
 // place Max in a scene: (sx, sy) = his origin on screen, k = pixels per unit (pixels per metre x UNIT)
 export function drawMax(t, sx, sy, k, act = {}, part = 'upper') { const lw0 = S.lwScale; S.lwScale = lw0 * Math.max(.3, Math.min(1, k));   // the ink thins as he gets smaller
-  push(); translate(sx, sy); scale(k); if (part === 'upper') maxUpper(t, act); else if (part === 'legs') maxLegs(act.legs, act.shoe); else maxArms(act.handY); pop(); S.lwScale = lw0; }
+  push(); translate(sx, sy); scale(k); if (part === 'upper') maxUpper(t, act); else if (part === 'legs') maxLegs(act.legs, act.shoe); else maxArms(act.handY, act.hands, act.only); pop(); S.lwScale = lw0; }
