@@ -3,6 +3,7 @@
 // Our own character: Max (orange cap, hi-vis vest over a grey tee), on a night shift, with his car payment on the counter.
 import { AUDIT, tx, INK, init, frame, push, pop, translate, rotate, scale, shape, fillOnly, stroke, ell, arc, spline, rr, rect, noodle, quad, dot, text, bands } from './toon.js';
 import { eye, mouth, hand, sweat } from './faces.js';
+import { maxUpper, maxArms } from './max.js';
 import { hash } from './lib.js';
 let g; export function setupCounter(canvas) { g = init(canvas); }
 const C = { wall: '#7a8c8e', wallS: '#55666c', ceil: '#b4c2c1', light: '#f4fbf6', counter: '#c9b896', counterS: '#a8977a', counterF: '#7d6e56', night: '#23304f', night2: '#2f3f63',
@@ -53,29 +54,8 @@ export function drawCounter(t, act = {}) {
   // Max behind the counter: hi-vis vest over a grey tee, arms on the counter, head hung
   const ox = 540, oy = 1290;
   push(); translate(ox, oy);
-  shape(spline([[-190, 40], [-170, -150], [-90, -230], [90, -230], [170, -150], [190, 40]]), { fill: C.tee, lw: 7, shade: () => fillOnly(spline([[60, -230], [190, -150], [200, 60], [80, 60]]), C.teeS, { boil: .4 }) });
-  for (const s of [-1, 1]) { shape(spline([[s * 30, -228], [s * 150, -170], [s * 180, 40], [s * 50, 40], [s * 40, -120]]), { fill: C.vest, lw: 7, shade: () => fillOnly(rect(s > 0 ? 100 : -200, -230, 100, 280), C.vestS, { boil: .4 }) });
-    shape(rect(s > 0 ? 58 : -170, -110, 112, 26), { fill: C.strip, lw: 5 }); shape(rect(s > 0 ? 58 : -170, -40, 112, 26), { fill: C.strip, lw: 5 }); }
-  // arms forward onto the counter, hands flat
-  // neck and the big round head, hung forward
-  shape(rr(-36, -290, 72, 80, 20), { fill: C.skin, lw: 6, shade: () => fillOnly(rect(-40, -290, 80, 30), C.skinS, { boil: .3 }) });
-  push(); translate(0, -470 + 18 * A.sigh); rotate(A.tilt);
-  { const [a0, b0] = tx(-200, -190), [a1, b1] = tx(200, 190); AUDIT.subject('Max (at the counter)', [a0, b0, a1, b1], 120); }
-  shape(ell(0, 0, 200, 190, 80), { fill: C.skin, lw: 8, shade: () => { fillOnly(spline([[60, -200], [230, -40], [210, 140], [80, 210], [150, 40]]), C.skinS, { boil: .3 }); } });
-  for (const s of [-1, 1]) shape(ell(s * 196, 14, 26, 36, 18), { fill: C.skin, lw: 6, shade: () => fillOnly(ell(s * 192, 16, 10, 18, 12), C.skinS, { boil: .3 }) });
-  // the cap: crown, front panel shading, a long bill, a button
-  shape(spline([[-196, -40], [-180, -140], [-90, -200], [60, -206], [170, -150], [200, -40], [0, -64]]), { fill: C.cap, lw: 7, shade: () => fillOnly(spline([[60, -206], [200, -150], [210, -30], [90, -50]]), C.capS, { boil: .4 }) });
-  shape(spline([[-210, -48], [-60, -86], [120, -80], [250, -30], [240, -6], [100, -40], [-80, -42], [-214, -24]]), { fill: C.capS, lw: 7 });
-  dot(-10, -196, 9, INK);
-  // tired eyes, inner brows up, a small frown, a sweat drop
-  const lid = A.blink ? 1 : A.lid;
-  eye(-70, 40, 58, 62, { lid, look: A.look, pupil: 8, skin: C.skin, lw: 7 }); eye(70, 40, 58, 62, { lid, look: A.look, pupil: 8, skin: C.skin, lw: 7 });
-  stroke(spline([[-130, -8], [-80, -24], [-30, -6]], false), 9); stroke(spline([[30, -6], [80, -24], [130, -8]], false), 9);
-  for (const [ex] of [[-70], [70]]) stroke(arc(ex, 108, 40, 12, Math.PI * .2, Math.PI * .8, 10), 4);
-  shape(spline([[-4, 64], [14, 96], [0, 112], [-16, 104]]), { fill: C.skin, lw: 6 });
-  mouth(0, 150, 70, { o: .35 * A.sigh, w: 1 - .3 * A.sigh, sm: -.6, lw: 7 });
-  sweat(178, -60 + (t * 30 % 40), 1.3);
-  pop(); pop();
+  maxUpper(t, act);
+  pop();
   // the counter, worn, in front of him
   shape(rect(-20, 1300, 1120, 120), { fill: C.counter, lw: 7, shade: () => { for (const [a, b] of [[[120, 1330], [240, 1350]], [[700, 1320], [790, 1360]], [[420, 1380], [470, 1365]]]) stroke([a, b], 3, { line: '#9c8a6a' }); fillOnly(rect(-20, 1400, 1120, 20), C.counterS, { boil: .3 }); } });
   shape(rect(-20, 1420, 1120, 520), { fill: C.counterF, lw: 7, shade: () => { for (let i = 0; i < 6; i++) stroke([[-20 + i * 200, 1420], [-20 + i * 200, 1940]], 5); fillOnly(rect(-20, 1420, 1120, 50), 'rgba(0,0,0,.2)', { boil: .3 }); } });
@@ -91,9 +71,7 @@ export function drawCounter(t, act = {}) {
   shape(spline([[-34, 1176], [0, 1110], [190, 1104], [214, 1176]]), { fill: 'rgba(210,235,240,.25)', lw: 5 });
   // Max's arms: short grey sleeves, forearms resting on the counter, hands flat
   push(); translate(540, 1290);
-  for (const s of [-1, 1]) { shape(noodle([s * 160, -180], [s * 175, -60], s * 10, 62, 56), { fill: C.tee, lw: 7, shade: () => fillOnly(rect(s > 0 ? 160 : -240, -200, 80, 160), C.teeS, { boil: .3 }) });
-    shape(noodle([s * 175, -70], [s * 95, 55], s * -20, 48, 42), { fill: C.skin, lw: 7, shade: () => fillOnly(rect(s > 0 ? 140 : -200, -80, 60, 140), C.skinS, { boil: .3 }) });
-    hand(s * 70, 62, s > 0 ? Math.PI : 0, 30, C.skin); }
+  maxArms();
   pop();
   // the night: the room is lit only by the tubes, so the corners fall into a flat cool shade
   g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'multiply'; g.fillStyle = '#c3cbe0'; g.fillRect(0, 0, 1080, 1920); g.globalCompositeOperation = 'source-over';   // the cold night cast over everything
