@@ -90,8 +90,8 @@ function storeToTheo(t) {   // 0 - 7.45: one move, inside the store to Theo's fr
   const act = ACT0(t);
   let st;
   if (t < 5.8) { const v = io(pr(t, 3.9, 5.8)), L = v > 0 ? lmix(2.3, 70, v) : mix(2.45, 2.3, ss(pr(t, POV_END, 3.9)));
-    const down = v < .08 ? mix(.30, .14, ss(v / .08)) : mix(.14, .75, ss(pr(v, .25, 1)));
-    st = { look: mix3(MAXC, MID, ss(pr(v, .28, 1))), L, down, F: lmix(2070, 2600, v) }; }
+    const down = v < .08 ? mix(.30, .14, ss(v / .08)) : mix(.14, .75, ss(pr(v, .5, 1)));   // out through the window, back across the street, and only then up
+    st = { look: mix3(MAXC, MID, ss(pr(v, .5, 1))), L, down, F: lmix(2070, 2600, v) }; }
   else { const u = io(pr(t, 5.8, 7.45)); st = { look: mix3(MID, CLOSE_THEO.look, ss(u)), L: lmix(70, CLOSE_THEO.L, u), down: mix(.75, CLOSE_THEO.down, u), F: lmix(2600, CLOSE_THEO.F, u) }; }
   const cam = { ...camOf(st), act, focus: t < 4.6 ? 'max' : null }; FOCUS = st.L < 15;
   if (insideStore(eyeOf(cam))) { frame(t); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#141b30'; g.fillRect(0, 0, 1080, 1920); drawStore(t, cam, act); return; }
@@ -134,15 +134,20 @@ window.renderAt = t => {
     const u = pr(t, 25.1, 25.5), st = push_(FRAME_THEO, ss(pr(t, 25.3, 27.9)), 10);
     if (u < 1) expandBottom(u, maxShot(t, FRAME_MAX, { old: true }), theoShot(t, st)); else theoShot(t, st, { act: { smile: .6 } })();
     card(540, 300, 'THEO ALSO HAS', money(17660 * ss(pr(t, 25.4, 26.8))), { col: '#2f6f73', w: 620, bigPx: 120, s: pop_(t, 25.3) }); }
-  else {   // ten years on: rise over the town, the money keeps growing; same paycheck
-    const u = io(pr(t, 27.9, 33.0)), st = { look: mix3(push_(FRAME_THEO, 1, 10).look, [14, 0, -10], ss(u)), L: lmix(10, 230, u), down: mix(.12, .8, ss(u)), F: lmix(2300, 2900, u) };
-    FOCUS = st.L < 15; drawWide(t, { ...camOf(st), extras: [theoEx(t, { smile: .6 }), maxEx(t), ...carsEx(true)] }, { tilt: u > .5 });
-    const [a, b] = pin(22, -16, 9), [c, d] = pin(6, -16, 11), k = ss(pr(t, 28.3, 28.7));
-    card(clamp(a, 330, 750), Math.max(b, 330), t < 32.6 ? 'TEN YEARS ON · 7% A YEAR' : 'THEO', money(t < 28.6 ? 17660 : mix(17660, 23621, ss(pr(t, 28.6, 31.4)))), { col: '#2f6f73', w: 640, bigPx: 110, s: k * (1 - pr(t, 34.0, 34.25)) });   // the figure cards clear before the last line
-    if (t > 32.7) { card(clamp(c, 330, 750), Math.max(d, 330) + 250, 'MAX', 'NEW CAR', { col: '#b8302a', w: 460, bigPx: 80, s: pop_(t, 32.8) * (1 - pr(t, 34.0, 34.25)) }); card(540, 960, 'SAME PAYCHECK', 'ONE PAYMENT APART', { w: 760, bigPx: 80, s: pop_(t, 34.2) }); } }   // the last line alone, mid-frame, clear of the caption
+  else if (t < 33.17) {   // ten years on: stay with Theo, the money keeps growing
+    const u = ss(pr(t, 27.9, 33.1)), st0 = push_(FRAME_THEO, 1, 10), st = { ...st0, look: mix3(st0.look, [THEO_X + .9, 1.15, THEO_Z], u), L: lmix(10, 7, u) };   // push in on Theo, keeping him well inside the frame
+    theoShot(t, st, { act: { smile: .6 } })();
+    card(540, 300, 'TEN YEARS ON · 7% A YEAR', money(t < 28.6 ? 17660 : mix(17660, 23621, ss(pr(t, 28.6, 31.4)))), { col: '#2f6f73', w: 640, bigPx: 120 }); }
+  else {   // same paycheck: the two men, side by side; then the last line alone over them
+    split(t, () => { maxShot(t, FRAME_MAX, { old: true, act: { lid: .5 } })(); const [a, b] = pin(MCAR[0], MCAR[1], 2.6); card(clamp(a, 300, 780), Math.max(b - 60, 640), 'MAX', 'AN OLD CAR', { col: '#b8302a', w: 460, bigPx: 80, s: pop_(t, 33.3) }); },
+      () => { theoShot(t, FRAME_THEO, { act: { smile: .6 } })(); const [a, b] = pin(TCAR[0], TCAR[1], 2.6); card(clamp(a, 300, 780), Math.max(b - 60, 640), 'THEO', '$23,621', { col: '#2f6f73', w: 460, bigPx: 80, s: pop_(t, 33.6) }); });
+    const k = ss(pr(t, 35.3, 35.6));
+    if (k > 0) { blurPan(10 * k); g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = .6 * k; g.fillStyle = '#141b30'; g.fillRect(0, 0, 1080, 1920); g.globalAlpha = 1;
+      if (k >= 1) AUDIT.log = AUDIT.log.filter(e => e.k !== 'subject' && e.k !== 'text');   // under the dark veil the scene is background, not checked
+      card(540, 900, 'SAME PAYCHECK', 'ONE PAYMENT APART', { w: 760, bigPx: 72, s: pop_(t, 35.41) }); } }
   const c = CAPTIONS.find(([a, , b]) => t >= a && t < b); capEl.innerHTML = c ? c[1] : '';
 };
-const MOVES = [[3.9, 7.8], [17.45, 17.8], [27.9, 33.0]];   // the camera is sweeping: things pass the frame edge and under the caption
+const MOVES = [[3.9, 7.8], [17.45, 17.8]];   // the camera is sweeping: things pass the frame edge and under the caption
 window.audit = t => { AUDIT.on = true; AUDIT.log = []; window.renderAt(t); AUDIT.on = false;
   return auditFrame(AUDIT.log, 1080, 1920, { moving: MOVES.some(([a, b]) => t >= a && t <= b), capBox: capEl.innerHTML ? [60, 1395, 1020, 1500] : null }); };
 window.DURATION = DURATION; window.done = true; window.renderAt(0);
