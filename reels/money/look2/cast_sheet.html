@@ -1,0 +1,25 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Ten Years On: cast sheet</title>
+<style>@font-face { font-family: "Cap"; src: url("/node_modules/@fontsource/montserrat/files/montserrat-latin-800-normal.woff2") format("woff2"); font-weight: 800; } html,body{margin:0;background:#efe6d2} canvas{display:block}</style></head>
+<body><canvas id="c" width="1900" height="1350"></canvas>
+<script type="module">
+// The cast sheet: three plain Theo options beside the spender Max (at work and off duty), all on one floor at true size,
+// with a height rule in metres. Pick a Theo; the difference between the two men should read at a glance, even small.
+import { init, frame, push, pop, translate, scale, stroke, text } from './toon.js';
+import { maxStanding, theoStanding, THEO } from './cast.js';
+import { UNIT } from './max.js';
+await document.fonts.load("800 30px Cap");
+const g = init(document.getElementById('c')); frame(0); g.fillStyle = '#efe6d2'; g.fillRect(0, 0, 1900, 1350);
+const PPM = 520, k = PPM * UNIT, FLOOR = 1170, ox = FLOOR - 758 * k;   // px per metre; his origin sits 758 units above the floor
+text('CAST SHEET  ·  Theo, the saver (pick one)   vs   Max, the spender', 950, 50, { font: '800 34px Cap', fill: '#2e1d1c' });
+stroke([[60, FLOOR], [1860, FLOOR]], 4);
+for (let m = 0; m <= 1.8; m += .25) { const y = FLOOR - m * PPM; stroke([[60, y], [m % .5 ? 78 : 92, y]], 3); if (!(m % .5)) text(`${m.toFixed(1)} m`, 100, y - (m ? 0 : 18), { font: '800 20px Cap', fill: '#6b5a4a', align: 'left' }); }
+stroke([[180, FLOOR - 1.75 * PPM], [1860, FLOOR - 1.75 * PPM]], 2, { line: 'rgba(46,29,28,.25)' });
+const COLS = [['THEO', THEO.A], ['THEO', THEO.B], ['THEO', THEO.C], ['MAX', 'work'], ['MAX', 'flash']], X0 = 330, DX = 350;
+COLS.forEach(([who, v], i) => { const x = X0 + i * DX;
+  push(); translate(x, ox); scale(k); if (who === 'THEO') theoStanding(0, v); else maxStanding(0, { outfit: v }); pop();
+  text(who === 'THEO' ? `THEO ${v.name}` : v === 'work' ? 'MAX · at work' : 'MAX · off duty', x, FLOOR + 50, { font: '800 24px Cap', fill: who === 'THEO' ? '#2f6f73' : '#b8302a' });
+  text(who === 'THEO' ? 'plain, nothing new' : v === 'work' ? 'chain, shades, gold watch, trainers' : 'satin bomber, chain, shades', x, FLOOR + 84, { font: '800 18px Cap', fill: '#6b5a4a' }); });
+stroke([[X0 + 2.5 * DX, 120], [X0 + 2.5 * DX, FLOOR + 110]], 3, { line: 'rgba(46,29,28,.3)' });
+window.done = true;
+</script></body></html>
