@@ -1,0 +1,11 @@
+hook gate · ep02-bnpl · line 1: Before you split 400 dollars into four payments, watch what happens to your next six weeks.
+
+ 67 WORKABLE  The Warning              SPEC 56  ADDR 96  STAK 62  CURI 58  BREV 100  |  Before you split 400 dollars into four payments, watch what happens to your next six weeks.
+ 65 WORKABLE  The Warning              SPEC 56  ADDR 76  STAK 62  CURI 58  BREV 100  |  Before you tap pay later on a 400 dollar purchase, see why nearly half of users end up paying late.
+ 58 WORKABLE  The Warning              SPEC 40  ADDR 76  STAK 74  CURI 58  BREV 100  |  Stop. Before you tap pay later, see why nearly half of users paid late last year.
+ 54 WEAK      The Warning              SPEC 34  ADDR 96  STAK 48  CURI 58  BREV 100  |  Before you tap pay later, look at what your next six weeks look like.
+ 45 WEAK      Unclassified             SPEC 84  ADDR 26  STAK 36  CURI 41  BREV 100  |  Four payments of 100 dollars feels cheaper than 400. It isn't, and here's why nearly half of users end up paying late.
+ 44 WEAK      The Direct Address       SPEC 34  ADDR 96  STAK 22  CURI 41  BREV 100  |  If you've ever split a purchase into four payments, this is what it's doing to your spending.
+ 42 WEAK      Unclassified             SPEC 84  ADDR 26  STAK 36  CURI 24  BREV 100  |  Max bought 400 dollar sneakers for 100. Six weeks later, three plans want money in the same week.
+ 38 WEAK      The Impossible Claim     SPEC 40  ADDR 26  STAK 48  CURI 24  BREV 100  |  Nearly half of pay-later users paid late last year. It never starts with one big purchase.
+ 34 WEAK      Unclassified             SPEC 34  ADDR 26  STAK 22  CURI 24  BREV 100  |  Nearly half of buy now, pay later users paid late this past year.

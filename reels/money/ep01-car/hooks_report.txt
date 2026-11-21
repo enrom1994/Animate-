@@ -1,0 +1,12 @@
+hook gate · ep01-car · line 1: Before you sign a 787 dollar car payment, see why your neighbour ends up 24,000 dollars ahead.
+
+ 72 STRONG    The Warning              SPEC 84  ADDR 76  STAK 88  CURI 58  BREV 100  |  Stop. Before you sign a 787 dollar car payment, watch what one choice costs over 10 years.
+ 70 WORKABLE  The Statistic            SPEC 78  ADDR 96  STAK 62  CURI 58  BREV 100  |  Before you sign a 787 dollar car payment, see why your neighbour ends up 24,000 dollars ahead.
+ 70 WORKABLE  Someone Else's Result    SPEC 78  ADDR 96  STAK 62  CURI 58  BREV 100  |  Before you sign a 787 dollar car payment, watch what it costs you in 10 years.
+ 67 WORKABLE  The Warning              SPEC 56  ADDR 96  STAK 62  CURI 58  BREV 100  |  Before you sign a 787 dollar car payment, watch what it costs you in ten years.
+ 44 WEAK      The Question             SPEC 56  ADDR 26  STAK 36  CURI 59  BREV 100  |  Why does the guy with the nicer car end up with 24,000 dollars less?
+ 44 WEAK      The Statistic            SPEC 100  ADDR 26  STAK 36  CURI 24  BREV 100  |  A new car payment is 787 dollars a month. A used one is 580. That 205 dollar gap becomes 24,000.
+ 40 WEAK      The Statistic            SPEC 68  ADDR 26  STAK 36  CURI 24  BREV 100  |  Same paycheck, same street. Ten years later, one neighbour has 24,000 dollars more. The difference was one car payment.
+ 40 WEAK      The Statistic            SPEC 68  ADDR 26  STAK 36  CURI 24  BREV 100  |  Max and Theo earn the same. One car payment put them 24,000 dollars apart.
+ 39 WEAK      Unclassified             SPEC 62  ADDR 26  STAK 36  CURI 24  BREV 100  |  The average new car payment in America is now 787 dollars a month.
+# why: the neighbour line (70) over 'Stop... one choice' (72): it sets up the show's premise, two neighbours, and the question the film answers

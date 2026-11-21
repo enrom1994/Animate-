@@ -19,7 +19,7 @@ import { setupWide, drawWide } from '/money/look2/wide.js';
 import { drawStore, STORE } from '/money/look2/store.js';
 import { AUDIT, frame, g } from '/money/look2/toon.js';
 import { auditFrame } from '/money/look2/check.js';
-import { clamp, io, pr, mix, mix3, ss, lmix, money, camOf, push_, pop_, card, stamp, banner, split, blurPan, veil, setupEdit } from '/money/look2/edit.js';
+import { clamp, io, pr, mix, mix3, ss, lmix, money, camOf, push_, pop_, card, stamp, banner, split, blurPan, veil, setupEdit, takeWarp } from '/money/look2/edit.js';
 import { STREET, THEO_X, THEO_Z, MAX_X, MAX_Z, MCAR, TCAR, FRAME_THEO, FRAME_MAX, theoEx, maxEx, carsEx, pin, maxShot, theoShot } from '/money/look2/street.js';
 import { drawPovPhone, checkout, payments, alert, lock } from '/money/look2/phonepov.js';
 import { parcel } from '/money/look2/props/props.js';
@@ -43,7 +43,7 @@ const tapAt = (t, t0, d = .3) => clamp(Math.min((t - t0 + d) / d, 1 - (t - t0 - 
 // Max's front step (his door at x 2.0, the step z -11.5 to -10.2, 0.18 m up): the console, the sneakers stacked on it, the phone beside
 const DOORSTEP = [{ x: 1.55, y: .18, z: -10.8, rot: .12, mesh: parcel('console').faces }, { x: 1.6, y: .34, z: -10.75, rot: -.25, mesh: parcel('sneakers').faces }, { x: 2.45, y: .18, z: -10.6, rot: .35, mesh: parcel('phone').faces }];
 const PLANS = t => [['sneakers', 100, 1], ['phone', 150, pop_(t, 13.9)], ['console', 125, pop_(t, 15.25)]];
-window.renderAt = t => {
+const renderShot = t => {   // t in the first take's seconds (see TW below)
   AUDIT.subjects = 0; STREET.focus = true;
   if (t < 3.8) {   // the hook, a flash-forward: his lock screen fills with payment alerts
     pov(t, () => lock({ n: mix(0, 4, pr(t, .2, 2.6)) }), { glass: '#2b4a63', F0: 2500, F1: 2800, t1: 3.8 });
@@ -89,8 +89,11 @@ window.renderAt = t => {
     banner(540, 1030, 'ONLY FOR WHAT YOU COULD PAY TODAY', pop_(t, 36.6), { px: 44, w: 760, fill: '#ffd23f' }); }
   const c = CAPTIONS.find(([a, , b]) => t >= a && t < b); capEl.innerHTML = c ? c[1] : '';
 };
+// the voice was re-recorded with a new hook (the hook gate): times in the new take map back to the shots' seconds, word by word
+const TW = takeWarp(await (await fetch(new URL('./tools/takewarp.json', location.href))).json());
+window.renderAt = t => { renderShot(TW(t)); const c = CAPTIONS.find(([a, , b]) => t >= a && t < b); capEl.innerHTML = c ? c[1] : ''; };
 const MOVES = [];
 window.audit = t => { AUDIT.on = true; AUDIT.log = []; window.renderAt(t); AUDIT.on = false;
-  return auditFrame(AUDIT.log, 1080, 1920, { moving: MOVES.some(([a, b]) => t >= a && t <= b), capBox: capEl.innerHTML ? [60, 1395, 1020, 1500] : null }); };
+  return auditFrame(AUDIT.log, 1080, 1920, { moving: MOVES.some(([a, b]) => TW(t) >= a && TW(t) <= b), capBox: capEl.innerHTML ? [60, 1395, 1020, 1500] : null }); };
 window.DURATION = DURATION; window.done = true; window.renderAt(0);
 </script></body></html>

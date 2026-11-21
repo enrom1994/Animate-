@@ -41,3 +41,6 @@ export function expandBottom(u, drawTop, drawFull) {   // the bottom half grows 
 }
 export function blurPan(px) { if (px < .5) return; hg.drawImage(cv, 0, 0); g.setTransform(1, 0, 0, 1, 0, 0); g.filter = `blur(${px}px)`; g.drawImage(half, 0, 0); g.filter = 'none'; }
 export function veil(a, col = '#141b30') { if (a <= 0) return; g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = a; g.fillStyle = col; g.fillRect(0, 0, 1080, 1920); g.globalAlpha = 1; }
+// a new voice take for a finished film: pairs [old take s, new take s] word by word (tools/takewarp.json). The shots stay written in
+// the old take's seconds; takeWarp(pairs)(t) turns a time in the new take into the old one, so every shot lands on the same word.
+export const takeWarp = P => t => { if (t <= P[0][1]) return t; for (let i = 1; i < P.length; i++) if (t <= P[i][1]) { const [a0, b0] = P[i - 1], [a1, b1] = P[i]; return a0 + (a1 - a0) * (t - b0) / (b1 - b0); } return P.at(-1)[0] + (t - P.at(-1)[1]); };

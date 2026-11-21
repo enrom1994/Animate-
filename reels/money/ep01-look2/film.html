@@ -18,7 +18,7 @@ import { setupWide, drawWide, town, HOMES } from '/money/look2/wide.js';
 import { drawStore, drawPovBill, POV_BILL, eyeOf, insideStore, STORE } from '/money/look2/store.js';
 import { AUDIT, S as INKS, frame, g, push, pop, translate, scale, shape, stroke, rr, text } from '/money/look2/toon.js';
 import { auditFrame } from '/money/look2/check.js';
-import { clamp, io, pr, mix, mix3, ss, lmix, money, camOf, push_, pop_, fitW, card, stamp, split, expandBottom, blurPan, setupEdit } from '/money/look2/edit.js';
+import { clamp, io, pr, mix, mix3, ss, lmix, money, camOf, push_, pop_, fitW, card, stamp, split, expandBottom, blurPan, setupEdit, takeWarp } from '/money/look2/edit.js';
 import { STREET, THEO_X, THEO_Z, TCAR, MAX_X, MAX_Z, MCAR, FRAME_THEO, FRAME_MAX, CLOSE_THEO, theoEx, maxEx, carsEx, pin, maxShot, theoShot } from '/money/look2/street.js';
 import { CAPTIONS, DURATION } from '/money/ep01-car/src/captions.js';
 await document.fonts.load("800 54px Cap");
@@ -51,7 +51,7 @@ function storeToTheo(t) {   // 0 - 7.45: one move, inside the store to Theo's fr
   const k = pr(t, 4.9, 5.2) * (1 - pr(t, 6.3, 6.6));   // who lives where, as the camera hangs over the town
   if (k > 0) { const [a, b] = pin(3, 27, 9), [c, d] = pin(22, -16, 9); card(c, d, 'NEXT DOOR TO MAX', 'THEO', { w: 460, bigPx: 80, s: k * .8 }); }
 }
-window.renderAt = t => {
+const renderShot = t => {   // t in the first take's seconds (see TW below)
   AUDIT.subjects = 0; STREET.focus = true;
   if (t < POV_END) povShot(t);
   else if (t < 7.45) storeToTheo(t);
@@ -96,8 +96,11 @@ window.renderAt = t => {
       card(540, 900, 'SAME PAYCHECK', 'ONE PAYMENT APART', { w: 760, bigPx: 72, s: pop_(t, 35.41) }); } }
   const c = CAPTIONS.find(([a, , b]) => t >= a && t < b); capEl.innerHTML = c ? c[1] : '';
 };
+// the voice was re-recorded with a new hook (the hook gate): times in the new take map back to the shots' seconds, word by word
+const TW = takeWarp(await (await fetch(new URL('./tools/takewarp.json', location.href))).json());
+window.renderAt = t => { renderShot(TW(t)); const c = CAPTIONS.find(([a, , b]) => t >= a && t < b); capEl.innerHTML = c ? c[1] : ''; };
 const MOVES = [[3.9, 7.8], [17.45, 17.8]];   // the camera is sweeping: things pass the frame edge and under the caption
 window.audit = t => { AUDIT.on = true; AUDIT.log = []; window.renderAt(t); AUDIT.on = false;
-  return auditFrame(AUDIT.log, 1080, 1920, { moving: MOVES.some(([a, b]) => t >= a && t <= b), capBox: capEl.innerHTML ? [60, 1395, 1020, 1500] : null }); };
+  return auditFrame(AUDIT.log, 1080, 1920, { moving: MOVES.some(([a, b]) => TW(t) >= a && TW(t) <= b), capBox: capEl.innerHTML ? [60, 1395, 1020, 1500] : null }); };
 window.DURATION = DURATION; window.done = true; window.renderAt(0);
 </script></body></html>

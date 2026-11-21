@@ -20,7 +20,11 @@ can measure, so a film can be audited before it is rendered in full.
 
 ## 2. Script
 
-- **Open on the impossible-sounding fact**, in the first sentence, then explain why it is true. No scene-setting first.
+- **The hook gate comes first.** Five or more candidate hooks against the 21 formulas (`.claude/skills/yt-script/hooks.json`),
+  scored by `python3 reels/hookgate.py <film>` before the voice is recorded; the chosen line needs 60+. A flat fact scores about
+  35: it gives the viewer nothing to stay for. The first line says *you*, names what it costs, and leaves a question open.
+- **Open on the impossible-sounding fact**, in the first sentence, then explain why it is true. No scene-setting first. The
+  fact can live on screen (a card over the first shot) while the voice carries the hook.
 - State the stakes (who loses what) inside the first 15 s, and the question the video answers inside 30 s.
 - One idea per sentence. A new picture for every sentence.
 - Every number is sourced; both sides of a dispute are stated in their own terms.
