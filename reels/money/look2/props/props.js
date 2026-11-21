@@ -1,6 +1,7 @@
 // The prop library: everyday objects as small 3D models in real metres, generic designs (no brands, no copied products).
 // Each export returns { faces, size: [length x, height y, depth z], name }. Front of a prop faces +z unless it says otherwise.
-import { box, extrude, cyl, panel, panelX } from './mesh.js';
+import { box, extrude, cyl, panel, panelX, proj } from './mesh.js';
+import { getM, setM, shape, fillOnly, stroke, text } from '../toon.js';
 const poly = (pts, col, n, o = {}) => ({ pts, col, n, part: -3, bias: .015, ...o });
 const GLASS = '#9fbccc', TYRE = '#26242a', RIM = '#c9ccd4', TRIM = '#2d2b30', CHROME = '#d0d3d8';
 // ---- vehicles ----
@@ -72,4 +73,25 @@ export function phone() {   // a smartphone 0.072 x 0.15 x 0.008, standing
   const f = [...box(-.036, 0, -.004, .036, .15, .004, '#26242a'), panel(-.032, .005, .032, .145, .0041, '#3f6f8a', { glow: true })];
   return { faces: f, size: [.072, .15, .008], name: 'phone' };
 }
-export const ALL = [car, counter, shelf, pylon, tv, sofa, table, fridge, door, phone];
+// ---- paper ----
+// a car-loan payment statement, US letter (216 x 279 mm), lying flat; its print is drawn on the sheet's own plane from any camera
+export function bill() {
+  const W = .216, D = .279, up = [0, 1, 0], f = [...box(-W / 2, 0, -D / 2, W / 2, .002, D / 2, '#f6f3ea')];
+  f.push(poly([[-W / 2, .0021, -D / 2], [W / 2, .0021, -D / 2], [W / 2, .0021, -D / 2 + .04], [-W / 2, .0021, -D / 2 + .04]], '#2f6f73', up, { lw: 1.5 }));   // the lender's band
+  return { faces: f, size: [W, .002, D], name: 'payment statement (letter paper)', ink: (at = [0, 0, 0], rot = 0) => billInk(at, rot) };
+}
+function billInk(at, rot) {   // print in millimetres on the sheet: u across from the left edge, v down from the top edge
+  const c = Math.cos(rot), s = Math.sin(rot), w = (u, v) => { const x = -.108 + u / 1000, z = -.1395 + v / 1000; return proj(at[0] + x * c + z * s, at[1] + .0022, at[2] - x * s + z * c); };
+  const o = w(0, 0), a = w(1, 0), b = w(0, 1), m0 = getM(); setM([a[0] - o[0], a[1] - o[1], b[0] - o[0], b[1] - o[1], o[0], o[1]]);
+  const big = Math.hypot(a[0] - o[0], a[1] - o[1]) * 216 > 150;   // print only when the sheet is big enough on screen to read
+  if (big) text('AUTO LOAN', 108, 21, { font: '800 19px Cap', fill: '#ffffff' });
+  if (big) text('MONTHLY PAYMENT DUE', 108, 60, { font: '800 13px Cap', fill: '#2e1d1c' });
+  shape([[22, 72], [194, 72], [194, 128], [22, 128]], { fill: '#fff7e6', lw: 2, boil: .15 });
+  if (big) text('$787.00', 108, 101, { font: '800 40px Cap', fill: '#b8302a' });
+  for (let i = 0; i < 5; i++) fillOnly([[22, 144 + i * 11], [22 + (i % 2 ? 120 : 160), 144 + i * 11], [22 + (i % 2 ? 120 : 160), 148 + i * 11], [22, 148 + i * 11]], '#b9b4a8', { boil: 0 });   // fine print
+  for (let u = 8; u < 210; u += 9) fillOnly([[u, 206], [u + 5, 206], [u + 5, 207.5], [u, 207.5]], '#9a958a', { boil: 0 });                                                     // the tear line
+  for (let i = 0; i < 26; i++) { const x = 120 + i * 3.4, ww = i % 3 ? 1.4 : 2.4; fillOnly([[x, 226], [x + ww, 226], [x + ww, 262], [x, 262]], '#2e1d1c', { boil: 0 }); }     // barcode on the stub
+  fillOnly([[20, 226], [100, 226], [100, 230], [20, 230]], '#b9b4a8', { boil: 0 }); fillOnly([[20, 238], [80, 238], [80, 242], [20, 242]], '#b9b4a8', { boil: 0 });
+  setM(m0);
+}
+export const ALL = [bill, car, counter, shelf, pylon, tv, sofa, table, fridge, door, phone];

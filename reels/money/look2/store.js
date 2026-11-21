@@ -1,7 +1,7 @@
 // The QUICK STOP, built once in the 3D world, inside and out, so one camera can move from Max at the counter, back through the
 // shop window, out to the street and up over the town without ever changing drawings. Metres; the shopfront faces +z at z = 27.
 import { view as meshView, proj, draw, box, panel } from './props/mesh.js';
-import { counter, shelf, fridge } from './props/props.js';
+import { counter, shelf, fridge, bill } from './props/props.js';
 import { drawMax, UNIT, ORIGIN_H } from './max.js';
 import { push, pop, translate, scale, shape, fillOnly, text, ell } from './toon.js';
 export const STORE = { x0: -8, x1: 14, z0: 14, z1: 27, h: 4.5, counterX: 5.3, counterZ: 22.6, maxZ: 21.9 };
@@ -20,6 +20,7 @@ const STOCK = (() => { const f = [], fr = fridge().faces;
   for (const x of [-3.2, -.2]) for (let i = 0; i < 2; i++) f.push(...place(shelf().faces, x + i * 1.05, 19.5), ...place(shelf().faces, x + i * 1.05, 20.0, Math.PI));   // aisles
   return f; })();
 const LIGHTS = []; for (const x of [-4.5, .5, 5.3, 10]) for (const z of [16, 19.5, 23, 25.8]) LIGHTS.push(...box(x - .75, S.h - .3, z - .1, x + .75, S.h - .2, z + .1, '#fbfff8', { glow: true }));
+const BILL = bill(), BILL_AT = [S.counterX - .28, .95, S.counterZ + .15], BILL_ROT = .06;
 const CTR = place(counter(2.8).faces, S.counterX, S.counterZ);
 const BOARD = [...box(S.counterX - 1.9, 2.4, 20.75, S.counterX + 1.9, 3.2, 21.0, '#2d2b30')];
 const CELLS = [['COFFEE', '$1.29', '#e8742e'], ['HOT DOGS', '2 FOR $3', '#c8433a'], ['ICE', '$2.49', '#4f8fd6']];
@@ -50,14 +51,11 @@ export function drawStore(t, cam, act = {}) {
     if (w > 120) { push(); translate(cx, cy); scale(w / 300); text(a, 0, -55, { font: '800 44px Cap', fill: '#fff', scenery: true }); text(b, 0, 30, { font: '800 52px Cap', fill: '#2e1d1c', scenery: true }); pop(); } });
   // Max behind the counter: his origin is 0.963 m above the floor at his spot
   const [mx, my] = sp(S.counterX, ORIGIN_H, S.maxZ), k = pm(S.counterX, ORIGIN_H, S.maxZ) * UNIT, actM = { ...act, subject: cam.focus === 'max', subjectName: 'Max (in the store)', minH: 60 };
-  drawMax(t, mx, my, k, actM, 'upper');
+  drawMax(t, mx, my, k, actM, 'legs'); drawMax(t, mx, my, k, actM, 'upper');
   draw(CTR, [0, 0, 0], 0, opt);
   // on the counter: the car payment letter, his card, the car key, a coffee
   const flat = (x0, z0, x1, z1, y = .952) => [sp(x0, y, z1), sp(x1, y, z1), sp(x1, y, z0), sp(x0, y, z0)].map(p => [p[0], p[1]]);
-  const L = flat(S.counterX - .46, S.counterZ - .02, S.counterX - .18, S.counterZ + .24); shape(L, { fill: '#f6f1e2', lw: Math.max(1.5, lw * .7) });
-  { const cx = (L[0][0] + L[1][0] + L[2][0] + L[3][0]) / 4, cy = (L[0][1] + L[1][1] + L[2][1] + L[3][1]) / 4, w = L[1][0] - L[0][0], h = L[0][1] - L[3][1];
-    if (w > 110 && h > 34) { push(); translate(cx, cy); scale(w / 300, h / 150);
-      text('CAR PAYMENT', 0, -34, { font: '800 40px Cap', fill: '#2e1d1c' }); text('$787 / mo', 0, 26, { font: '800 56px Cap', fill: '#b8302a' }); pop(); } }
+  draw(BILL.faces, BILL_AT, BILL_ROT, { lw: Math.max(1.2, lw * .5), boil: .15 }); BILL.ink(BILL_AT, BILL_ROT);   // the car payment statement (prop library)
   shape(flat(S.counterX + .1, S.counterZ + .02, S.counterX + .27, S.counterZ + .13), { fill: '#2f6f73', lw: Math.max(1.5, lw * .6) });
   { const [a, b] = sp(S.counterX + .36, .952, S.counterZ + .22), r = pm(S.counterX + .36, .95, S.counterZ + .22); shape(ell(a, b, r * .035, r * .02, 12), { fill: '#3a3840', lw: Math.max(1.2, lw * .5) }); }
   { const r = pm(S.counterX - 1.05, 1, S.counterZ), [a, b] = sp(S.counterX - 1.05, .952, S.counterZ), [c, d] = sp(S.counterX - 1.05, 1.07, S.counterZ);

@@ -4,6 +4,7 @@
 import { AUDIT, S, tx, INK, push, pop, translate, rotate, scale, shape, fillOnly, stroke, ell, arc, spline, rr, rect, noodle, dot } from './toon.js';
 import { eye, mouth, hand, sweat } from './faces.js';
 export const UNIT = .00127, ORIGIN_H = .963;   // metres per unit; the origin's height above the floor
+const LEG = { cloth: '#3b4458', clothS: '#2c3444', shoe: '#2a2624', sole: '#d8d2c4', belt: '#2a2624' };
 const C = { skin: '#e9b98f', skinS: '#cf9a6f', cap: '#e8742e', capS: '#c45a1c', vest: '#f08a24', vestS: '#cf6c10', strip: '#dfe4e6', tee: '#7d8086', teeS: '#63666c' };
 const DEF = t => ({ look: [.15, .55], lid: .52 + .05 * Math.sin(t * 1.3), tilt: -.05, sigh: 0, blink: false });
 // the upper body and head; call after translate() to his origin
@@ -32,6 +33,15 @@ export function maxUpper(t, act = {}) { const A = { ...DEF(t), ...act };
   sweat(178, -60 + (t * 30 % 40), 1.3);
   pop();
 }
+// hips, legs and shoes down to the floor (758 units below the origin = 0.963 m): drawn first, so the counter covers what it should
+export function maxLegs() {
+  shape(spline([[-185, 20], [185, 20], [178, 120], [-178, 120]]), { fill: LEG.cloth, lw: 7 });                         // hips
+  for (const s of [-1, 1]) {
+    shape([[s * 20, 90], [s * 175, 90], [s * 150, 700], [s * 40, 700]], { fill: LEG.cloth, lw: 7, shade: () => fillOnly(s > 0 ? [[110, 90], [175, 90], [150, 700], [115, 700]] : [[-60, 90], [-20, 90], [-40, 700], [-70, 700]], LEG.clothS, { boil: .3 }) });
+    shape(spline([[s * 32, 690], [s * 158, 690], [s * 175, 735], [s * 150, 758], [s * 18, 758], [s * 22, 720]]), { fill: LEG.shoe, lw: 7 });   // shoes
+    stroke([[s * 20, 750], [s * 160, 750]], 4, { line: LEG.sole }); }
+  shape(rect(-186, 18, 372, 30), { fill: LEG.belt, lw: 5 }); shape(rect(-22, 16, 44, 34), { fill: '#c9ccd4', lw: 4 });   // belt and buckle
+}
 // the forearms resting on the counter, hands flat; drawn after the counter so the hands lie on it
 export function maxArms() {
   for (const s of [-1, 1]) { shape(noodle([s * 160, -180], [s * 175, -60], s * 10, 62, 56), { fill: C.tee, lw: 7, shade: () => fillOnly(rect(s > 0 ? 160 : -240, -200, 80, 160), C.teeS, { boil: .3 }) });
@@ -40,4 +50,4 @@ export function maxArms() {
 }
 // place Max in a scene: (sx, sy) = his origin on screen, k = pixels per unit (pixels per metre x UNIT)
 export function drawMax(t, sx, sy, k, act = {}, part = 'upper') { const lw0 = S.lwScale; S.lwScale = lw0 * Math.max(.3, Math.min(1, k));   // the ink thins as he gets smaller
-  push(); translate(sx, sy); scale(k); if (part === 'upper') maxUpper(t, act); else maxArms(); pop(); S.lwScale = lw0; }
+  push(); translate(sx, sy); scale(k); if (part === 'upper') maxUpper(t, act); else if (part === 'legs') maxLegs(); else maxArms(); pop(); S.lwScale = lw0; }
