@@ -18,61 +18,13 @@ import { setupWide, drawWide, town, HOMES } from '/money/look2/wide.js';
 import { drawStore, drawPovBill, POV_BILL, eyeOf, insideStore, STORE } from '/money/look2/store.js';
 import { AUDIT, S as INKS, frame, g, push, pop, translate, scale, shape, stroke, rr, text } from '/money/look2/toon.js';
 import { auditFrame } from '/money/look2/check.js';
-import { maxStanding, theoStanding, THEO } from '/money/look2/cast.js';
-import { UNIT, ORIGIN_H } from '/money/look2/max.js';
-import { car as hatch, coupe } from '/money/look2/props/props.js';
+import { clamp, io, pr, mix, mix3, ss, lmix, money, camOf, push_, pop_, fitW, card, stamp, split, expandBottom, blurPan, setupEdit } from '/money/look2/edit.js';
+import { STREET, THEO_X, THEO_Z, TCAR, MAX_X, MAX_Z, MCAR, FRAME_THEO, FRAME_MAX, CLOSE_THEO, theoEx, maxEx, carsEx, pin, maxShot, theoShot } from '/money/look2/street.js';
 import { CAPTIONS, DURATION } from '/money/ep01-car/src/captions.js';
 await document.fonts.load("800 54px Cap");
 const cv = document.getElementById('c'); setupWide(cv); const capEl = document.getElementById('cap');
-const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x)), io = u => u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2, pr = (t, a, b) => clamp((t - a) / (b - a)),
-  mix = (a, b, u) => a + (b - a) * u, mix3 = (a, b, u) => a.map((v, i) => mix(v, b[i], u)), ss = u => u * u * (3 - 2 * u), lmix = (a, b, u) => a * Math.pow(b / a, u), back = u => 1 + 2.7 * Math.pow(u - 1, 3) + 1.7 * Math.pow(u - 1, 2);
-const money = n => '$' + Math.round(n).toLocaleString('en-US');
-// ---- the camera: a look point, its distance L, how much it looks down, the lens F (px per metre at 1 m) ----
-const camOf = ({ look, L, down, F }) => ({ pitch: Math.PI / 2 - down, P: F / L, dist: L, cx: look[0], cy: look[1], cz: look[2] });
+setupEdit(cv);
 const MAXC = [STORE.counterX - .15, 1.35, STORE.maxZ], MID = [14, 0, -2];
-const THEO_X = 21.3, THEO_Z = -6.9, TCAR = [24.0, -8.8], MAX_X = 8.0, MAX_Z = -6.9, MCAR = [9.9, -9.0];   // each man stands in front of his car
-const FRAME_THEO = { look: [22.5, 1.1, -7.2], L: 9.5, down: .1, F: 2300 }, FRAME_MAX = { look: [9.2, 1.1, -7.2], L: 9.5, down: .1, F: 2300 };
-const CLOSE_THEO = { look: [THEO_X + .3, 1.2, THEO_Z], L: 5, down: .1, F: 2300 };
-// ---- the people and cars, as extras the town draws in depth ----
-let FOCUS = true;   // is the camera close on the people? (in the wide town shots they are scenery, not the subject)
-const person = (draw, name) => (sx, sy, kpx) => { const k = kpx * UNIT, lw0 = INKS.lwScale; INKS.lwScale = lw0 * clamp(k, .3, 1); push(); translate(sx, sy); scale(k); draw(); pop(); INKS.lwScale = lw0;
-  if (FOCUS) AUDIT.subject(name, [sx - 200 * k, sy - 670 * k, sx + 200 * k, sy - 270 * k], 60); };
-const COUPE = coupe('#c8302a').faces, COUPE_OLD = coupe('#8f3a33').faces, HATCH = hatch('#7d8f86').faces;
-const theoEx = (t, act = {}) => ({ x: THEO_X, z: THEO_Z, h: ORIGIN_H, fn: person(() => theoStanding(t, THEO.C, act), 'Theo') });
-const maxEx = (t, act = {}) => ({ x: MAX_X, z: MAX_Z, h: ORIGIN_H, fn: person(() => maxStanding(t, { outfit: 'flash', act }), 'Max') });
-const carsEx = (old = false) => [{ x: MCAR[0], z: MCAR[1], dir: 'x', car: old ? COUPE_OLD : COUPE }, { x: TCAR[0], z: TCAR[1], dir: 'x', car: HATCH }];
-// ---- story cards: a rounded card with a small heading and a big figure, pinned to a point on screen ----
-const textW = (str, font) => { g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.font = font; const w = g.measureText(str).width; g.restore(); return w; };
-const fitW = (w, ...items) => Math.max(w, ...items.map(([str, font, px]) => textW(str, font) + 2 * Math.max(30, px * .45)));   // a box never narrower than its text plus a margin
-function card(x, y, head, big, { col = '#2e1d1c', w = 520, bigPx = 96, tilt = 0, s = 1 } = {}) {
-  if (s <= .01) return; w = fitW(w, [head, '800 40px Cap', 40], [big, `800 ${bigPx}px Cap`, bigPx]); push(); translate(x, y); scale(s); if (tilt) { /* a stamp leans */ }
-  shape(rr(-w / 2, -95, w, 190, 28), { fill: '#fbf6ea', lw: 8 });
-  text(head, 0, -46, { font: '800 40px Cap', fill: '#6b5a4a' }); text(big, 0, 26, { font: `800 ${bigPx}px Cap`, fill: col }); pop(); }
-function stamp(x, y, word, s = 1) { if (s <= .01) return; push(); translate(x, y); scale(s); shape(rr(-230, -62, 460, 124, 16), { fill: '#fbf6ea', lw: 10, line: '#b8302a' }); text(word, 0, 4, { font: '800 76px Cap', fill: '#b8302a' }); pop(); }
-const pin = (x, z, h) => town.pj(x, z, h);
-const pop_ = (t, t0, d = .35) => back(clamp((t - t0) / d)) * (t >= t0 ? 1 : 0);   // a card springs in
-// ---- one half of a split screen: render the shot full frame, keep its middle band ----
-const half = document.createElement('canvas'); half.width = 1080; half.height = 1920; const hg = half.getContext('2d');
-function renderHalf(drawFull, top, layer) {
-  const n0 = AUDIT.log.length; drawFull();
-  for (const e of AUDIT.log.slice(n0)) { e.bb = [e.bb[0], e.bb[1] + (top ? -480 : 480), e.bb[2], e.bb[3] + (top ? -480 : 480)]; e.clip = top ? [0, 0, 1080, 960] : [0, 960, 1080, 1920]; e.layer = layer;
-    if (e.bb[3] < e.clip[1] || e.bb[1] > e.clip[3]) e.drop = true; }
-  AUDIT.log = AUDIT.log.filter(e => !e.drop);
-  hg.drawImage(cv, 0, 480, 1080, 960, 0, top ? 0 : 960, 1080, 960);
-}
-function split(t, drawTop, drawBottom, { reveal = 1 } = {}) {   // reveal: how far the bottom half has wiped up
-  renderHalf(drawTop, true, 'top'); renderHalf(drawBottom, false, 'bottom');
-  g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(half, 0, 0, 1080, 960, 0, 0, 1080, 960);
-  const y = mix(1920, 960, ss(reveal)); g.drawImage(half, 0, 960, 1080, 960, 0, y, 1080, 960);
-  g.fillStyle = '#1d1a26'; g.fillRect(0, y - 6, 1080, 12);
-}
-function expandBottom(u, drawTop, drawFull) {   // the bottom half grows to fill the frame, pushing the top half up and out
-  renderHalf(drawTop, true, 'top'); const n0 = AUDIT.log.length; drawFull(); const edge = mix(960, 0, ss(u));
-  for (const e of AUDIT.log.slice(n0)) e.layer = 'full';
-  for (const e of AUDIT.log) if (e.layer === 'top') { e.bb = [e.bb[0], e.bb[1] - (960 - edge), e.bb[2], e.bb[3] - (960 - edge)]; e.clip = [0, 0, 1080, edge]; }
-  if (edge > 1) { g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(half, 0, 960 - edge, 1080, edge, 0, 0, 1080, edge); g.fillStyle = '#1d1a26'; g.fillRect(0, edge - 6, 1080, 12); }
-}
-function blurPan(px) { if (px < .5) return; hg.drawImage(cv, 0, 0); g.setTransform(1, 0, 0, 1, 0, 0); g.filter = `blur(${px}px)`; g.drawImage(half, 0, 0); g.filter = 'none'; }
 // ---- the shots ----
 const POV_END = 3.0;   // 0 - 3.0: through Max's eyes, the statement in his hands; then a hard cut to him at the counter
 const ACT0 = t => { const up = io(pr(t, 3.05, 3.35)), sigh = Math.sin(Math.PI * pr(t, 3.35, 3.9));
@@ -93,17 +45,14 @@ function storeToTheo(t) {   // 0 - 7.45: one move, inside the store to Theo's fr
     const down = v < .08 ? mix(.30, .14, ss(v / .08)) : mix(.14, .75, ss(pr(v, .5, 1)));   // out through the window, back across the street, and only then up
     st = { look: mix3(MAXC, MID, ss(pr(v, .5, 1))), L, down, F: lmix(2070, 2600, v) }; }
   else { const u = io(pr(t, 5.8, 7.45)); st = { look: mix3(MID, CLOSE_THEO.look, ss(u)), L: lmix(70, CLOSE_THEO.L, u), down: mix(.75, CLOSE_THEO.down, u), F: lmix(2600, CLOSE_THEO.F, u) }; }
-  const cam = { ...camOf(st), act, focus: t < 4.6 ? 'max' : null }; FOCUS = st.L < 15;
+  const cam = { ...camOf(st), act, focus: t < 4.6 ? 'max' : null }; STREET.focus = st.L < 15;
   if (insideStore(eyeOf(cam))) { frame(t); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#141b30'; g.fillRect(0, 0, 1080, 1920); drawStore(t, cam, act); return; }
   drawWide(t, { ...cam, extras: [theoEx(t, { look: [0, 0] })] }, { tilt: st.L > 30 });
   const k = pr(t, 4.9, 5.2) * (1 - pr(t, 6.3, 6.6));   // who lives where, as the camera hangs over the town
   if (k > 0) { const [a, b] = pin(3, 27, 9), [c, d] = pin(22, -16, 9); card(c, d, 'NEXT DOOR TO MAX', 'THEO', { w: 460, bigPx: 80, s: k * .8 }); }
 }
-const maxShot = (t, st, { old = false, act = {} } = {}) => () => drawWide(t, { ...camOf(st), extras: [maxEx(t, act), ...carsEx(old)] }, { tilt: false });
-const theoShot = (t, st, { old = false, act = {} } = {}) => () => drawWide(t, { ...camOf(st), extras: [theoEx(t, act), ...carsEx(old)] }, { tilt: false });
-const push_ = (st, u, L1) => ({ ...st, L: lmix(st.L, L1, u) });
 window.renderAt = t => {
-  AUDIT.subjects = 0; FOCUS = true;
+  AUDIT.subjects = 0; STREET.focus = true;
   if (t < POV_END) povShot(t);
   else if (t < 7.45) storeToTheo(t);
   else if (t < 8.5) {   // whip pan along the street from Theo's yard to Max next door: his new coupe
