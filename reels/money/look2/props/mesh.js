@@ -3,13 +3,16 @@
 // A model is a list of faces: { pts: [[x, y, z], ...] (counter-clockwise seen from outside), col, line?, glow? }.
 import { shape, fillOnly, stroke, dot, text } from '../toon.js';
 // ---- the camera: yaw turns the world about the vertical, pitch tips it toward the viewer (0 = level, PI/2 = straight down) ----
-export const CAM = { yaw: 0, pitch: .5, P: 100, ox: 540, oy: 960, cx: 0, cy: 0, cz: 0 };
+// dist = 0: a parallel view (the prop sheet). dist > 0: a real camera that far from the look point (cx, cy, cz), P px per metre AT the
+// look point, nearer things bigger, farther smaller; what is behind the camera is not drawn.
+export const CAM = { yaw: 0, pitch: .5, P: 100, ox: 540, oy: 960, cx: 0, cy: 0, cz: 0, dist: 0 };
 export function view(o) { Object.assign(CAM, o); }
 // world -> [screen x, screen y, depth]; depth grows away from the viewer
 export function proj(x, y, z) {
   const c = Math.cos(CAM.yaw), s = Math.sin(CAM.yaw), dx = x - CAM.cx, dy = y - CAM.cy, dz = z - CAM.cz;
   const xr = dx * c - dz * s, zr = dx * s + dz * c, cp = Math.cos(CAM.pitch), sp = Math.sin(CAM.pitch);
-  return [CAM.ox + xr * CAM.P, CAM.oy + (zr * sp - dy * cp) * CAM.P, -(zr * cp + dy * sp)];
+  const d = -(zr * cp + dy * sp), k = CAM.dist ? CAM.P * CAM.dist / Math.max(.05, CAM.dist + d) : CAM.P;
+  return [CAM.ox + xr * k, CAM.oy + (zr * sp - dy * cp) * k, d];
 }
 // the light: from the upper left, a little toward the viewer. A face is lit or in shadow (toon: two tones, no gradient)
 const L = (() => { const v = [-.45, .8, .4], n = Math.hypot(...v); return v.map(a => a / n); })();
@@ -20,6 +23,7 @@ const normal = p => { const [a, b, c] = p; const u = [b[0] - a[0], b[1] - a[1], 
 export function draw(model, at = [0, 0, 0], rot = 0, { lw = 4, boil = .35 } = {}) {
   const c = Math.cos(rot), s = Math.sin(rot), F = [], cp = Math.cos(CAM.pitch), sp = Math.sin(CAM.pitch);
   const toCam = [cp * Math.sin(CAM.yaw), sp, cp * Math.cos(CAM.yaw)];   // world direction toward the viewer
+  const eye = CAM.dist ? [CAM.cx + toCam[0] * CAM.dist, CAM.cy + toCam[1] * CAM.dist, CAM.cz + toCam[2] * CAM.dist] : null;   // the camera itself
   const W = f => f.pts.map(([x, y, z]) => [at[0] + x * c + z * s, at[1] + y, at[2] - x * s + z * c]);
   // each part's centre, so every face's normal can be pointed outward whatever order its corners were listed in
   const parts = new Map(); for (const f of model) { const w = W(f), k = f.part ?? 0, a = parts.get(k) || [0, 0, 0, 0]; for (const p of w) { a[0] += p[0]; a[1] += p[1]; a[2] += p[2]; a[3]++; } parts.set(k, a); }
@@ -27,8 +31,11 @@ export function draw(model, at = [0, 0, 0], rot = 0, { lw = 4, boil = .35 } = {}
     const fc = w.reduce((m, p) => [m[0] + p[0] / w.length, m[1] + p[1] / w.length, m[2] + p[2] / w.length], [0, 0, 0]);
     let n; if (f.n) n = [f.n[0] * c + f.n[2] * s, f.n[1], -f.n[0] * s + f.n[2] * c];   // a panel says which way it faces
     else { n = normal(w); if (n[0] * (fc[0] - pc[0]) + n[1] * (fc[1] - pc[1]) + n[2] * (fc[2] - pc[2]) < 0) n = n.map(v => -v); }
-    if (!f.twoSided && n[0] * toCam[0] + n[1] * toCam[1] + n[2] * toCam[2] <= 1e-4) continue;   // turned away from the viewer
-    const P = w.map(p => proj(...p)), lit = n[0] * L[0] + n[1] * L[1] + n[2] * L[2];
+    const v = eye ? [eye[0] - fc[0], eye[1] - fc[1], eye[2] - fc[2]] : toCam;
+    if (!f.twoSided && n[0] * v[0] + n[1] * v[1] + n[2] * v[2] <= 1e-4) continue;   // turned away from the viewer
+    const P = w.map(p => proj(...p));
+    if (eye && P.every(p => p[2] < .05 - CAM.dist)) continue;   // wholly behind the camera
+    const lit = n[0] * L[0] + n[1] * L[1] + n[2] * L[2];
     F.push({ P, d: P.reduce((m, p) => m + p[2], 0) / P.length - (f.bias || 0), col: f.glow ? f.col : shadeCol(f.col, lit > .15 ? 1 : lit > -.3 ? .84 : .7), f }); }
   // order: parts first. A part that rests on top of another (its bottom at or above the other's top, footprints overlapping)
   // always draws after it; otherwise the farther part draws first. Panels belong to the part they sit on and draw just after its faces.

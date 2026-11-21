@@ -141,14 +141,14 @@ export const stroke = (pts, lw = S.lw, o = {}) => shape(pts, { ...o, closed: fal
 export const dot = (x, y, r, col = INK) => { const [a, b] = tx(x, y); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = col; g.beginPath(); g.arc(a, b, Math.max(1.5, r * zoom()), 0, TAU); g.fill(); };
 
 // Text in world coordinates (signs etc.)
-export function text(str, x, y, { font = '800 40px "Baloo 2"', fill = INK, align = 'center', base = 'middle', rot = 0, outlineW = 0, outlineCol = INK } = {}) {
+export function text(str, x, y, { font = '800 40px "Baloo 2"', fill = INK, align = 'center', base = 'middle', rot = 0, outlineW = 0, outlineCol = INK, scenery = false } = {}) {
   g.save(); g.setTransform(M[0], M[1], M[2], M[3], M[4], M[5]);
   g.translate(x, y); if (rot) g.rotate(rot); if (mirrored()) g.scale(-1, 1);
   g.font = font; g.textAlign = align; g.textBaseline = base;
   if (outlineW) { g.lineWidth = outlineW; g.lineJoin = 'round'; g.strokeStyle = outlineCol; g.strokeText(str, 0, 0); }
   g.fillStyle = fill; g.fillText(str, 0, 0);
   if (AUDIT.on) { const m = g.measureText(str), w = m.width, h = m.actualBoundingBoxAscent + m.actualBoundingBoxDescent, ax = align === 'center' ? -w / 2 : align === 'right' ? -w : 0, ay = base === 'middle' ? -h / 2 : -h;
-    const T = g.getTransform(), cs = [[ax, ay], [ax + w, ay], [ax + w, ay + h], [ax, ay + h]].map(([x, y]) => [T.a * x + T.c * y + T.e, T.b * x + T.d * y + T.f]); AUDIT.log.push({ k: 'text', str, bb: bbox(cs) }); }
+    const T = g.getTransform(), cs = [[ax, ay], [ax + w, ay], [ax + w, ay + h], [ax, ay + h]].map(([x, y]) => [T.a * x + T.c * y + T.e, T.b * x + T.d * y + T.f]); AUDIT.log.push({ k: 'text', str, bb: bbox(cs), scenery }); }
   g.restore();
 }
 

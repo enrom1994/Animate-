@@ -1,0 +1,36 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Ten Years On: one shot, inside to town</title>
+<style>@font-face { font-family: "Cap"; src: url("/node_modules/@fontsource/montserrat/files/montserrat-latin-800-normal.woff2") format("woff2"); font-weight: 800; } html,body{margin:0;background:#000} canvas{display:block;width:720px;height:1280px}</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script type="module">
+// One continuous shot, one world: the camera starts inside the QUICK STOP on Max at the counter, dollies back past the counter,
+// through the counter window's glass, out over the lot, and cranes up over the town. No cut: inside and outside are the same model,
+// drawn by the same real (perspective) camera, so the window frame grows in from the edges as the camera passes through it.
+import { setupWide, drawWide } from './wide.js';
+import { drawStore, eyeOf, STORE } from './store.js';
+import { AUDIT, frame, g } from './toon.js';
+import { auditFrame } from './check.js';
+await document.fonts.load("800 54px Cap");
+const cv = document.getElementById('c'); setupWide(cv);
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x)), io = u => u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2, pr = (t, a, b) => clamp((t - a) / (b - a)),
+  mix = (a, b, u) => a + (b - a) * u, ss = u => u * u * (3 - 2 * u), lmix = (a, b, u) => a * Math.pow(b / a, u);
+const PULL = [2.3, 6.0], MAX = [STORE.counterX - .15, 1.35, STORE.maxZ], TOWN = [2, 0, 14];
+// the camera: a look point, how far the camera is from it (L), how much it looks down (down), its lens (F = px per metre at 1 m)
+export function camAt(t) {
+  const v = io(pr(t, PULL[0], PULL[1])), L = v > 0 ? lmix(2.3, 250, v) : mix(2.45, 2.3, ss(pr(t, 0, PULL[0])));
+  const down = v < .08 ? mix(.30, .14, ss(v / .08)) : mix(.14, .79, ss(pr(v, .25, 1)));   // level while passing through the window
+  const w = ss(pr(v, .28, 1)), F = lmix(2070, 3125, v);
+  return { v, pitch: Math.PI / 2 - down, P: F / L, dist: L, cx: mix(MAX[0], TOWN[0], w), cy: mix(MAX[1], TOWN[1], w), cz: mix(MAX[2], TOWN[2], w), focus: v < .3 ? 'max' : null };
+}
+window.camAt = camAt;
+window.renderAt = t => {
+  const up = io(pr(t, .9, 1.25)), sigh = Math.sin(Math.PI * pr(t, 1.5, 2.2));   // he stares at the letter, looks up, sighs
+  const act = { look: [mix(.15, 0, up), mix(.6, -.05, up)], lid: mix(.55, .32, up) + .1 * sigh, tilt: mix(-.05, .03, up), sigh, blink: t > 1.32 && t < 1.42 };
+  const cam = { ...camAt(t), act };
+  if (eyeOf(cam)[2] < STORE.z1) { frame(t); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#141b30'; g.fillRect(0, 0, 1080, 1920); drawStore(t, cam, act); return; }   // inside: the room is all there is
+  drawWide(t, cam, { tilt: cam.v > .55 });
+};
+const moving = t => Math.abs(Math.log(camAt(t + .05).P / camAt(t).P)) / .05 > .8;   // the picture's scale changing faster than 80% a second
+window.audit = t => { AUDIT.on = true; AUDIT.log = []; window.renderAt(t); AUDIT.on = false; return auditFrame(AUDIT.log, 1080, 1920, { moving: moving(t) }); };
+window.DURATION = 6; window.done = true; window.renderAt(0);
+</script></body></html>

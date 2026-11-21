@@ -1,7 +1,7 @@
 // Max, one drawing for every shot: the same character at the counter close-up, through the shop window, anywhere.
 // Local units: origin 10 units above the counter top; 1 unit = 1.27 mm, so his head top is 1.80 m and the counter top 0.95 m
 // above the floor. drawMax(...) places him in any scene from his feet position and the scene's pixels per metre.
-import { AUDIT, tx, INK, push, pop, translate, rotate, scale, shape, fillOnly, stroke, ell, arc, spline, rr, rect, noodle, dot } from './toon.js';
+import { AUDIT, S, tx, INK, push, pop, translate, rotate, scale, shape, fillOnly, stroke, ell, arc, spline, rr, rect, noodle, dot } from './toon.js';
 import { eye, mouth, hand, sweat } from './faces.js';
 export const UNIT = .00127, ORIGIN_H = .963;   // metres per unit; the origin's height above the floor
 const C = { skin: '#e9b98f', skinS: '#cf9a6f', cap: '#e8742e', capS: '#c45a1c', vest: '#f08a24', vestS: '#cf6c10', strip: '#dfe4e6', tee: '#7d8086', teeS: '#63666c' };
@@ -15,7 +15,7 @@ export function maxUpper(t, act = {}) { const A = { ...DEF(t), ...act };
   // neck and the big round head, hung forward
   shape(rr(-36, -290, 72, 80, 20), { fill: C.skin, lw: 6, shade: () => fillOnly(rect(-40, -290, 80, 30), C.skinS, { boil: .3 }) });
   push(); translate(0, -470 + 18 * A.sigh); rotate(A.tilt);
-  { const [a0, b0] = tx(-200, -190), [a1, b1] = tx(200, 190); AUDIT.subject('Max (at the counter)', [a0, b0, a1, b1], 120); }
+  { const [a0, b0] = tx(-200, -190), [a1, b1] = tx(200, 190); if (A.subject !== false) AUDIT.subject(A.subjectName || 'Max (at the counter)', [a0, b0, a1, b1], A.minH || 120); }
   shape(ell(0, 0, 200, 190, 80), { fill: C.skin, lw: 8, shade: () => { fillOnly(spline([[60, -200], [230, -40], [210, 140], [80, 210], [150, 40]]), C.skinS, { boil: .3 }); } });
   for (const s of [-1, 1]) shape(ell(s * 196, 14, 26, 36, 18), { fill: C.skin, lw: 6, shade: () => fillOnly(ell(s * 192, 16, 10, 18, 12), C.skinS, { boil: .3 }) });
   // the cap: crown, front panel shading, a long bill, a button
@@ -39,4 +39,5 @@ export function maxArms() {
     hand(s * 70, 62, s > 0 ? Math.PI : 0, 30, C.skin); }
 }
 // place Max in a scene: (sx, sy) = his origin on screen, k = pixels per unit (pixels per metre x UNIT)
-export function drawMax(t, sx, sy, k, act = {}, part = 'upper') { push(); translate(sx, sy); scale(k); if (part === 'upper') maxUpper(t, act); else maxArms(); pop(); }
+export function drawMax(t, sx, sy, k, act = {}, part = 'upper') { const lw0 = S.lwScale; S.lwScale = lw0 * Math.max(.3, Math.min(1, k));   // the ink thins as he gets smaller
+  push(); translate(sx, sy); scale(k); if (part === 'upper') maxUpper(t, act); else maxArms(); pop(); S.lwScale = lw0; }
