@@ -60,7 +60,8 @@ export function drawStore(t, cam, act = {}) {
   { const [a, b] = sp(S.counterX + .36, .952, S.counterZ + .22), r = pm(S.counterX + .36, .95, S.counterZ + .22); shape(ell(a, b, r * .035, r * .02, 12), { fill: '#3a3840', lw: Math.max(1.2, lw * .5) }); }
   { const r = pm(S.counterX - 1.05, 1, S.counterZ), [a, b] = sp(S.counterX - 1.05, .952, S.counterZ), [c, d] = sp(S.counterX - 1.05, 1.07, S.counterZ);
     shape([[a - r * .04, b], [a + r * .04, b], [c + r * .045, d], [c - r * .045, d]], { fill: '#f4efe0', lw: Math.max(1.5, lw * .6) }); shape(ell((a + c) / 2, d, r * .045, r * .015, 12), { fill: '#5a3a22', lw: Math.max(1.2, lw * .5) }); }
-  drawMax(t, mx, my, k, { ...actM, subject: false }, 'arms');
+  const handY = (sp(S.counterX, .955, S.counterZ - .2)[1] - my) / k;   // his hands rest on the counter top, 20 cm in from its back edge
+  drawMax(t, mx, my, k, { ...actM, subject: false, handY: Math.max(62, handY) }, 'arms');
   draw(LIGHTS, [0, 0, 0], 0, opt);
   if (!outside) return;
   for (const q of GLASSES) shape(q.map(p => sp(...p)).map(p => [p[0], p[1]]), { fill: GLASS, stroke: false, boil: 0 });   // the glass

@@ -35,19 +35,23 @@ export function maxUpper(t, act = {}) { const A = { ...DEF(t), ...act };
 }
 // hips, legs and shoes down to the floor (758 units below the origin = 0.963 m): drawn first, so the counter covers what it should
 export function maxLegs() {
-  shape(spline([[-185, 20], [185, 20], [178, 120], [-178, 120]]), { fill: LEG.cloth, lw: 7 });                         // hips
-  for (const s of [-1, 1]) {
-    shape([[s * 20, 90], [s * 175, 90], [s * 150, 700], [s * 40, 700]], { fill: LEG.cloth, lw: 7, shade: () => fillOnly(s > 0 ? [[110, 90], [175, 90], [150, 700], [115, 700]] : [[-60, 90], [-20, 90], [-40, 700], [-70, 700]], LEG.clothS, { boil: .3 }) });
+  for (const s of [-1, 1]) {   // the legs, split at the crotch (0.79 m above the floor), one piece with the seat above
+    shape([[s * 6, 190], [s * 178, 120], [s * 150, 700], [s * 40, 700]], { fill: LEG.cloth, lw: 7, shade: () => fillOnly(s > 0 ? [[110, 120], [178, 120], [150, 700], [115, 700]] : [[-60, 190], [-6, 190], [-40, 700], [-70, 700]], LEG.clothS, { boil: .3 }) });
     shape(spline([[s * 32, 690], [s * 158, 690], [s * 175, 735], [s * 150, 758], [s * 18, 758], [s * 22, 720]]), { fill: LEG.shoe, lw: 7 });   // shoes
     stroke([[s * 20, 750], [s * 160, 750]], 4, { line: LEG.sole }); }
-  shape(rect(-186, 18, 372, 30), { fill: LEG.belt, lw: 5 }); shape(rect(-22, 16, 44, 34), { fill: '#c9ccd4', lw: 4 });   // belt and buckle
+  // the seat of the trousers: one shape from the belt down past the crotch, so the legs join it instead of hanging off it
+  shape(spline([[-190, 30], [190, 30], [184, 140], [120, 175], [0, 205], [-120, 175], [-184, 140]]), { fill: LEG.cloth, lw: 7, shade: () => fillOnly([[110, 30], [190, 30], [184, 150], [110, 170]], LEG.clothS, { boil: .3 }) });
+  stroke(spline([[0, 62], [4, 130], [-2, 196]], false), 4, { line: LEG.clothS });                                           // the fly seam
+  stroke(spline([[-150, 150], [-80, 172], [-30, 182]], false), 3, { line: LEG.clothS }); stroke(spline([[150, 150], [80, 172], [30, 182]], false), 3, { line: LEG.clothS });   // creases
+  shape(rect(-190, 28, 380, 30), { fill: LEG.belt, lw: 5 }); shape(rect(-22, 26, 44, 34), { fill: '#c9ccd4', lw: 4 });       // belt and buckle
 }
 // the forearms resting on the counter, hands flat; drawn after the counter so the hands lie on it
-export function maxArms() {
-  for (const s of [-1, 1]) { shape(noodle([s * 160, -180], [s * 175, -60], s * 10, 62, 56), { fill: C.tee, lw: 7, shade: () => fillOnly(rect(s > 0 ? 160 : -240, -200, 80, 160), C.teeS, { boil: .3 }) });
-    shape(noodle([s * 175, -70], [s * 95, 55], s * -20, 48, 42), { fill: C.skin, lw: 7, shade: () => fillOnly(rect(s > 0 ? 140 : -200, -80, 60, 140), C.skinS, { boil: .3 }) });
-    hand(s * 70, 62, s > 0 ? Math.PI : 0, 30, C.skin); }
+export function maxArms(handY = 62) {
+  const ey = -60 + (handY - 62) * .45;   // the elbows drop a little when the hands reach further
+  for (const s of [-1, 1]) { shape(noodle([s * 160, -180], [s * 175, ey], s * 10, 62, 56), { fill: C.tee, lw: 7, shade: () => fillOnly(rect(s > 0 ? 160 : -240, -200, 80, 160), C.teeS, { boil: .3 }) });
+    shape(noodle([s * 175, ey - 10], [s * 95, handY - 7], s * -20, 48, 42), { fill: C.skin, lw: 7, shade: () => fillOnly(rect(s > 0 ? 140 : -200, -80, 60, 140), C.skinS, { boil: .3 }) });
+    hand(s * 70, handY, s > 0 ? Math.PI : 0, 30, C.skin); }
 }
 // place Max in a scene: (sx, sy) = his origin on screen, k = pixels per unit (pixels per metre x UNIT)
 export function drawMax(t, sx, sy, k, act = {}, part = 'upper') { const lw0 = S.lwScale; S.lwScale = lw0 * Math.max(.3, Math.min(1, k));   // the ink thins as he gets smaller
-  push(); translate(sx, sy); scale(k); if (part === 'upper') maxUpper(t, act); else if (part === 'legs') maxLegs(); else maxArms(); pop(); S.lwScale = lw0; }
+  push(); translate(sx, sy); scale(k); if (part === 'upper') maxUpper(t, act); else if (part === 'legs') maxLegs(); else maxArms(act.handY); pop(); S.lwScale = lw0; }
