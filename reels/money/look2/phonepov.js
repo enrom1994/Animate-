@@ -70,24 +70,24 @@ function leftHandBack(lw) {
   shape(rr(-28, 112, 20, 26, 5), { fill: '#d9a83a', lw }); shape(rr(-25, 115, 14, 20, 4), { fill: '#f3ead2', lw: lw * .5 });     // its face, turned to us
 }
 function leftHandFront(lw) {
-  for (const [y, len] of [[-12, 12], [6, 13], [24, 12.5], [42, 10.5]]) {   // fingertips round the right edge, the little finger shortest
-    skinShape(spline([[34, y - 6.5], [34 + len - 3, y - 6.2], [34 + len + 1, y - 2], [34 + len + 1, y + 3], [34 + len - 3, y + 6.8], [34, y + 6.6]]), { lw, d: 1.6 });
-    stroke([[34 + 2.2, y - 4], [34 + 2.6, y + 4]], lw * .45, { line: 'rgba(29,26,38,.55)' }); }   // where the finger bends round the edge
-  skinShape(spline([[-58, 92], [-50, 58], [-40, 20], [-33, 0], [-26, -2], [-25, 10], [-31, 38], [-38, 70], [-42, 96]], true), { lw, d: 2 });   // the thumb up the left edge
-  shape(spline([[-32.5, 4], [-28.5, 2], [-27, 7], [-29, 14], [-33, 13]]), { fill: '#f3c7a6', lw: lw * .5 });                                 // its nail
-  stroke([[-44, 64], [-36, 62]], lw * .45, { line: 'rgba(29,26,38,.55)' });                                                                   // the knuckle crease
+  for (const [y, len] of [[-16, 13], [2, 14.5], [20, 14], [38, 11.5]]) {   // fingertips round the right edge, the little finger shortest
+    skinShape(spline([[34, y - 8.2], [34 + len - 4, y - 8], [34 + len + 1.5, y - 3], [34 + len + 1.5, y + 3.5], [34 + len - 4, y + 8.6], [34, y + 8.4]]), { lw, d: 1.8 });
+    stroke([[34 + 2.4, y - 5], [34 + 2.8, y + 5]], lw * .45, { line: 'rgba(29,26,38,.55)' }); }   // where the finger bends round the edge
+  skinShape(spline([[-62, 100], [-59, 66], [-50, 38], [-41, 22], [-30, 18], [-24, 26], [-25, 42], [-31, 70], [-37, 100]], true), { lw, d: 2.4 });   // the thumb on the left edge: short and broad, as a thumb is
+  shape(spline([[-37, 25], [-30.5, 22], [-27, 27], [-28, 35], [-34.5, 35]]), { fill: '#f3c7a6', lw: lw * .5 });                             // its nail
+  stroke([[-50, 58], [-39, 56]], lw * .45, { line: 'rgba(29,26,38,.55)' });                                                                   // the knuckle crease
 }
 // the right hand points: the index finger out to the tip, the other fingers curled, the thumb tucked; it comes up from the lower right
 function rightHand(tip, lw) {
-  const dir = nrm(-.42, -1), per = [-dir[1], dir[0]], K = add(tip, dir, -46), C = add(add(K, dir, -18), per, -6);   // K: the index knuckle; C: the back of the hand
+  const dir = nrm(-.42, -1), per = [-dir[1], dir[0]], K = add(tip, dir, -36), C = add(add(K, dir, -18), per, -6);   // K: the index knuckle; C: the back of the hand
   skinShape([add(C, per, -24), add(add(C, dir, -120), per, -26), add(add(C, dir, -120), per, 30), add(C, per, 26)].map(p => p), { lw, d: 3.5 });   // forearm
   const fist = []; for (let i = 0; i < 24; i++) { const a = i / 24 * Math.PI * 2, r = [24 + 3 * Math.cos(a), 29]; fist.push(add(add(C, per, Math.cos(a) * r[0]), dir, Math.sin(a) * r[1])); }
   skinShape(fist, { lw, d: 3.2 });                                                                                                          // back of the hand
-  skinShape(noodle(add(add(C, per, -24), dir, -14), add(add(K, per, -14), dir, 2), 5, 18, 14), { lw, d: 2 });                                  // the thumb, tucked along the side
+  skinShape(noodle(add(add(C, per, -24), dir, -14), add(add(K, per, -15), dir, 0), 5, 22, 19), { lw, d: 2 });                                  // the thumb, tucked along the side
   const base = add(add(K, per, -2), dir, -4);
-  skinShape(noodle(base, tip, -2, 17, 14.5), { lw, d: 2 });                                                                                  // the index finger
-  const nb = add(tip, dir, -5.5); shape([add(add(nb, per, -4.6), dir, 3.6), add(add(nb, per, 4.6), dir, 3.6), add(add(nb, per, 4), dir, -3.4), add(add(nb, per, -4), dir, -3.4)], { fill: '#f3c7a6', lw: lw * .5 });   // its nail
-  stroke([add(add(K, dir, 14), per, -6), add(add(K, dir, 14), per, 5)], lw * .45, { line: 'rgba(29,26,38,.55)' });                                // middle joint crease
+  skinShape(noodle(base, tip, -2, 21, 18), { lw, d: 2.2 });                                                                                  // the index finger
+  const nb = add(tip, dir, -6.5); shape([add(add(nb, per, -5.6), dir, 4.2), add(add(nb, per, 5.6), dir, 4.2), add(add(nb, per, 5), dir, -4), add(add(nb, per, -5), dir, -4)], { fill: '#f3c7a6', lw: lw * .5 });   // its nail
+  stroke([add(add(K, dir, 12), per, -7.5), add(add(K, dir, 12), per, 6.5)], lw * .45, { line: 'rgba(29,26,38,.55)' });                                // middle joint crease
 }
 // ---- the phone in his hands ----
 // at: screen point of the phone's centre; k: pixels per metre there (cam.P); rot: a little handheld roll; screen() draws the glass;

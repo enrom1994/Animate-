@@ -137,7 +137,9 @@ export function drawWide(t, cam = null, { tilt = true } = {}) { T_ = t;
   const XC = []; for (const c of CARS2) { const L = c.lane; if (L.x == null) continue; const d = ((ts * L.v + c.off) % 240) - 120, zz = L.dir === 'z' ? view.cz + d : view.cz - d; if (zz <= near && !(view.dist && view.dist < 40 && zz > view.cz - 1)) XC.push([L.x, zz, L.dir, c.col, t]); }
   XC.sort((a, b) => a[1] - b[1]); let xi = 0;
   const EX = (view.extras || []).filter(e => e.z <= near - .3).sort((a, b) => a.z - b.z); let ei = 0;   // people and parked cars, in depth among the buildings
-  const drawEx = e => e.car ? car(e.x, e.z, e.dir || 'z', e.col, t, false, e.car) : e.fn(...pj(e.x, e.z, e.h ?? 0), sc(e.x, e.z, e.h ?? 0));
+  const drawEx = e => e.car ? car(e.x, e.z, e.dir || 'z', e.col, t, false, e.car)
+    : e.mesh ? (meshView({ yaw: 0, pitch: Math.PI / 2 - view.pitch, P: view.P, ox: 540, oy: 960, cx: view.cx, cy: view.cy, cz: view.cz, dist: view.dist }), meshDraw(e.mesh, [e.x, e.y ?? 0, e.z], e.rot ?? 0, { lw: Math.max(1.5, Math.min(4, sc(e.x, e.z) * .1)), boil: .25 }))   // a prop-library model standing in the street
+    : e.fn(...pj(e.x, e.z, e.h ?? 0), sc(e.x, e.z, e.h ?? 0));
   for (const b of BLD) { if (b[1] > near) continue; while (si < streets.length && streets[si] + PW < b[1]) drawCarsOn(streets[si++]); while (xi < XC.length && XC[xi][1] < b[1]) car(...XC[xi++]); while (ei < EX.length && EX[ei].z < b[3]) drawEx(EX[ei++]);
     if (b[6] === 'mesh') { meshView({ yaw: 0, pitch: Math.PI / 2 - view.pitch, P: view.P, ox: 540, oy: 960, cx: view.cx, cy: view.cy, cz: view.cz, dist: view.dist }); meshDraw(b[7].faces, [(b[0] + b[2]) / 2, 0, (b[1] + b[3]) / 2], 0, { lw: Math.max(1.5, Math.min(4, sc((b[0] + b[2]) / 2, b[3]) * .1)), boil: .25 }); continue; }
     if (b[6] === 'store') { drawStore(t, view, view.act || {}); storeFront(b[0], b[2], b[3], b[4]); storeSign(b[0], b[2], b[3], b[4]); for (const [x, z] of [[-5, 16], [0, 18], [6, 16], [10, 20]]) acUnit(x, z, 4.5); }

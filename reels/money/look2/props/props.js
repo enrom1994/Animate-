@@ -106,7 +106,7 @@ export function house({ w = 10, d = 9, storeys = 1, wall = '#c9b79a', roof = '#6
   let li = 0; for (let st = 0; st < storeys; st++) { const y = st * 2.8 + .95;
     for (const x of (st === 0 ? (garage ? [-w / 2 + 4.4, -w / 2 + 6.2].filter(x => x < w / 2 - gw - .6) : [-w / 2 + 1.6, w / 2 - 1.6, w / 2 - 3.4]) : [-w / 2 + 1.6, -w / 2 + 3.6, w / 2 - 1.6, w / 2 - 3.6])) win(x, y, lit[li++ % lit.length]); }
   const doorX = garage ? -w / 2 + 2.0 : -w / 2 + 3.6;
-  f.push(panel(doorX - .55, 0, doorX + .55, 2.2, fz, trim), panel(doorX - .45, 0, doorX + .45, 2.05, fz + .002, door), panel(doorX - .25, 1.3, doorX + .25, 1.8, fz + .004, '#ffd98a', { glow: true }));
+  f.push(panel(doorX - .55, 0, doorX + .55, 2.2, fz, trim), panel(doorX - .45, 0, doorX + .45, 2.05, fz + .002, door, { bias: .12 }), panel(doorX - .25, 1.3, doorX + .25, 1.8, fz + .004, '#ffd98a', { glow: true, bias: .14 }));   // the door sits on its frame: its centre is lower than the frame's, so a plain depth sort put it behind (bias keeps it in front)
   f.push(...box(doorX - 1.1, 0, d / 2, doorX + 1.1, .18, d / 2 + 1.3, '#a9a295'));                                   // the porch step
   f.push(...box(doorX - 1.15, 2.5, d / 2, doorX + 1.15, 2.6, d / 2 + 1.35, roof), ...box(doorX - 1.05, .18, d / 2 + 1.18, doorX - .95, 2.5, d / 2 + 1.28, trim), ...box(doorX + .95, .18, d / 2 + 1.18, doorX + 1.05, 2.5, d / 2 + 1.28, trim));
   f.push(panel(doorX + .7, 1.6, doorX + .85, 1.75, fz + .006, '#ffe9a8', { glow: true }));   // porch light
@@ -116,6 +116,19 @@ export function house({ w = 10, d = 9, storeys = 1, wall = '#c9b79a', roof = '#6
   return { faces: f, size: [w + 2 * o, h + rh, d + 1.35], name: garage ? `house with garage (${storeys} storey)` : `house (${storeys} storey)` };
 }
 const houseBig = () => house({ w: 12, d: 9, storeys: 2, wall: '#e8e2d0', roof: '#3a3d48', door: '#c8302a', garage: true });
+// ---- parcels ----
+// a delivery box on the doorstep, sized for what is inside (outer sizes, metres): a pair of sneakers 0.36 x 0.14 x 0.25, a phone
+// 0.22 x 0.09 x 0.15, a game console 0.50 x 0.16 x 0.38. Cardboard, a strip of tape over the top, a white shipping label on the front.
+export const PARCEL = { sneakers: [.36, .14, .25], phone: [.22, .09, .15], console: [.50, .16, .38] };
+export function parcel(kind = 'sneakers') {
+  const [w, h, d] = PARCEL[kind], up = [0, 1, 0], f = [...box(-w / 2, 0, -d / 2, w / 2, h, d / 2, { all: '#c99a62', top: '#d6aa72' })];
+  const tw = Math.min(.05, w * .18);
+  f.push(poly([[-tw / 2, h + .001, -d / 2], [tw / 2, h + .001, -d / 2], [tw / 2, h + .001, d / 2], [-tw / 2, h + .001, d / 2]], '#b88a52', up, { lw: 1.2 }));   // tape over the top
+  f.push(panel(-tw / 2, h * .55, tw / 2, h, d / 2 + .001, '#b88a52', { lw: 1.2 }));                                                                     // and down the front
+  f.push(panel(w * .12, h * .18, w * .12 + Math.min(.1, w * .3), h * .18 + Math.min(.065, h * .5), d / 2 + .002, '#f6f3ea', { lw: 1.2 }));             // the shipping label
+  return { faces: f, size: [w, h, d], name: `parcel (${kind})` };
+}
+const parcelShoes = () => parcel('sneakers'), parcelConsole = () => parcel('console');
 // ---- paper ----
 // a car-loan payment statement, US letter (216 x 279 mm), lying flat; its print is drawn on the sheet's own plane from any camera
 export function bill() {
@@ -143,4 +156,4 @@ function billInk(m) {   // print in millimetres on the sheet: u across from the 
   fillOnly([[20, 226], [100, 226], [100, 230], [20, 230]], '#b9b4a8', { boil: 0 }); fillOnly([[20, 238], [80, 238], [80, 242], [20, 242]], '#b9b4a8', { boil: 0 });
   setM(m0);
 }
-export const ALL = [house, houseBig, coupe, bill, car, counter, shelf, pylon, tv, sofa, table, fridge, door, phone];
+export const ALL = [house, houseBig, coupe, bill, parcelShoes, parcelConsole, car, counter, shelf, pylon, tv, sofa, table, fridge, door, phone];

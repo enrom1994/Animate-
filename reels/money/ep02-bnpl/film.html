@@ -22,6 +22,7 @@ import { auditFrame } from '/money/look2/check.js';
 import { clamp, io, pr, mix, mix3, ss, lmix, money, camOf, push_, pop_, card, stamp, banner, split, blurPan, veil, setupEdit } from '/money/look2/edit.js';
 import { STREET, THEO_X, THEO_Z, MAX_X, MAX_Z, MCAR, TCAR, FRAME_THEO, FRAME_MAX, theoEx, maxEx, carsEx, pin, maxShot, theoShot } from '/money/look2/street.js';
 import { drawPovPhone, checkout, payments, alert, lock } from '/money/look2/phonepov.js';
+import { parcel } from '/money/look2/props/props.js';
 import { CAPTIONS, DURATION } from './src/captions.js';
 await document.fonts.load("800 54px Cap");
 const cv = document.getElementById('c'); setupWide(cv); setupEdit(cv); const capEl = document.getElementById('cap');
@@ -39,6 +40,8 @@ function pov(t, screen, { tap = null, over = null, F0 = 2650, F1 = 2850, t0 = 0,
 }
 const ITEMS = { sneakers: { item: 'sneakers', name: 'SNEAKERS', price: '$400.00', each: '$100' }, phone: { item: 'phone', name: 'NEW PHONE', price: '$600.00', each: '$150' }, console: { item: 'console', name: 'GAME CONSOLE', price: '$500.00', each: '$125' } };
 const tapAt = (t, t0, d = .3) => clamp(Math.min((t - t0 + d) / d, 1 - (t - t0 - .15) / .35), 0, 1);   // the thumb travels in, presses at t0, lifts away
+// Max's front step (his door at x 2.0, the step z -11.5 to -10.2, 0.18 m up): the console, the sneakers stacked on it, the phone beside
+const DOORSTEP = [{ x: 1.55, y: .18, z: -10.8, rot: .12, mesh: parcel('console').faces }, { x: 1.6, y: .34, z: -10.75, rot: -.25, mesh: parcel('sneakers').faces }, { x: 2.45, y: .18, z: -10.6, rot: .35, mesh: parcel('phone').faces }];
 const PLANS = t => [['sneakers', 100, 1], ['phone', 150, pop_(t, 13.9)], ['console', 125, pop_(t, 15.25)]];
 window.renderAt = t => {
   AUDIT.subjects = 0; STREET.focus = true;
@@ -63,11 +66,11 @@ window.renderAt = t => {
   else if (t < 20.6) {   // late fee
     pov(t, () => payments({ plans: PLANS(t).map(([i, e]) => [i, e, 1]), payday: 1, late: 1, total: 1 }), { over: () => alert({ k: pr(t, 19.9, 20.15) }), t0: 15.65, t1: 20.6 });
     stamp(540, 160, 'LATE FEE', pop_(t, 20.0)); }
-  else if (t < 24.2) {   // one in four users has had three or more at once: the town at night
-    STREET.focus = false; const u = io(pr(t, 20.6, 24.2));
-    drawWide(t, { ...camOf({ look: [mix(4, 12, u), 0, mix(6, 2, u)], L: lmix(90, 60, u), down: .9, F: 2600 }) }, { tilt: true });
-    card(540, 330, 'BUY NOW, PAY LATER USERS', '1 IN 4', { col: '#2e1d1c', w: 640, bigPx: 120, s: pop_(t, 20.75) });
-    card(540, 620, 'HAVE HAD AT ONCE', '3+ LOANS', { col: '#b8302a', w: 520, bigPx: 96, s: pop_(t, 22.1) }); }
+  else if (t < 24.2) {   // one in four users has had three or more at once: three boxes on Max's doorstep
+    const u = ss(pr(t, 20.6, 24.2)), st = { look: [mix(2.25, 2.05, u), 1.05, -10.8], L: lmix(6.6, 5.4, u), down: .16, F: 2300 };
+    drawWide(t, { ...camOf(st), extras: DOORSTEP }, { tilt: false });
+    card(540, 250, 'BUY NOW, PAY LATER USERS', '1 IN 4', { col: '#2e1d1c', w: 640, bigPx: 110, s: pop_(t, 20.75) });
+    card(540, 520, 'HAVE HAD AT ONCE', '3+ LOANS', { col: '#b8302a', w: 520, bigPx: 96, s: pop_(t, 22.1) }); }
   else if (t < 29.3) {   // one large study: about 10% more spent when the price can be split
     const st = push_(FRAME_MAX, ss(pr(t, 24.2, 29.3)), 7.5); maxShot(t, st, { act: { smile: .5 } })();
     card(540, 250, 'ONE LARGE STUDY', 'SPEND ~10% MORE', { col: '#b8302a', w: 640, bigPx: 84, s: pop_(t, 24.6) });
@@ -86,7 +89,7 @@ window.renderAt = t => {
     banner(540, 1030, 'ONLY FOR WHAT YOU COULD PAY TODAY', pop_(t, 36.6), { px: 44, w: 760, fill: '#ffd23f' }); }
   const c = CAPTIONS.find(([a, , b]) => t >= a && t < b); capEl.innerHTML = c ? c[1] : '';
 };
-const MOVES = [[20.6, 24.2]];   // the camera drifts over the town the whole shot: scenery passes the frame edge
+const MOVES = [];
 window.audit = t => { AUDIT.on = true; AUDIT.log = []; window.renderAt(t); AUDIT.on = false;
   return auditFrame(AUDIT.log, 1080, 1920, { moving: MOVES.some(([a, b]) => t >= a && t <= b), capBox: capEl.innerHTML ? [60, 1395, 1020, 1500] : null }); };
 window.DURATION = DURATION; window.done = true; window.renderAt(0);
