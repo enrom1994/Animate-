@@ -7,7 +7,9 @@ import { hash } from './lib.js';
 let g; export function setupCounter(canvas) { g = init(canvas); }
 const C = { wall: '#7a8c8e', wallS: '#55666c', ceil: '#b4c2c1', light: '#f4fbf6', counter: '#c9b896', counterS: '#a8977a', counterF: '#7d6e56', night: '#23304f', night2: '#2f3f63',
   skin: '#e9b98f', skinS: '#cf9a6f', cap: '#e8742e', capS: '#c45a1c', vest: '#f08a24', vestS: '#cf6c10', strip: '#dfe4e6', tee: '#7d8086', teeS: '#63666c', shelf: '#6b5a4a' };
-export function drawCounter(t) {
+// act: how Max performs this frame. look [x, y] for the pupils, lid 0..1, tilt of the head, sigh 0..1 (shoulders drop, mouth opens), blink
+export function drawCounter(t, act = {}) {
+  const A = { look: [.15, .55], lid: .52 + .05 * Math.sin(t * 1.3), tilt: -.05, sigh: 0, blink: false, ...act };
   frame(t);
   // ---- the room in perspective: one vanishing point behind Max's head; the far wall, the ceiling, two side walls, the floor ----
   const VX = 540, VY = 760, F = [120, 500, 960, 1150];   // far wall: x0, y0, x1, y1
@@ -57,7 +59,7 @@ export function drawCounter(t) {
   // arms forward onto the counter, hands flat
   // neck and the big round head, hung forward
   shape(rr(-36, -290, 72, 80, 20), { fill: C.skin, lw: 6, shade: () => fillOnly(rect(-40, -290, 80, 30), C.skinS, { boil: .3 }) });
-  push(); translate(0, -470); rotate(-.05);
+  push(); translate(0, -470 + 18 * A.sigh); rotate(A.tilt);
   shape(ell(0, 0, 200, 190, 80), { fill: C.skin, lw: 8, shade: () => { fillOnly(spline([[60, -200], [230, -40], [210, 140], [80, 210], [150, 40]]), C.skinS, { boil: .3 }); } });
   for (const s of [-1, 1]) shape(ell(s * 196, 14, 26, 36, 18), { fill: C.skin, lw: 6, shade: () => fillOnly(ell(s * 192, 16, 10, 18, 12), C.skinS, { boil: .3 }) });
   // the cap: crown, front panel shading, a long bill, a button
@@ -65,12 +67,12 @@ export function drawCounter(t) {
   shape(spline([[-210, -48], [-60, -86], [120, -80], [250, -30], [240, -6], [100, -40], [-80, -42], [-214, -24]]), { fill: C.capS, lw: 7 });
   dot(-10, -196, 9, INK);
   // tired eyes, inner brows up, a small frown, a sweat drop
-  const lid = .52 + .05 * Math.sin(t * 1.3);
-  eye(-70, 40, 58, 62, { lid, look: [.15, .55], pupil: 8, skin: C.skin, lw: 7 }); eye(70, 40, 58, 62, { lid, look: [.15, .55], pupil: 8, skin: C.skin, lw: 7 });
+  const lid = A.blink ? 1 : A.lid;
+  eye(-70, 40, 58, 62, { lid, look: A.look, pupil: 8, skin: C.skin, lw: 7 }); eye(70, 40, 58, 62, { lid, look: A.look, pupil: 8, skin: C.skin, lw: 7 });
   stroke(spline([[-130, -8], [-80, -24], [-30, -6]], false), 9); stroke(spline([[30, -6], [80, -24], [130, -8]], false), 9);
   for (const [ex] of [[-70], [70]]) stroke(arc(ex, 108, 40, 12, Math.PI * .2, Math.PI * .8, 10), 4);
   shape(spline([[-4, 64], [14, 96], [0, 112], [-16, 104]]), { fill: C.skin, lw: 6 });
-  mouth(0, 150, 70, { o: 0, sm: -.6, lw: 7 });
+  mouth(0, 150, 70, { o: .35 * A.sigh, w: 1 - .3 * A.sigh, sm: -.6, lw: 7 });
   sweat(178, -60 + (t * 30 % 40), 1.3);
   pop(); pop();
   // the counter, worn, in front of him

@@ -1,0 +1,24 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Ten Years On: scene test</title>
+<style>@font-face { font-family: "Cap"; src: url("/node_modules/@fontsource/montserrat/files/montserrat-latin-800-normal.woff2") format("woff2"); font-weight: 800; } html,body{margin:0;background:#000} canvas{display:block;width:720px;height:1280px}</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script type="module">
+// The opening, as asked: inside the store, Max at the counter -> cut outside, Max seen behind the counter through the window -> the zoom out.
+import { setupWide, drawWide } from './wide.js';
+import { setupCounter, drawCounter } from './counter.js';
+await document.fonts.load("800 54px Cap");
+const cv = document.getElementById('c'); setupWide(cv); setupCounter(cv);
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x)), io = u => u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2, pr = (t, a, b) => clamp((t - a) / (b - a)), mix = (a, b, u) => a + (b - a) * u;
+const CUT = 2.4, ZOOM = [3.6, 6.0], WIN_X = 5.3, FRONT_Z = 27;
+window.renderAt = t => {
+  if (t < CUT) {   // inside: he stares at the slip, looks up, sighs
+    const up = io(pr(t, .9, 1.25)), sigh = Math.sin(Math.PI * pr(t, 1.5, 2.2));
+    drawCounter(t, { look: [mix(.15, 0, up), mix(.6, -.05, up)], lid: mix(.55, .32, up) + .1 * sigh, tilt: mix(-.05, .03, up), sigh, blink: t > 1.32 && t < 1.42 });
+    return; }
+  // outside: front-on to the store, Max small behind the counter in the right-hand window; then the pull out and tilt up
+  const u = io(pr(t, ZOOM[0], ZOOM[1])), P0 = 125 * (1 + .05 * pr(t, CUT, ZOOM[0])), P = P0 * Math.pow(12.5 / P0, u);
+  const pitch = mix(1.22, .78, io(pr(t, ZOOM[0], ZOOM[0] + 1.5))), hc = mix(1.9, 0, u);
+  drawWide(t, { pitch, P, cx: mix(WIN_X - 2.6, 2, u), cz: mix(FRONT_Z - hc * Math.tan(pitch), 14, u), near: 44 + 160 * u * u }, { tilt: u > .3 });
+};
+window.DURATION = 6; window.done = true; window.renderAt(0);
+</script></body></html>

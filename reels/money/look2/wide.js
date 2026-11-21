@@ -30,12 +30,12 @@ function storeFront(x0, x1, z, h) {
   shape([F(x0, 3.4), F(x1, 3.4), F(x1, 4.5), F(x0, 4.5)], { fill: '#e8e2d0', lw: 4, shade: () => {   // the sign band
     fillOnly([F(x0 + .4, 3.55), F(x0 + 5.5, 3.55), F(x0 + 5.5, 4.35), F(x0 + .4, 4.35)], '#e9d38a', { boil: .3 });
     fillOnly([F(x0 + .9, 3.7), F(x0 + 2.6, 4.25), F(x0 + 2.3, 3.95), F(x0 + 4.6, 4.2), F(x0 + 2.9, 3.6), F(x0 + 3.2, 3.9)], '#d9533a', { boil: .3 }); } });
-  { const [sx, sy] = F((x0 + x1) / 2 + 2, 3.95); text('QUICK STOP', sx, sy, { font: `800 ${view.P * .75}px Cap`, fill: '#c8433a', outlineW: Math.max(3, view.P * .08), outlineCol: '#3a1810' }); }
   fillOnly([F(x0, 0), F(x1, 0), F(x1, .6), F(x0, .6)], '#8a3a2e', { boil: .2 });   // a brick plinth under the windows
-  const bays = [[x0 + .4, x0 + 4.4, 'win'], [x0 + 4.7, x0 + 8.7, 'win'], [x0 + 9.0, x0 + 11.0, 'door'], [x0 + 11.3, x0 + 15.3, 'win'], [x0 + 15.6, x1 - .4, 'win']];
+  const bays = [[x0 + .4, x0 + 4.4, 'win'], [x0 + 4.7, x0 + 8.7, 'win'], [x0 + 9.0, x0 + 11.0, 'door'], [x0 + 11.3, x0 + 15.3, 'counter'], [x0 + 15.6, x1 - .4, 'win']];
   for (const [a, b, k] of bays) {
-    const top = k === 'door' ? M.door.h : 3.1, bot = k === 'door' ? 0 : .6;
+    const top = k === 'door' ? M.door.h : k === 'counter' ? 2.45 : 3.1, bot = k === 'door' ? 0 : k === 'counter' ? .75 : .6;
     shape([F(a, bot), F(b, bot), F(b, top), F(a, top)], { fill: '#f6e2a8', lw: 4, shade: () => {
+      if (k === 'counter') { maxInWindow(a, b, z, T_); fillOnly([F(a, top - .25), F(b, top - .25), F(b, top), F(a, top)], 'rgba(255,255,255,.35)', { boil: 0 }); return; }
       if (k === 'win') { for (let r = 0; r < 3; r++) { const y = 1.0 + r * .7; fillOnly([F(a, y), F(b, y), F(b, y + .06), F(a, y + .06)], '#8a7a62', { boil: .2 });
           for (let i = 0; i < 7; i++) { const xx = a + .2 + i * (b - a - .4) / 7; fillOnly([F(xx, y + .06), F(xx + .3, y + .06), F(xx + .3, y + .45), F(xx, y + .45)], ['#d9433a', '#4f8fd6', '#7ab55c', '#e8742e'][(i + r) % 4], { boil: .2 }); } }
         fillOnly([F(a + .3, 2.3), F(a + 1.5, 2.3), F(a + 1.5, 3.0), F(a + .3, 3.0)], ['#ffffff', '#e9d38a'][Math.round(a) % 2], { boil: .3 }); }   // a poster in the glass
@@ -46,6 +46,32 @@ function storeFront(x0, x1, z, h) {
   for (const xx of [x1 + .3, x1 + 1.4]) { shape([F(xx, 0), F(xx + 1.0, 0), F(xx + 1.0, 1.85), F(xx, 1.85)], { fill: '#2f5fa8', lw: 4, shade: () => fillOnly([F(xx + .12, .9), F(xx + .88, .9), F(xx + .88, 1.7), F(xx + .12, 1.7)], '#cfe6f2', { boil: .2 }) }); }
   shape([pj(x0 + 1, z + 1.2, 0), pj(x0 + 3.2, z + 1.2, 0), pj(x0 + 3.2, z + 1.2, .9), pj(x0 + 1, z + 1.2, .9)], { fill: '#e8e2d0', lw: 4, shade: () => fillOnly([pj(x0 + 1, z + 1.2, .45), pj(x0 + 3.2, z + 1.2, .45), pj(x0 + 3.2, z + 1.2, .6), pj(x0 + 1, z + 1.2, .6)], '#4f8fd6', { boil: .2 }) });
   for (let i = 0; i < 6; i++) { const xx = x0 + 4 + i * 3; shape([pj(xx, z + 3, 0), pj(xx + .25, z + 3, 0), pj(xx + .25, z + 3, 1), pj(xx, z + 3, 1)], { fill: '#e9c23a', lw: 3 }); }
+}
+// the store's name on a sign wall that stands above the roofline (drawn after the roof, so the roof can never cover it)
+function storeSign(x0, x1, z, h) {
+  const F = (x, y) => pj(x, z + .02, y), a = x0 + 3, b = x1 - 3, y0 = h - .2, y1 = h + 2.0;
+  shape([F(a - .3, y0), F(b + .3, y0), F(b + .3, y1 + .25), F(a - .3, y1 + .25)], { fill: '#3a2a28', lw: 4 });
+  shape([F(a, y0 + .15), F(b, y0 + .15), F(b, y1), F(a, y1)], { fill: '#f4e7c4', lw: 4, shade: () => {
+    fillOnly([F(a + .4, y0 + .4), F(a + 1.6, y1 - .3), F(a + 1.4, y0 + 1.0), F(a + 2.6, y1 - .4), F(a + 1.7, y0 + .3), F(a + 1.9, y0 + .8)], '#d9533a', { boil: .3 }); } });
+  const [sx, sy] = F((a + b) / 2 + 1.2, (y0 + y1) / 2 + .05); text('QUICK STOP', sx, sy, { font: `800 ${view.P * 1.25}px Cap`, fill: '#c8433a', outlineW: Math.max(3, view.P * .1), outlineCol: '#3a1810' });
+  for (let i = 0; i < 9; i++) { const [lx, ly] = F(a + .5 + i * (b - a - 1) / 8, y1 + .12); dot(lx, ly, view.P * .07, '#ffe9a8'); }   // bulbs along the top
+}
+// Max behind the counter, seen through the glass: the counter (0.95 m), Max standing behind it (1.75 m), shelves behind him
+function maxInWindow(a, b, z, t) {
+  const F = (x, y) => pj(x, z - .02, y), cx = (a + b) / 2;
+  fillOnly([F(a, .6), F(b, .6), F(b, 3.1), F(a, 3.1)], '#e9dcb0', { boil: .2 });
+  fillOnly([F(a, 1.75), F(b, 1.75), F(b, 1.8), F(a, 1.8)], '#8a7a62', { boil: .2 });                       // the lit room behind the glass
+  for (let r = 0; r < 2; r++) for (let i = 0; i < 6; i++) { const xx = a + .2 + i * (b - a - .4) / 6; fillOnly([F(xx, 1.8 + r * .32), F(xx + .4, 1.8 + r * .32), F(xx + .4, 2.05 + r * .32), F(xx, 2.05 + r * .32)], ['#d9433a', '#4f8fd6', '#7ab55c', '#e8742e'][(i + r) % 4], { boil: .2 }); }
+  const P = view.P * 1.25, [hx, hy] = F(cx, 1.42), lean = .02 * Math.sin(t * 1.3);
+  // torso: grey tee, hi-vis vest with silver strips
+  shape([F(cx - .38, .95), F(cx - .34, 1.27), F(cx + .34, 1.27), F(cx + .38, .95)], { fill: '#f08a24', lw: 3, shade: () => { fillOnly([F(cx - .06, .95), F(cx + .06, .95), F(cx + .06, 1.25), F(cx - .06, 1.25)], '#7d8086', { boil: .2 }); fillOnly([F(cx - .3, 1.05), F(cx + .3, 1.05), F(cx + .3, 1.1), F(cx - .3, 1.1)], '#dfe4e6', { boil: .2 }); } });
+  // the big round head with the orange cap, tired eyes
+  shape(ell(hx, hy, P * .27, P * .26, 30), { fill: '#e9b98f', lw: 3 });
+  shape([[hx - P * .27, hy - P * .02], [hx - P * .22, hy - P * .2], [hx, hy - P * .28], [hx + P * .22, hy - P * .2], [hx + P * .27, hy - P * .02]], { fill: '#e8742e', lw: 3 });
+  shape([[hx - P * .2, hy - P * .04], [hx + P * .38, hy - P * .06], [hx + P * .36, hy + P * .0], [hx - P * .2, hy + P * .0]], { fill: '#c45a1c', lw: 3 });
+  for (const s of [-1, 1]) { shape(ell(hx + s * P * .09, hy + P * .06, P * .07, P * .075, 14), { fill: '#fff', lw: 2.5 }); dot(hx + s * P * .09 + P * .01, hy + P * .09, P * .018); stroke([[hx + s * P * .15, hy + P * .02], [hx + s * P * .03, hy + P * .0]], 3); }
+  stroke([[hx - P * .06, hy + P * .18], [hx + P * .06, hy + P * .18]], 2.5);
+  fillOnly([F(a - .1, .6), F(b + .1, .6), F(b + .1, .97), F(a - .1, .97)], '#b8a586', { boil: .2 }); stroke([F(a - .1, .97), F(b + .1, .97)], 3);   // the counter top in front of him
 }
 // roof clutter: AC units on flat roofs
 const acUnit = (x, z, h) => { shape([pj(x, z, h + .9), pj(x + 1.4, z, h + .9), pj(x + 1.4, z + 1.2, h + .9), pj(x, z + 1.2, h + .9)], { fill: '#9aa3ad', lw: 3 }); shape([pj(x, z + 1.2, h), pj(x + 1.4, z + 1.2, h), pj(x + 1.4, z + 1.2, h + .9), pj(x, z + 1.2, h + .9)], { fill: '#7a838d', lw: 3 }); const [a, b] = pj(x + .7, z + .6, h + .9); dot(a, b, view.P * .35, '#4a525c'); };
@@ -79,7 +105,8 @@ BLD.sort((a, b) => a[3] - b[3]);   // far rows first, so nearer fronts overlap t
 const TREES = Array.from({ length: 60 }, (_, i) => [XS[0] + hash(i * 3.1) * (XS[3] - XS[0]), ZS[0] + hash(i * 7.3) * (ZS[5] - ZS[0])]).filter(([x, z]) => !ZS.some(zz => Math.abs(z - zz) < PW + 1) && !XS.some(xx => Math.abs(x - xx) < PW + 1) && !BLD.some(b => x > b[0] - 2 && x < b[2] + 2 && z > b[1] - 2 && z < b[3] + 2) && !(x > -14 && x < 22 && z > 2 && z < 32));
 const LANES = [...ZS.flatMap(z => [{ z: z - 2, dir: 'x', v: 11 }, { z: z + 2, dir: '-x', v: 9 }]), ...XS.flatMap(x => [{ x: x + 2, dir: 'z', v: 10 }, { x: x - 2, dir: '-z', v: 8 }])];
 const CARS2 = Array.from({ length: 110 }, (_, i) => ({ lane: LANES[i % LANES.length], off: hash(i * 5.3) * 240, col: ['#c8433a', '#e8e2d0', '#4f7fc4', '#2d2a33', '#d9a83a', '#6f8a7a'][i % 6] }));
-export function drawWide(t, cam = null, { tilt = true } = {}) {
+let T_ = 0;
+export function drawWide(t, cam = null, { tilt = true } = {}) { T_ = t;
   frame(t); const ts = Math.floor(t * 8) / 8;   // the time-lapse step
   view.pitch = .78; view.P = 12.5 - t * .25; view.cx = 2 + t * .7; view.cz = 14 - t * .4; if (cam) Object.assign(view, cam);
   g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = C.sky; g.fillRect(0, 0, 1080, 1920);
@@ -102,7 +129,7 @@ export function drawWide(t, cam = null, { tilt = true } = {}) {
   let si = 0;
   const near = view.near ?? 1e9;   // the camera's own position: buildings behind it are not in the picture
   for (const b of BLD) { if (b[1] > near) continue; while (si < streets.length && streets[si] + PW < b[1]) drawCarsOn(streets[si++]);
-    if (b[6] === 'store') { building(b[0], b[1], b[2], b[3], b[4], C.store, C.storeS, C.roof, { lit: 1, seed: 4 }); storeFront(b[0], b[2], b[3], b[4]); for (const [x, z] of [[-5, 16], [0, 18], [6, 16], [10, 20]]) acUnit(x, z, 4.5); }
+    if (b[6] === 'store') { building(b[0], b[1], b[2], b[3], b[4], C.store, C.storeS, C.roof, { lit: 1, seed: 4 }); storeFront(b[0], b[2], b[3], b[4]); storeSign(b[0], b[2], b[3], b[4]); for (const [x, z] of [[-5, 16], [0, 18], [6, 16], [10, 20]]) acUnit(x, z, 4.5); }
     else { building(b[0], b[1], b[2], b[3], b[4], b[5], '#5a4f46', b[7], { lit: .45, seed: Math.round(b[0] * 7 + b[1]) }); if (b[8]) { const zm = (b[1] + b[3]) / 2; stroke([pj(b[0] + .5, zm, b[4]), pj(b[2] - .5, zm, b[4])], 4); for (let x = b[0] + 2; x < b[2] - 1; x += 2.2) stroke([pj(x, b[1] + .5, b[4]), pj(x, zm - .4, b[4])], 2, { line: 'rgba(0,0,0,.25)' }); } else acUnit(b[0] + 1.5, b[1] + 2, b[4]); } }
   while (si < streets.length) drawCarsOn(streets[si++]);
   // parked cars in the store's bays (real size), and the cross-street traffic on top
