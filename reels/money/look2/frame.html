@@ -15,25 +15,49 @@ import { eye, mouth, hand, sweat } from './faces.js';
 import { hash } from './lib.js';
 await document.fonts.load("800 54px Cap");
 const g = init(document.getElementById('c'));
-const C = { wall: '#6f8489', wallS: '#5a6e74', ceil: '#a9b8b8', light: '#f4fbf6', counter: '#c9b896', counterS: '#a8977a', counterF: '#7d6e56', night: '#23304f', night2: '#2f3f63',
+const C = { wall: '#7a8c8e', wallS: '#55666c', ceil: '#b4c2c1', light: '#f4fbf6', counter: '#c9b896', counterS: '#a8977a', counterF: '#7d6e56', night: '#23304f', night2: '#2f3f63',
   skin: '#e9b98f', skinS: '#cf9a6f', cap: '#e8742e', capS: '#c45a1c', vest: '#f08a24', vestS: '#cf6c10', strip: '#dfe4e6', tee: '#7d8086', teeS: '#63666c', shelf: '#6b5a4a' };
 window.renderAt = t => {
   frame(t);
-  g.fillStyle = C.wall; g.fillRect(0, 0, 1080, 1920);
-  for (let i = 0; i < 40; i++) fillOnly(ell(hash(i) * 1080, 620 + hash(i * 3.3) * 700, 20 + hash(i * 7) * 60, 10 + hash(i * 9) * 30, 14), 'rgba(40,50,45,.10)', { boil: .2 });
-  // ceiling with fluorescent tubes (one flickers)
-  fillOnly(rect(-20, 0, 1120, 300), C.ceil, { boil: 0 });
-  for (let i = 0; i < 6; i++) stroke([[-20, 60 + i * 44], [1100, 60 + i * 44]], 3, { line: '#aab6b5' });
-  for (const [x, y, on] of [[120, 120, 1], [620, 160, (Math.floor(t * 9) % 7 === 0) ? .4 : 1]]) { shape(rr(x, y, 340, 44, 10), { fill: on > .5 ? C.light : '#cfd8d4', lw: 6 }); if (on > .5) shape(rr(x - 30, y + 44, 400, 30, 14), { fill: 'rgba(240,255,245,.18)', stroke: false }); }
-  // night window strip with a gas pump and a street light outside
-  shape(rect(-20, 300, 1120, 300), { fill: C.night, lw: 7, shade: () => { fillOnly(rect(-20, 520, 1120, 80), C.night2, { boil: 0 }); fillOnly(ell(860, 360, 60, 60), 'rgba(255,230,150,.12)', { boil: 0 }); } });
-  shape(rect(820, 360, 14, 200), { fill: '#3a4566', lw: 5 }); shape(ell(830, 352, 26, 14), { fill: '#ffe9a8', lw: 5 });
-  shape(rr(120, 400, 110, 170, 10), { fill: '#c8433a', lw: 6, shade: () => fillOnly(rr(140, 420, 70, 50, 6), '#ffe9a8', { boil: .3 }) }); stroke(spline([[230, 450], [270, 470], [262, 540]], false), 6);
-  for (const x of [380, 700]) stroke([[x, 300], [x, 600]], 9);
-  // the back wall: shelves of snacks, a cigarette-style rack (cards, generic), a coffee machine
-  for (let r = 0; r < 3; r++) { const y = 690 + r * 150; fillOnly(rect(-20, y + 110, 640, 18), C.shelf, { boil: .3 }); stroke([[-20, y + 110], [620, y + 110]], 6);
-    for (let i = 0; i < 9; i++) { const x = 10 + i * 68, h = 70 + hash(i + r * 9) * 30, col = ['#d9433a', '#f2c14e', '#4f8fd6', '#7ab55c', '#e8742e', '#b45fc4'][(i + r * 2) % 6]; shape(rr(x, y + 110 - h, 56, h, 6), { fill: col, lw: 5, shade: () => fillOnly(rect(x + 36, y + 110 - h, 30, h), 'rgba(0,0,0,.18)', { boil: .3 }) }); fillOnly(rr(x + 10, y + 120 - h, 36, 18, 4), 'rgba(255,255,255,.7)', { boil: .3 }); } }
-  shape(rr(690, 650, 330, 420, 16), { fill: '#3f4a5a', lw: 7, shade: () => { for (let r = 0; r < 4; r++) for (let i = 0; i < 4; i++) fillOnly(rr(712 + i * 76, 676 + r * 96, 60, 80, 4), ['#e9e2c8', '#c8433a', '#e9e2c8', '#2f6f73'][(i + r) % 4], { boil: .3 }); } });
+  // ---- the room in perspective: one vanishing point behind Max's head; the far wall, the ceiling, two side walls, the floor ----
+  const VX = 540, VY = 760, F = [120, 500, 960, 1150];   // far wall: x0, y0, x1, y1
+  const toV = (x, y, k) => [x + (VX - x) * k, y + (VY - y) * k];
+  g.fillStyle = '#16203a'; g.fillRect(0, 0, 1080, 1920);
+  // ceiling: a trapezoid with a tile grid running back, and two rows of tubes that get smaller with distance
+  shape([[-20, -20], [1100, -20], [F[2], F[1]], [F[0], F[1]]], { fill: C.ceil, lw: 6, shade: () => {
+    for (let i = 0; i <= 10; i++) { const x = -20 + i * 112; stroke([[x, -20], toV(x, -20, (F[1] + 20) / (VY + 20))], 3, { line: '#8e9d9e' }); }
+    for (const k of [.25, .48, .66, .8, .9]) { const a = toV(-20, -20, k), b = toV(1100, -20, k); stroke([a, b], 3, { line: '#8e9d9e' }); }
+    fillOnly([[-20, -20], [1100, -20], [1100, 120], [-20, 120]], 'rgba(10,15,30,.25)', { boil: 0 }); } });
+  const flick = (Math.floor(t * 9) % 11 === 0) ? .35 : 1;
+  for (const [k, w, on] of [[.12, 300, 1], [.42, 170, flick], [.66, 100, 1]]) for (const sx of [-1, 1]) {
+    const [cx, cy] = toV(VX + sx * 300, -20, k), h = 40 * (1 - k * .8);
+    shape(rr(cx - w / 2, cy, w, h, 8), { fill: on > .5 ? C.light : '#9fb0ad', lw: 6 * (1 - k * .5) });
+    if (on > .5) fillOnly(ell(cx, cy + h * 2.2, w * .9, h * 1.6, 24), 'rgba(235,255,245,.10)', { boil: 0 }); }
+  // the cracked tube: a little lightning flicker in the ceiling, as in the reference's mood
+  if (flick < .5) stroke([toV(VX + 300, -20, .42), [toV(VX + 300, -20, .42)[0] + 30, toV(VX + 300, -20, .42)[1] + 40], [toV(VX + 300, -20, .42)[0] + 10, toV(VX + 300, -20, .42)[1] + 60]], 4, { line: '#e8fbff' });
+  // left wall: night windows with a pump and a street light outside
+  shape([[-20, -20], [F[0], F[1]], [F[0], F[3]], [-20, 1500]], { fill: C.wallS, lw: 6, shade: () => {
+    shape([toV(-20, 260, .05), toV(-20, 260, .62), toV(-20, 1180, .62), toV(-20, 1180, .05)], { fill: C.night, lw: 6, shade: () => {
+      fillOnly(ell(110, 560, 70, 70), 'rgba(255,230,150,.14)', { boil: 0 }); shape(rect(100, 560, 12, 260), { fill: '#3a4566', lw: 5 }); shape(ell(106, 556, 24, 12), { fill: '#ffe9a8', lw: 5 });
+      shape(rr(40, 760, 80, 130, 8), { fill: '#c8433a', lw: 5, shade: () => fillOnly(rr(54, 776, 52, 36, 5), '#ffe9a8', { boil: .3 }) }); } });
+    for (const k of [.05, .33, .62]) stroke([toV(-20, 260, k), toV(-20, 1180, k)], 9); } });
+  // right wall: the drinks fridge, glass doors glowing
+  shape([[1100, -20], [F[2], F[1]], [F[2], F[3]], [1100, 1500]], { fill: C.wallS, lw: 6, shade: () => {
+    shape([toV(1100, 300, .08), toV(1100, 300, .62), toV(1100, 1300, .62), toV(1100, 1300, .08)], { fill: '#9fd0d8', lw: 6, shade: () => {
+      for (let r = 0; r < 5; r++) for (let i = 0; i < 6; i++) { const k = .1 + i * .085, [x, y] = toV(1100, 360 + r * 190, k); fillOnly(rr(x - 20 * (1 - k), y, 26 * (1 - k * .7), 70 * (1 - k * .6), 5), ['#d9433a', '#f2c14e', '#4f8fd6', '#7ab55c'][(i + r) % 4], { boil: .3 }); }
+      fillOnly([toV(1100, 300, .08), toV(1100, 300, .2), toV(1100, 1300, .2), toV(1100, 1300, .08)], 'rgba(255,255,255,.18)', { boil: 0 }); } });
+    for (const k of [.08, .35, .62]) stroke([toV(1100, 300, k), toV(1100, 1300, k)], 8); } });
+  // floor seen past the counter ends
+  shape([[-20, 1500], [F[0], F[3]], [F[2], F[3]], [1100, 1500]], { fill: '#8c9a92', lw: 6, shade: () => { for (let i = 0; i <= 8; i++) { const x = -20 + i * 140; stroke([[x, 1500], toV(x, 1500, (1500 - F[3]) / (1500 - VY))], 3, { line: '#6f7c75' }); } } });
+  // far wall: shelves of snacks and a card rack, small with distance
+  shape(rect(F[0], F[1], F[2] - F[0], F[3] - F[1]), { fill: C.wall, lw: 6, shade: () => {
+    for (let i = 0; i < 24; i++) fillOnly(ell(F[0] + hash(i) * 660, F[1] + hash(i * 3.3) * 680, 14 + hash(i * 7) * 40, 8 + hash(i * 9) * 20, 12), 'rgba(40,50,45,.12)', { boil: .2 });
+    for (let r = 0; r < 4; r++) { const y = F[1] + 150 + r * 120; fillOnly(rect(F[0], y + 70, 420, 12), C.shelf, { boil: .3 }); stroke([[F[0], y + 70], [F[0] + 420, y + 70]], 5);
+      for (let i = 0; i < 9; i++) { const x = F[0] + 8 + i * 46, h = 46 + hash(i + r * 9) * 20; shape(rr(x, y + 70 - h, 38, h, 4), { fill: ['#d9433a', '#f2c14e', '#4f8fd6', '#7ab55c', '#e8742e', '#b45fc4'][(i + r * 2) % 6], lw: 4 }); } }
+    shape(rr(F[0] + 450, F[1] + 160, 200, 280, 10), { fill: '#3f4a5a', lw: 6, shade: () => { for (let r = 0; r < 4; r++) for (let i = 0; i < 3; i++) fillOnly(rr(F[0] + 466 + i * 62, F[1] + 178 + r * 64, 48, 54, 4), ['#e9e2c8', '#c8433a', '#2f6f73'][(i + r) % 3], { boil: .3 }); } });
+    fillOnly(rect(F[0], F[1], F[2] - F[0], 60), 'rgba(10,15,30,.18)', { boil: 0 }); } });
+  // the back counter running along under the far wall
+  shape(rect(F[0] - 40, F[3] - 140, F[2] - F[0] + 80, 140), { fill: '#6b5f4c', lw: 6, shade: () => fillOnly(rect(F[0] - 40, F[3] - 140, F[2] - F[0] + 80, 26), '#8c7d64', { boil: .3 }) });
   // Max behind the counter: hi-vis vest over a grey tee, arms on the counter, head hung
   const ox = 540, oy = 1290;
   push(); translate(ox, oy);
@@ -79,7 +103,7 @@ window.renderAt = t => {
     hand(s * 70, 62, s > 0 ? Math.PI : 0, 30, C.skin); }
   pop();
   // the night: the room is lit only by the tubes, so the corners fall into a flat cool shade
-  fillOnly([[-20, -20], [1100, -20], [1100, 1940], [-20, 1940], [-20, -20], [90, 640], [90, 1300], [990, 1300], [990, 640], [90, 640]], 'rgba(20,30,55,.22)', { boil: 0 });
+  g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'multiply'; g.fillStyle = '#c3cbe0'; g.fillRect(0, 0, 1080, 1920); g.globalCompositeOperation = 'source-over';   // the cold night cast over everything
 };
 window.done = true; window.renderAt(0);
 </script></body></html>
