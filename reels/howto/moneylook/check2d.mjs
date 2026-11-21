@@ -9,7 +9,8 @@ const [page, step = .25] = process.argv.slice(2);
 const b = await chromium.launch(), pg = await b.newPage({ viewport: { width: 720, height: 1280 } }); pg.on('pageerror', e => console.log('[pageerror]', e.message));
 await pg.goto(`http://localhost:${server.address().port}${page}`); await pg.waitForFunction(() => window.done && window.audit, null, { timeout: 60000 });
 const dur = await pg.evaluate(() => window.DURATION), seen = new Map();
-for (let t = 0; t < dur; t += +step) for (const [lvl, msg] of await pg.evaluate(t => window.audit(t), t)) { const k = msg.replace(/\d+(%| px)/g, '#'); if (!seen.has(k)) seen.set(k, [lvl, msg, []]); seen.get(k)[2].push(t.toFixed(2)); }
+const [T0, T1] = (process.env.SPAN || `0:${dur}`).split(':').map(Number);   // SPAN=a:b audits only those seconds (to split the gate across processes)
+for (let t = T0; t < Math.min(T1, dur); t += +step) for (const [lvl, msg] of await pg.evaluate(t => window.audit(t), t)) { const k = msg.replace(/\d+(%| px)/g, '#'); if (!seen.has(k)) seen.set(k, [lvl, msg, []]); seen.get(k)[2].push(t.toFixed(2)); }
 await b.close(); server.close();
 const rows = [...seen.values()].sort((a, b) => (a[0] === 'error' ? 0 : 1) - (b[0] === 'error' ? 0 : 1));
 for (const [lvl, msg, ts] of rows) console.log(`${lvl.toUpperCase().padEnd(5)} t=${ts.length > 4 ? ts.slice(0, 2).join(',') + '…' + ts.at(-1) : ts.join(',')}  ${msg}`);
