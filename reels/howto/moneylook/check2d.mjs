@@ -10,7 +10,11 @@ const b = await chromium.launch(), pg = await b.newPage({ viewport: { width: 720
 await pg.goto(`http://localhost:${server.address().port}${page}`); await pg.waitForFunction(() => window.done && window.audit, null, { timeout: 60000 });
 const dur = await pg.evaluate(() => window.DURATION), seen = new Map();
 const [T0, T1] = (process.env.SPAN || `0:${dur}`).split(':').map(Number);   // SPAN=a:b audits only those seconds (to split the gate across processes)
-for (let t = T0; t < Math.min(T1, dur); t += +step) for (const [lvl, msg] of await pg.evaluate(t => window.audit(t), t)) { const k = msg.replace(/\d+(%| px)/g, '#'); if (!seen.has(k)) seen.set(k, [lvl, msg, []]); seen.get(k)[2].push(t.toFixed(2)); }
+// speed is checked too: a frame should draw in well under a second (the pilot's drew in 18-37 s until toon.js stopped resampling
+// still outlines and off-screen edges, which turned a 3 1/2 hour render into 3 minutes). A slow frame is an error, caught here, not mid-render.
+const SLOW = 1000, timed = t => pg.evaluate(([t, SLOW]) => { const a = performance.now(), r = window.audit(t), ms = performance.now() - a;
+  return ms > SLOW ? [...r, ['error', `frame takes ${(ms / 1000).toFixed(1)} s to draw (limit ${SLOW / 1000} s): profile it; usually a huge shape resampled point by point`]] : r; }, [t, SLOW]);
+for (let t = T0; t < Math.min(T1, dur); t += +step) for (const [lvl, msg] of await timed(t)) { const k = msg.replace(/\d+(%| px)/g, '#'); if (!seen.has(k)) seen.set(k, [lvl, msg, []]); seen.get(k)[2].push(t.toFixed(2)); }
 await b.close(); server.close();
 const rows = [...seen.values()].sort((a, b) => (a[0] === 'error' ? 0 : 1) - (b[0] === 'error' ? 0 : 1));
 for (const [lvl, msg, ts] of rows) console.log(`${lvl.toUpperCase().padEnd(5)} t=${ts.length > 4 ? ts.slice(0, 2).join(',') + '…' + ts.at(-1) : ts.join(',')}  ${msg}`);

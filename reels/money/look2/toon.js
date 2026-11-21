@@ -79,29 +79,32 @@ export function noodle(a, b, bend, w0, w1 = w0) {
 // —— transform + resample + boil ——
 function toScreen(pts, closed) {
   const s = pts.map(p => tx(p[0], p[1]));
-  // resample by arc length (screen space)
-  const out = [], step = 7; let acc = 0;
+  // resample by arc length (screen space), every 7 px — but only along edges near the frame: an edge wholly off screen keeps its two
+  // ends (a building beside a close camera can run 100,000 px round, nearly all of it outside the picture). Each point carries its
+  // distance along the outline, which sets the boil, so what is on screen boils exactly as if the whole outline had been resampled.
+  const out = [s[0]], arc = [0], step = 7, M = 60; let acc = 0, len = 0;
   const n = closed ? s.length : s.length - 1;
-  out.push(s[0]);
   for (let i = 0; i < n; i++) {
     const a = s[i], b = s[(i + 1) % s.length], d = Math.hypot(b[0] - a[0], b[1] - a[1]);
     let pos = step - acc;
-    while (pos < d) { const u = pos / d; out.push([a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u]); pos += step; }
-    acc = d - (pos - step);
+    const off = (a[0] < -M && b[0] < -M) || (a[0] > W + M && b[0] > W + M) || (a[1] < -M && b[1] < -M) || (a[1] > H + M && b[1] > H + M);
+    if (off) { while (pos < d) pos += step; if (i < n - 1) { out.push(b); arc.push(len + d); } }
+    else while (pos < d) { const u = pos / d; out.push([a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u]); arc.push(len + pos); pos += step; }
+    acc = d - (pos - step); len += d;
   }
-  if (!closed) out.push(s[s.length - 1]);
-  return out;
+  if (!closed) { out.push(s[s.length - 1]); arc.push(len); }
+  out.arc = arc; out.len = len; return out;
 }
 function boilPts(s, closed, amp, seed) {
   if (amp <= 0 || s.length < 3) return s;
-  const n = s.length, L = n * 7, out = new Array(n);
+  const n = s.length, arc = s.arc, L = Math.ceil(s.len / 7) * 7, out = new Array(n);
   for (let i = 0; i < n; i++) {
     const a = s[(i - 1 + n) % n], b = s[(i + 1) % n];
     const p = s[i], ia = closed ? a : s[Math.max(0, i - 1)], ib = closed ? b : s[Math.min(n - 1, i + 1)];
     let nx = -(ib[1] - ia[1]), ny = ib[0] - ia[0]; const l = Math.hypot(nx, ny) || 1; nx /= l; ny /= l;
-    const x = i * 7 / 38;
+    const x = arc[i] / 38;
     let v = vnoise(x + seed) * 2 - 1;
-    if (closed) { const w = i / n; v = lerp(v, vnoise(x - L / 38 + seed) * 2 - 1, w); }
+    if (closed) { const w = arc[i] / L; v = lerp(v, vnoise(x - L / 38 + seed) * 2 - 1, w); }
     const v2 = vnoise(x * 2.3 + seed * 1.7 + 50) * 2 - 1;
     const d = (v * .8 + v2 * .35) * amp;
     out[i] = [p[0] + nx * d, p[1] + ny * d];
@@ -120,8 +123,10 @@ const bbox = s => { let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; for (const [x,
 export function shape(pts, o = {}) {
   const closed = o.closed !== false, id = S.sid++;
   const seed = hash(id * 1.37 + 3) * 90 + S.boil * 23.7;
-  let s = toScreen(pts, closed);
-  s = boilPts(s, closed, (o.boil ?? 1) * S.amp, seed);
+  const amp = (o.boil ?? 1) * S.amp;
+  // no boil: the shape is drawn from its own points. Resampling a still outline every 7 px adds nothing (the points lie on the same edges)
+  // and on a 600 m ground quad in a close shot it made ~20,000 points a shape: most of a frame's time went there and to the garbage collector
+  let s = amp > 0 ? boilPts(toScreen(pts, closed), closed, amp, seed) : pts.map(p => tx(p[0], p[1]));
   const P = pathOf(s, closed);
   g.setTransform(1, 0, 0, 1, 0, 0);
   if (o.alpha != null) g.globalAlpha = o.alpha;
