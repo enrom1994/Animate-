@@ -16,9 +16,9 @@ window.renderAt = t => {
     drawCounter(t, { look: [mix(.15, 0, up), mix(.6, -.05, up)], lid: mix(.55, .32, up) + .1 * sigh, tilt: mix(-.05, .03, up), sigh, blink: t > 1.32 && t < 1.42 });
     return; }
   // outside: front-on to the store, Max small behind the counter in the right-hand window; then the pull out and tilt up
-  const u = io(pr(t, ZOOM[0], ZOOM[1])), P0 = 125 * (1 + .05 * pr(t, CUT, ZOOM[0])), P = P0 * Math.pow(12.5 / P0, u);
+  const u = io(pr(t, ZOOM[0], ZOOM[1])), P0 = 98 * (1 + .05 * pr(t, CUT, ZOOM[0])), P = P0 * Math.pow(12.5 / P0, u);
   const pitch = mix(1.22, .78, io(pr(t, ZOOM[0], ZOOM[0] + 1.5))), hc = mix(1.9, 0, u);
-  drawWide(t, { pitch, P, cx: mix(WIN_X - 2.6, 2, u), cz: mix(FRONT_Z - hc * Math.tan(pitch), 14, u), near: 44 + 160 * u * u }, { tilt: u > .3 });
+  drawWide(t, { pitch, P, cx: mix(WIN_X - 1.0, 2, u), cz: mix(FRONT_Z - hc * Math.tan(pitch), 14, u), near: 44 + 160 * u * u }, { tilt: u > .3 });
 };
 window.DURATION = 6; window.done = true; window.renderAt(0);
 </script></body></html>
