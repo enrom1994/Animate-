@@ -88,8 +88,8 @@ const renderShot = t => {   // t in the first take's seconds (see TW below)
     theoShot(t, st, { act: { smile: .6 } })();
     card(540, 300, 'TEN YEARS ON · 7% A YEAR', money(t < 28.6 ? 17660 : mix(17660, 23621, ss(pr(t, 28.6, 31.4)))), { col: '#2f6f73', w: 640, bigPx: 120 }); }
   else {   // same paycheck: the two men, side by side; then the last line alone over them
-    split(t, () => { maxShot(t, FRAME_MAX, { old: true, act: { lid: .5 } })(); const [a, b] = pin(MCAR[0], MCAR[1], 2.6); card(clamp(a, 300, 780), Math.max(b - 60, 640), 'MAX', 'AN OLD CAR', { col: '#b8302a', w: 460, bigPx: 80, s: pop_(t, 33.3) }); },
-      () => { theoShot(t, FRAME_THEO, { act: { smile: .6 } })(); const [a, b] = pin(TCAR[0], TCAR[1], 2.6); card(clamp(a, 300, 780), Math.max(b - 60, 640), 'THEO', '$23,621', { col: '#2f6f73', w: 460, bigPx: 80, s: pop_(t, 33.6) }); });
+    split(t, () => { maxShot(t, FRAME_MAX, { old: true, act: { lid: .5 } })(); const [a, b] = pin(MCAR[0], MCAR[1], 2.6); card(clamp(a, 300, 780), Math.max(b - 60, 640), 'MAX · INVESTMENTS', '$0', { col: '#b8302a', w: 460, bigPx: 80, s: pop_(t, 33.3) }); },
+      () => { theoShot(t, FRAME_THEO, { act: { smile: .6 } })(); const [a, b] = pin(TCAR[0], TCAR[1], 2.6); card(clamp(a, 300, 780), Math.max(b - 60, 640), 'THEO · INVESTMENTS', '$23,621', { col: '#2f6f73', w: 460, bigPx: 80, s: pop_(t, 33.6) }); });
     const k = ss(pr(t, 35.3, 35.6));
     if (k > 0) { blurPan(10 * k); g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = .6 * k; g.fillStyle = '#141b30'; g.fillRect(0, 0, 1080, 1920); g.globalAlpha = 1;
       if (k >= 1) AUDIT.log = AUDIT.log.filter(e => e.k !== 'subject' && e.k !== 'text');   // under the dark veil the scene is background, not checked

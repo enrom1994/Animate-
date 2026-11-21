@@ -3,7 +3,7 @@
 - **File:** `ep01-look2.mp4` (39.0 s, 1080 x 1920)
 - **Title:** New Car vs Used Car: The $24,000 Difference  (yt-package 94/100; 43 characters, a phone shows "New Car vs Used Car: The $24,000...")
 - **Hook it pairs with:** "Before you sign a 787 dollar car payment, see why your neighbor ends up 24,000 dollars ahead." (hook gate 70)
-- **Cover frame:** 36.2 s, the split screen: Max over "AN OLD CAR", Theo over "$23,621" (pick it in the app's frame picker)
+- **Cover frame:** 36.2 s, the split screen: Max over "MAX · INVESTMENTS $0", Theo over "THEO · INVESTMENTS $23,621" (pick it in the app's frame picker)
 - **Runner-up title:** The $787 Car Payment That Costs $24,000 (100/100, but "costs" overstates it: the $24,000 is what the $205 a
   month difference grows to at an illustrative 7%, not money the car payment charges)
 
