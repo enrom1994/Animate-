@@ -117,7 +117,9 @@ function pathOf(s, closed) {
   if (closed) P.closePath(); return P;
 }
 // ---- the audit log: when AUDIT.on, every opaque shape and every text label records its box on screen, in draw order ----
-export const AUDIT = { on: false, log: [], subject(name, bb, minH = 70) { if (this.on) this.log.push({ k: 'subject', name, bb, minH }); } };
+// AUDIT.parts(list of point lists in local coordinates): log each part's screen box, for a shape drawn with audit: false
+export const AUDIT = { on: false, log: [], subject(name, bb, minH = 70) { if (this.on) this.log.push({ k: 'subject', name, bb, minH }); },
+  parts(list) { if (this.on) for (const pts of list) this.log.push({ k: 'shape', bb: bbox(pts.map(p => tx(p[0], p[1]))) }); } };
 const bbox = s => { let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; for (const [x, y] of s) { if (x < x0) x0 = x; if (y < y0) y0 = y; if (x > x1) x1 = x; if (y > y1) y1 = y; } return [x0, y0, x1, y1]; };
 // Main draw: returns a Path2D (reusable for clip / stroke)
 export function shape(pts, o = {}) {
@@ -131,7 +133,7 @@ export function shape(pts, o = {}) {
   g.setTransform(1, 0, 0, 1, 0, 0);
   if (o.alpha != null) g.globalAlpha = o.alpha;
   if (o.fill && closed) { g.fillStyle = o.fill; g.fill(P); }
-  if (AUDIT.on && o.fill && closed && o.alpha == null && !/rgba|transparent/.test(o.fill)) AUDIT.log.push({ k: 'shape', bb: bbox(s) });
+  if (AUDIT.on && o.fill && closed && o.alpha == null && o.audit !== false && !/rgba|transparent/.test(o.fill)) AUDIT.log.push({ k: 'shape', bb: bbox(s) });   // audit: false = the shape logs its own parts (a concave outline's box would cover what it wraps)
   if (o.shade) { g.save(); g.clip(P); o.shade(); g.restore(); }
   if (o.stroke !== false && o.line !== null) outline(P, o.lw ?? S.lw, o.line ?? INK);
   if (o.alpha != null) g.globalAlpha = 1;
