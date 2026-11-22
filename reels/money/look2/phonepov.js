@@ -66,6 +66,23 @@ function fund(o) {
   text('LONG RUN, AFTER', 34, 94, { font: F(4.2), fill: '#6b5a4a' }); text('INFLATION', 34, 99.5, { font: F(4.2), fill: '#6b5a4a' }); text('~7% A YEAR', 34, 109, { font: F(7.6), fill: teal });
   text('NOT A PROMISE', 34, 121, { font: F(3.8), fill: '#6b5a4a' }); text('NOT ADVICE', 34, 127, { font: F(3.8), fill: '#6b5a4a' }); }   // set right of centre: his left thumb lies along the left edge
 export const SCREENS = { checkout, payments, lock, fund };
+// ---- a two-handed grip on a sheet of paper (the letter in ep. 1) ----
+// side: -1 left hand, +1 right hand; at: the screen point on the page's side edge where the thumb's base sits; mm: pixels per mm
+// there. Call with layer 'back' before drawing the page (the hand beside and behind the paper) and 'front' after it (the thumb).
+export function gripHand(side, at, mm, layer, { hands = null } = {}) {   // no watch by default: on a letter-wide grip the wrists sit at the frame's edge, where a watch is only a gold scrap
+  SK = { skin: MAXC.skin, skinS: MAXC.skinS, watch: false, ...(hands || {}) }; const lw = 6.5 * Math.min(1.5, mm / 4.6), s = side;
+  push(); translate(at[0], at[1]); scale(mm); if (s > 0) scale(-1, 1);   // drawn as a left hand; the right is its mirror
+  if (layer === 'back') {
+    skinShape(spline([[-38, 300], [-34, 160], [-24, 80], [-10, 34], [6, -14], [14, -40], [8, -58], [-10, -54], [-30, -20], [-52, 30], [-70, 100], [-96, 300]]), { lw, d: 4 });   // wrist and the side of the hand, beside the edge
+    for (const [y, r] of [[-50, 1], [-30, .95], [-11, .9]]) skinShape(spline([[-2, y - 8 * r], [9 * r, y - 7 * r], [12 * r, y], [9 * r, y + 7 * r], [-2, y + 8 * r]]), { lw, d: 1.4 });   // fingertips curling round from behind
+    if (SK.watch && s < 0) { push(); translate(-49, 128); rotate(-.08); shape(rr(-34, -8, 68, 16, 4), { fill: '#d9a83a', lw }); shape(rr(-12, -14, 24, 28, 5), { fill: '#d9a83a', lw }); shape(rr(-8, -10, 16, 20, 4), { fill: '#f3ead2', lw: lw * .5 }); pop(); }   // the gold watch
+  } else {
+    skinShape(spline([[-16, 70], [-12, 40], [2, 14], [16, -2], [27, -2], [31, 8], [24, 22], [10, 44], [2, 74]], true), { lw, d: 2.4 });   // the thumb on the front of the page: short, broad, tilted in
+    shape(spline([[19, 1], [26, 0], [29, 6], [25, 13], [18, 11]]), { fill: '#f3c7a6', lw: lw * .5 });                                     // its nail
+    stroke([[-8, 50], [4, 52]], lw * .45, { line: 'rgba(29,26,38,.55)' });                                                                   // the knuckle crease
+  }
+  pop();
+}
 // ---- the phone in his hands ----
 // at: screen point of the phone's centre; k: pixels per metre there (cam.P); rot: a little handheld roll; screen(t) draws the glass;
 // tap: { u, v, k } the right thumb reaching to a point on the glass (k 0 = at rest on the corner, 1 = on the point)

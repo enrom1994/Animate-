@@ -5,6 +5,7 @@ import { counter, shelf, fridge, bill } from './props/props.js';
 import { drawMax, UNIT, ORIGIN_H, MAXC } from './max.js';
 import { hand } from './faces.js';
 import { push, pop, translate, scale, shape, fillOnly, text, ell, noodle } from './toon.js';
+import { gripHand } from './phonepov.js';
 export const STORE = { x0: -8, x1: 14, z0: 14, z1: 27, h: 4.5, counterX: 5.3, counterZ: 22.6, maxZ: 21.9 };
 const S = STORE, GLASS = 'rgba(200,232,240,.16)';
 const place = (faces, dx, dz, rot = 0) => faces.map(q => ({ ...q, pts: q.pts.map(([x, y, z]) => [dx + x * Math.cos(rot) + z * Math.sin(rot), y, dz - x * Math.sin(rot) + z * Math.cos(rot)]) }));
@@ -78,14 +79,8 @@ export const POV_BILL = [STORE.counterX, 1.2, STORE.maxZ + .4];
 export function drawPovBill(t, cam, { lean = .78 } = {}) {
   meshView({ yaw: cam.yaw || 0, pitch: Math.PI / 2 - cam.pitch, P: cam.P, ox: 540, oy: 960, cx: cam.cx, cy: cam.cy || 0, cz: cam.cz, dist: cam.dist || 0 });
   const m = BILL.heldAt(POV_BILL, lean, Math.PI), sp = (...p) => proj(...m(p)), px = Math.hypot(...[0, 1].map(i => sp(.108, 0, 0)[i] - sp(-.108, 0, 0)[i])) / .216;
+  const mm = px / 1000, grips = [-1, 1].map(s => [s, sp(s * .108, 0, .055)]);   // his hands at true size, holding the page's side edges a little below the middle
+  for (const [s, at] of grips) gripHand(s, at, mm, 'back');                       // the hands beside and behind the paper
   draw(BILL.placed(m), [0, 0, 0], 0, { lw: Math.max(2, px * .0016), boil: .15 }); BILL.ink(m);
-  const k = px * UNIT;   // his hands at true size: pixels per unit at the page
-  const lwk = 7 * Math.min(1.6, k), pt = (x, y) => [x, y];
-  for (const s of [-1, 1]) {   // a real grip: fingers behind the page, the palm just outside its edge, only the thumb on the front
-    const [hx, hy] = sp(s * .108, 0, .04), ox = hx + s * 34 * k, [ex, ey] = [hx + s * 300 * k, 1920 + 420 * k];
-    shape(noodle([ex, ey], [ox + s * 6 * k, hy + 40 * k], s * 24 * k, 70 * k, 58 * k), { fill: MAXC.skin, lw: lwk });                 // forearm, up out of the bottom of the frame
-    shape(ell(ox, hy + 4 * k, 40 * k, 62 * k, 20), { fill: MAXC.skin, lw: lwk });                                                     // the palm and the curled fingers behind the edge
-    shape(noodle([hx + s * 8 * k, hy + 26 * k], [hx - s * 40 * k, hy - 22 * k], s * -4 * k, 30 * k, 24 * k), { fill: MAXC.skin, lw: lwk });   // the thumb on the page
-    shape(ell(hx - s * 34 * k, hy - 16 * k, 9 * k, 7 * k, 10), { fill: '#f6d2b8', lw: lwk * .5 }); }                              // its nail
-
+  for (const [s, at] of grips) gripHand(s, at, mm, 'front');                      // the thumbs on the front
 }
