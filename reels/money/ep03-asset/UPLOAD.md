@@ -16,5 +16,6 @@ returns after inflation (past returns are not a promise). The resale numbers are
 Full sources: [link or pinned comment]
 
 Education, not financial advice.
+New money choices every week · @TenYearsOnShorts
 #assets #personalfinance #money
 ```

@@ -10,8 +10,8 @@ code in `brand/brand.html`).
 
 - "Same Paycheck" was the first idea, but a YouTube channel already has that name (checked November 2026). Next Door Money,
   The Money Street, Money Lane and Two Doors Down are taken too.
-- "Ten Years On" turned up no channel of that name and says what the channel does: the time jump. **The @handle is not checked
-  yet** (that needs a signed-in YouTube account); try `@tenyearson`. If the name changes, `brand/brand.html` redraws the art.
+- "Ten Years On" turned up no channel of that name and says what the channel does: the time jump. `@tenyearson` was taken, so the
+  channel is **Ten Years On, handle `@TenYearsOnShorts`** (created November 2026). The name need not be unique; only the handle is.
 - The two-people money comparison is not an empty format: at least one channel runs one ("Jordan & Alex"). Our edge is the
   street that ages, the numbers living on the objects, and the neighbors' ongoing story, not the comparison itself.
 

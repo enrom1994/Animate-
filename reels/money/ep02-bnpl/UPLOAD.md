@@ -20,5 +20,6 @@ CFPB research, January 2025; Maesen & Ang, Journal of Marketing (2024). Prices i
 Full sources: [link or pinned comment]
 
 Education, not financial advice.
+New money choices every week · @TenYearsOnShorts
 #buynowpaylater #personalfinance #money
 ```

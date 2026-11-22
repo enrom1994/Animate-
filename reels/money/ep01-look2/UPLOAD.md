@@ -16,5 +16,6 @@ Figures (US): Edmunds Q3 2026 new and used car financing; Kelley Blue Book depre
 inflation. Returns are not guaranteed; any single decade can be far lower. Full sources: [link or pinned comment]
 
 Education, not financial advice.
+New money choices every week · @TenYearsOnShorts
 #cars #personalfinance #money
 ```
