@@ -1,0 +1,39 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Ten Years On: channel art</title>
+<style>@font-face { font-family: 'Cap'; src: url('/node_modules/@fontsource/montserrat/files/montserrat-latin-800-normal.woff2') format('woff2'); font-weight: 800; }
+html, body { margin: 0; background: #000; } canvas { display: block; }</style></head>
+<body><canvas id="c"></canvas>
+<script type="module">
+// The channel art, drawn by the same code as the films: ?what=profile (800 x 800, shown as a circle as small as ~98 px) or
+// ?what=banner (2048 x 1152; only the centre 1235 x 338 shows on every device, so the name lives there).
+import { setupWide } from '/money/look2/wide.js';
+import { init, frame, g, push, pop, translate, scale, shape, fillOnly, text, rr, S as INKS } from '/money/look2/toon.js';
+import { card, setupEdit } from '/money/look2/edit.js';
+import { maxStanding, theoStanding, THEO } from '/money/look2/cast.js';
+import { FRAME_MAX, FRAME_THEO, maxShot, theoShot, STREET } from '/money/look2/street.js';
+await document.fonts.load("800 54px Cap");
+const what = new URLSearchParams(location.search).get('what') || 'profile', cv = document.getElementById('c');
+const RED = '#c8302a', TEAL = '#2f6f73', INK = '#1d1a26', CREAM = '#fbf6ea';
+if (what === 'profile') {
+  cv.width = cv.height = 800; init(cv); frame(0); INKS.lwScale = 1.25;
+  g.fillStyle = RED; g.fillRect(0, 0, 800, 800); g.fillStyle = TEAL; g.beginPath(); g.moveTo(470, 0); g.lineTo(800, 0); g.lineTo(800, 800); g.lineTo(330, 800); g.closePath(); g.fill();   // red for Max, teal for Theo, split on a slant
+  g.strokeStyle = CREAM; g.lineWidth = 14; g.beginPath(); g.moveTo(470, 0); g.lineTo(330, 800); g.stroke();
+  const k = .86; push(); translate(525, 790); scale(k); theoStanding(0, THEO.C, { smile: .55, look: [-.25, 0] }); pop();   // Theo on the right
+  push(); translate(275, 790); scale(k); maxStanding(0, { outfit: 'flash', act: { smile: .6, look: [.25, 0] } }); pop();   // Max in front, on the left
+} else {
+  cv.width = 2048; cv.height = 1152;
+  const off = document.createElement('canvas'); off.width = 1080; off.height = 1920; setupWide(off); setupEdit(off); STREET.focus = false;
+  const shot = (draw) => { draw(); const c = document.createElement('canvas'); c.width = 1080; c.height = 1920; c.getContext('2d').drawImage(off, 0, 0); return c; };
+  const CAM = x => ({ look: [x, 1.45, -6.9], L: 6, down: .06, F: 2300 });   // each man 480 px from his shot's left edge, his head at the strip's height
+  const M = shot(maxShot(0, CAM(8.0 + 60 / 383), { act: { smile: .6 } })), T = shot(theoShot(0, CAM(21.3 + 60 / 383), { act: { smile: .6 } }));
+  const ctx = cv.getContext('2d'), SY = 360;   // the strip of each shot that becomes the banner (the people's heads near the middle)
+  ctx.save(); ctx.translate(1024, 0); ctx.scale(-1, 1); ctx.drawImage(M, 0, SY, 1080, 1152, 0, 0, 1080, 1152); ctx.restore();   // Max's half, mirrored so he stands by the middle
+  ctx.drawImage(T, 0, SY, 1080, 1152, 1024, 0, 1080, 1152);
+  ctx.fillStyle = INK; ctx.fillRect(1018, 0, 12, 1152);   // the split, as in the films
+  init(cv); frame(0); setupEdit(cv);
+  const tw = Math.max(...[['TEN YEARS ON', '800 78px Cap'], ['SAME PAYCHECK · DIFFERENT CHOICES', '800 26px Cap']].map(([s, f]) => { g.font = f; return g.measureText(s).width; })) + 90;   // the card fits its words
+  push(); translate(1024, 576); shape(rr(-tw / 2, -100, tw, 200, 30), { fill: CREAM, lw: 10 });
+  text('TEN YEARS ON', 0, -18, { font: '800 78px Cap', fill: INK }); text('SAME PAYCHECK · DIFFERENT CHOICES', 0, 52, { font: '800 26px Cap', fill: '#6b5a4a' }); pop();
+}
+window.done = true;
+</script></body></html>
