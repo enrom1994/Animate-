@@ -14,7 +14,7 @@
 
 ## Description
 ```
-New car or used car? A $787-a-month car payment against a $580 one, and what the $205 difference grows to in 10 years.
+New car or used car? A $787-a-month car payment against a $580 one, and what investing the $205 difference adds up to 10 years on.
 Two neighbors, same paycheck: Max buys new, Theo buys used and invests the difference. Ten years on, at an illustrative 7% a year, that's about $24,000.
 
 Figures (US): Edmunds Q3 2026 new and used car financing; Kelley Blue Book depreciation; long-run S&P 500 returns after
@@ -28,9 +28,10 @@ New money choices every week · @TenYearsOnShorts
 ## Pinned comment (post it, then pin it)
 ```
 Sources (US, checked November 2026):
-• $787 new / $582 used average monthly payment: Edmunds Q3 2026 financing report
+• $787 new / $582 used average monthly payment: Edmunds Q3 2026 financing report (reported by Fortune, 14 Oct 2026:
+  https://fortune.com/2026/10/14/car-payments-record-787-seven-year-auto-loans-edmunds/ )
   https://www.edmunds.com/press/new-car-financing-records-pile-up-in-q3-as-buyers-borrow-more-and-stretch-loans-longer-according-to-edmunds.html
-• About half its value lost in five years: Kelley Blue Book https://www.kbb.com/car-depreciation
+• About half its value lost in five years (KBB: about 55%): Kelley Blue Book https://www.kbb.com/car-depreciation
 • About 7% a year after inflation, long run (S&P 500, 1928 to 2025): https://www.fool.com/research/average-stock-market-return/
 • $205 a month for 70 months at 7%: about $17,660; left to grow to year 10: about $23,621 (our arithmetic).
 Past returns are not a promise. Education, not financial advice.
