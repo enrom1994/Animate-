@@ -7,17 +7,22 @@
 - **Runner-up title:** The $787 Car Payment That Costs $24,000 (100/100, but "costs" overstates it: the $24,000 is what the $205 a
   month difference grows to at an illustrative 7%, not money the car payment charges)
 
+## Search
+- **Queries it should win:** new car vs used car · new or used car · car payment / car loan explained (each one's words are in the title or the first two lines)
+- **Tags** (a weak signal; for spellings and variants only): new car vs used car, new or used car, car payment, average car payment, car loan, car loan explained, buying a car, used car, investing the difference, personal finance
+- **Hashtags:** three, at the end of the description. No #shorts: YouTube files a vertical video under 3 minutes as a Short without it.
+
 ## Description
 ```
-Two neighbors, same paycheck. One buys new at $787 a month, one buys used at about $580 and invests the $205 difference.
-Ten years on, at an illustrative 7% a year, that's about $24,000.
+New car or used car? A $787-a-month car payment against a $580 one, and what the $205 difference grows to in 10 years.
+Two neighbors, same paycheck: Max buys new, Theo buys used and invests the difference. Ten years on, at an illustrative 7% a year, that's about $24,000.
 
 Figures (US): Edmunds Q3 2026 new and used car financing; Kelley Blue Book depreciation; long-run S&P 500 returns after
 inflation. Returns are not guaranteed; any single decade can be far lower. Full sources in the pinned comment.
 
 Education, not financial advice.
 New money choices every week · @TenYearsOnShorts
-#cars #personalfinance #money
+#CarLoan #PersonalFinance #MoneyTips
 ```
 
 ## Pinned comment (post it, then pin it)
