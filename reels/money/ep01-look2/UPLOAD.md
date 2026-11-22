@@ -13,9 +13,20 @@ Two neighbors, same paycheck. One buys new at $787 a month, one buys used at abo
 Ten years on, at an illustrative 7% a year, that's about $24,000.
 
 Figures (US): Edmunds Q3 2026 new and used car financing; Kelley Blue Book depreciation; long-run S&P 500 returns after
-inflation. Returns are not guaranteed; any single decade can be far lower. Full sources: [link or pinned comment]
+inflation. Returns are not guaranteed; any single decade can be far lower. Full sources in the pinned comment.
 
 Education, not financial advice.
 New money choices every week · @TenYearsOnShorts
 #cars #personalfinance #money
+```
+
+## Pinned comment (post it, then pin it)
+```
+Sources (US, checked November 2026):
+• $787 new / $582 used average monthly payment: Edmunds Q3 2026 financing report
+  https://www.edmunds.com/press/new-car-financing-records-pile-up-in-q3-as-buyers-borrow-more-and-stretch-loans-longer-according-to-edmunds.html
+• About half its value lost in five years: Kelley Blue Book https://www.kbb.com/car-depreciation
+• About 7% a year after inflation, long run (S&P 500, 1928 to 2025): https://www.fool.com/research/average-stock-market-return/
+• $205 a month for 70 months at 7%: about $17,660; left to grow to year 10: about $23,621 (our arithmetic).
+Past returns are not a promise. Education, not financial advice.
 ```
