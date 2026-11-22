@@ -72,14 +72,16 @@ export const SCREENS = { checkout, payments, lock, fund };
 export function gripHand(side, at, mm, layer, { hands = null } = {}) {   // no watch by default: on a letter-wide grip the wrists sit at the frame's edge, where a watch is only a gold scrap
   SK = { skin: MAXC.skin, skinS: MAXC.skinS, watch: false, ...(hands || {}) }; const lw = 6.5 * Math.min(1.5, mm / 4.6), s = side;
   push(); translate(at[0], at[1]); scale(mm); if (s > 0) scale(-1, 1);   // drawn as a left hand; the right is its mirror
-  if (layer === 'back') {
-    skinShape(spline([[-38, 300], [-34, 160], [-24, 80], [-10, 34], [6, -14], [14, -40], [8, -58], [-10, -54], [-30, -20], [-52, 30], [-70, 100], [-96, 300]]), { lw, d: 4 });   // wrist and the side of the hand, beside the edge
-    for (const [y, r] of [[-50, 1], [-30, .95], [-11, .9]]) skinShape(spline([[-2, y - 8 * r], [9 * r, y - 7 * r], [12 * r, y], [9 * r, y + 7 * r], [-2, y + 8 * r]]), { lw, d: 1.4 });   // fingertips curling round from behind
-    if (SK.watch && s < 0) { push(); translate(-49, 128); rotate(-.08); shape(rr(-34, -8, 68, 16, 4), { fill: '#d9a83a', lw }); shape(rr(-12, -14, 24, 28, 5), { fill: '#d9a83a', lw }); shape(rr(-8, -10, 16, 20, 4), { fill: '#f3ead2', lw: lw * .5 }); pop(); }   // the gold watch
-  } else {
-    skinShape(spline([[-16, 70], [-12, 40], [2, 14], [16, -2], [27, -2], [31, 8], [24, 22], [10, 44], [2, 74]], true), { lw, d: 2.4 });   // the thumb on the front of the page: short, broad, tilted in
-    shape(spline([[19, 1], [26, 0], [29, 6], [25, 13], [18, 11]]), { fill: '#f3c7a6', lw: lw * .5 });                                     // its nail
-    stroke([[-8, 50], [4, 52]], lw * .45, { line: 'rgba(29,26,38,.55)' });                                                                   // the knuckle crease
+  // One outline for the whole visible hand, drawn over the paper, so the thumb grows out of the hand instead of floating on the
+  // page: up the wrist, round the side of the hand and the index finger (its tip is behind the paper), the web at the paper's
+  // edge, out along the thumb across the page, and back down the ball of the thumb into the wrist. The left hand; the right is its mirror.
+  if (layer === 'front') {
+    skinShape(spline([[-52, 330], [-53, 200], [-55, 120], [-57, 60], [-51, 10], [-39, -30], [-21, -52], [-6, -56], [2, -46], [3, -26],   // wrist, side of the hand, index finger to the edge
+      [12, -24], [26, -34], [37, -41], [45, -36], [44, -23], [34, -13], [20, 2], [10, 20],                                                       // the thumb across the page
+      [4, 50], [0, 90], [-3, 150], [-8, 330]]), { lw, d: 3.2 });                                                                                  // the ball of the thumb, down into the wrist
+    shape(spline([[33, -36], [40, -41], [45, -35], [41, -28], [34, -29]]), { fill: '#f3c7a6', lw: lw * .5 });          // the thumbnail
+    stroke(spline([[16, -6], [4, 22], [-4, 56], [-8, 96]], false, 6), lw * .45, { line: 'rgba(29,26,38,.5)' });       // the crease round the ball of the thumb
+    stroke([[24, -26], [27, -18]], lw * .4, { line: 'rgba(29,26,38,.45)' });                                            // its knuckle
   }
   pop();
 }
