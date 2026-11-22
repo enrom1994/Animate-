@@ -14,6 +14,13 @@ const [T0, T1] = (process.env.SPAN || `0:${dur}`).split(':').map(Number);   // S
 // still outlines and off-screen edges, which turned a 3 1/2 hour render into 3 minutes). A slow frame is an error, caught here, not mid-render.
 const SLOW = 1000, timed = t => pg.evaluate(([t, SLOW]) => { const a = performance.now(), r = window.audit(t), ms = performance.now() - a;
   return ms > SLOW ? [...r, ['error', `frame takes ${(ms / 1000).toFixed(1)} s to draw (limit ${SLOW / 1000} s): profile it; usually a huge shape resampled point by point`]] : r; }, [t, SLOW]);
+// code after a mid-line // is commented out: the page and the shared money code are read as text first (the ep. 3 car shot drew
+// nothing for six seconds this way, and render2d's wait never ran). Same rule as the howto gate's check 14.
+{ const files = [path.join(MONEY, page.replace(/^\/money\//, '')), ...fs.readdirSync(path.join(MONEY, 'look2')).filter(f => f.endsWith('.js')).map(f => path.join(MONEY, 'look2', f))];
+  const CODE = /(\)\(\)|;\s*\w+\s*\(|\b\w+\(t[,)]|\b(card|stamp|banner|split|drawWide|maxShot|theoShot|shape|text|push|pop)\(|=>\s*\{|\bconst\s+\w|\blet\s+\w|return\s)/;
+  for (const f of files) fs.readFileSync(f, 'utf8').split('\n').forEach((line, i) => { const c = line.indexOf('//');
+    if (c > 0 && !/https?:\/\//.test(line) && !/['"`][^'"`]*\/\//.test(line.slice(0, c + 2)) && /\S/.test(line.slice(0, c)) && CODE.test(line.slice(c + 2)))
+      { const k = `code after a // comment is commented out: ${path.basename(f)}:${i + 1}`; if (!seen.has(k)) seen.set(k, ['error', k, ['lint']]); } }); }
 for (let t = T0; t < Math.min(T1, dur); t += +step) for (const [lvl, msg] of await timed(t)) { const k = msg.replace(/\d+(%| px)/g, '#'); if (!seen.has(k)) seen.set(k, [lvl, msg, []]); seen.get(k)[2].push(t.toFixed(2)); }
 await b.close(); server.close();
 const rows = [...seen.values()].sort((a, b) => (a[0] === 'error' ? 0 : 1) - (b[0] === 'error' ? 0 : 1));

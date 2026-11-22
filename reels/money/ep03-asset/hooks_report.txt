@@ -1,0 +1,12 @@
+hook gate · ep03-asset · line 1: Stop. Before you call your car an asset, see which of these 4 things actually pays you.
+
+ 73 STRONG    The Warning              SPEC 57  ADDR 100  STAK 88  CURI 75  BREV 100  |  Stop. Before you call your car an asset, see which of these 4 things actually pays you.
+ 72 STRONG    The Warning              SPEC 62  ADDR 100  STAK 88  CURI 58  BREV 100  |  Stop. Before you call your car an asset, watch what it costs you in 5 years.
+ 67 WORKABLE  The Warning              SPEC 51  ADDR 100  STAK 62  CURI 75  BREV 100  |  Before you buy your next car, see which of these 4 things actually puts money in your pocket.
+ 55 WORKABLE  The Warning              SPEC 34  ADDR 96  STAK 74  CURI 41  BREV 100  |  Before you buy your next big thing, ask the one question most people never ask.
+ 50 WEAK      The Mistake              SPEC 35  ADDR 76  STAK 48  CURI 41  BREV 100  |  Stop calling your car an asset. Watch where the money actually goes.
+ 45 WEAK      The Reveal               SPEC 40  ADDR 96  STAK 22  CURI 41  BREV 100  |  Your car isn't an asset. Here's the one question that tells you what is.
+ 43 WEAK      Unclassified             SPEC 40  ADDR 96  STAK 22  CURI 24  BREV 100  |  You think your car is an asset. In five years it loses about half its value.
+ 43 WEAK      Unclassified             SPEC 40  ADDR 96  STAK 22  CURI 24  BREV 100  |  Everything you own either puts money in your pocket or takes it out. Here are four.
+ 42 WEAK      The Statistic            SPEC 84  ADDR 26  STAK 36  CURI 24  BREV 100  |  Max's 50,000 dollar coupe loses half its value. His 200 dollar side hustle makes money.
+ 36 WEAK      The Superlative          SPEC 34  ADDR 26  STAK 22  CURI 41  BREV 100  |  Max has the nicer car, but the only thing he owns that makes money isn't the car.

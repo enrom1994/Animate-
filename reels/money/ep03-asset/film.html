@@ -1,0 +1,85 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Ten Years On, ep. 3: asset or liability?</title>
+<style>
+  @font-face { font-family: 'Cap'; src: url('/node_modules/@fontsource/montserrat/files/montserrat-latin-800-normal.woff2') format('woff2'); font-weight: 800; }
+  html, body { margin: 0; background: #000; }
+  #stage { position: relative; width: 720px; height: 1280px; }
+  canvas { display: block; width: 720px; height: 1280px; }
+  #cap { position: absolute; left: 0; right: 0; top: 938px; text-align: center; font: 800 54px/1.1 'Cap', sans-serif; color: #fff; -webkit-text-stroke: 9px #1d1a26; paint-order: stroke fill; letter-spacing: -0.5px; }
+  #cap b { color: #ffd23f; }
+</style></head>
+<body><div id="stage"><canvas id="c" width="1080" height="1920"></canvas><div id="cap"></div></div>
+<script type="module">
+// Ten Years On, episode 3: asset or liability? Every frame is window.renderAt(t); t is seconds of audio/vo.wav.
+// Shots: Max by his coupe, "ASSET?" -> the town: asset = money in, liability = money out -> the coupe loses half, -$787 a month:
+// LIABILITY -> through Theo's eyes, his index fund rising: ASSET -> Max's doorstep stacked with sneaker boxes: ASSET, Max wins one ->
+// a pan across both houses: IT DEPENDS -> the question, alone over the two men.
+import { setupWide, drawWide } from '/money/look2/wide.js';
+import { AUDIT, frame, g, reset } from '/money/look2/toon.js';
+import { auditFrame } from '/money/look2/check.js';
+import { clamp, io, pr, mix, mix3, ss, lmix, money, camOf, push_, pop_, card, stamp, banner, split, blurPan, veil, setupEdit } from '/money/look2/edit.js';
+import { STREET, THEO_X, THEO_Z, MAX_X, MAX_Z, MCAR, TCAR, FRAME_THEO, FRAME_MAX, theoEx, maxEx, carsEx, pin, person, maxShot, theoShot } from '/money/look2/street.js';
+import { maxStanding, TSKIN, TSKIN_S } from '/money/look2/cast.js';
+import { ORIGIN_H } from '/money/look2/max.js';
+import { drawPovPhone, fund } from '/money/look2/phonepov.js';
+import { parcel } from '/money/look2/props/props.js';
+import { CAPTIONS, DURATION } from './src/captions.js';
+await document.fonts.load("800 54px Cap");
+const cv = document.getElementById('c'); setupWide(cv); setupEdit(cv); const capEl = document.getElementById('cap');
+const GOLD = '#c98a12';
+// Max's front step (door at x 2.0, the step z -11.5 to -10.2, 0.18 m up): his resale stock, four sneaker boxes; Max on the lawn beside it
+const SNK = parcel('sneakers').faces;
+const STOCK = [[1.45, .18, -10.85, .08], [1.47, .32, -10.86, -.1], [1.46, .46, -10.84, .14], [2.35, .18, -10.7, .4]].map(([x, y, z, rot]) => ({ x, y, z, rot, mesh: SNK }));
+const maxAtDoor = t => ({ x: 3.15, z: -9.6, h: ORIGIN_H, fn: person(() => maxStanding(t, { outfit: 'flash', act: { smile: .7 } }), 'Max') });
+// through Theo's eyes, outside his house at night: the phone in his hands, the house out of focus behind it
+function theoPov(t, t0, t1) {
+  const u = ss(pr(t, t0, t1)), k = lmix(6900, 7600, u);
+  drawWide(t, { ...camOf({ look: [THEO_X + .6, 1.4, -11], L: 5, down: .05, F: 2300 }), extras: [] }, { tilt: false }); blurPan(10); reset();   // the town leaves its own transform set: start the phone from the screen's
+  const at = [540 + Math.sin(t * 1.3) * 6, 850 + Math.sin(t * 1.9) * 5];
+  drawPovPhone({ at, k, rot: Math.sin(t * 1.1) * .02, screen: () => fund({ k: ss(pr(t, 14.7, 21.2)) }), hands: { skin: TSKIN, skinS: TSKIN_S, watch: false } });
+  AUDIT.subject('phone', [at[0] - 36 * k / 1000, at[1] - 75 * k / 1000, at[0] + 36 * k / 1000, at[1] + 75 * k / 1000], 200);
+}
+window.renderAt = t => {
+  AUDIT.subjects = 0; STREET.focus = true;
+  if (t < 4.8) {   // the hook: Max beside his coupe. Is it an asset?
+    const st = push_(FRAME_MAX, ss(pr(t, 0, 4.8)), 7.5); maxShot(t, st, { act: { smile: .5 } })();
+    const [a, b] = pin(MCAR[0], MCAR[1], 2.4); stamp(clamp(a, 300, 780), b - 40, 'ASSET?', pop_(t, 1.6), { col: GOLD });
+    banner(540, 300, '4 THINGS · WHICH PAY YOU?', pop_(t, 2.9), { px: 52, w: 640, fill: '#fbf6ea' }); }
+  else if (t < 8.15) {   // an asset puts money in your pocket; a liability takes it out
+    STREET.focus = false; const u = io(pr(t, 4.8, 8.15));
+    drawWide(t, { ...camOf({ look: [mix(6, 20, u), 0, mix(-8, -6, u)], L: 70, down: .8, F: 2600 }), extras: [theoEx(t), maxEx(t), ...carsEx()] }, { tilt: true });
+    card(540, 560, 'ASSET', '+ MONEY IN', { col: '#2f6f73', w: 560, s: pop_(t, 4.95) });
+    card(540, 900, 'LIABILITY', '− MONEY OUT', { col: '#b8302a', w: 560, s: pop_(t, 6.8) }); }
+  else if (t < 14.45) {   // Max's coupe: half its value gone in five years, and a payment every month: liability
+    const st = { ...FRAME_MAX, look: [mix(9.2, 9.45, ss(pr(t, 8.15, 14.45))), 1.0, -7.4], L: lmix(10, 9.2, ss(pr(t, 8.15, 14.45))) }, [a, b] = pin(MCAR[0], MCAR[1], 2.5);   /* on the coupe, Max at the edge */ maxShot(t, st, { old: t > 11.3, act: { lid: .45 } })();
+    const yr = Math.floor(5 * ss(pr(t, 9.2, 11.3)));
+    card(540, 260, `CAR VALUE · YEAR ${yr}`, money(50000 - 5000 * yr), { col: '#b8302a', w: 600, s: pop_(t, 8.4) });
+    card(540, 520, 'AND EVERY MONTH', '−$787', { col: '#b8302a', w: 480, s: pop_(t, 12.3) });
+    stamp(540, 770, 'LIABILITY', pop_(t, 13.6)); }
+  else if (t < 22.2) {   // Theo's index fund, through his eyes: asset
+    theoPov(t, 14.45, 22.2); stamp(540, 160, 'ASSET', pop_(t, 21.6), { col: '#2f6f73' }); }
+  else if (t < 28.85) {   // Max's side hustle: sneakers bought and resold for more: asset. Max wins one
+    const u = ss(pr(t, 22.2, 28.85)), st = { look: [mix(2.55, 2.45, u), 1.05, -10.4], L: lmix(8.4, 7.2, u), down: .16, F: 2300 };
+    drawWide(t, { ...camOf(st), extras: [...STOCK, maxAtDoor(t)] }, { tilt: false });
+    card(540, 200, 'BUY $200 · SELL $260', '+$60 A PAIR', { col: '#2f6f73', w: 600, bigPx: 84, s: pop_(t, 24.3) });
+    text_small(540, 330, 'ILLUSTRATIVE', pop_(t, 24.3));
+    stamp(540, 450, 'ASSET', pop_(t, 27.0), { col: '#2f6f73' });
+    banner(540, 600, 'MAX WINS THIS ONE', pop_(t, 27.7), { px: 56, w: 560 }); }
+  else if (t < 36.0) {   // their houses: it depends. A pan from Max's house to Theo's
+    STREET.focus = false; const u = io(pr(t, 28.85, 36.0));
+    drawWide(t, { ...camOf({ look: [mix(6, 22, u), 3.2, -13], L: 30, down: .12, F: 2300 }), extras: [theoEx(t), maxEx(t), ...carsEx()] }, { tilt: false });
+    stamp(540, 220, 'IT DEPENDS', pop_(t, 29.9), { col: GOLD });
+    card(540, 470, 'A HOME YOU LIVE IN', '− MONEY OUT', { col: '#b8302a', w: 560, s: pop_(t, 31.7) * (t < 33.1 ? 1 : 0) });
+    card(540, 470, 'IT PAYS ONLY IF IT', 'EARNS MORE THAN IT COSTS', { col: '#2f6f73', w: 640, bigPx: 52, s: pop_(t, 33.2) }); }
+  else {   // the question, alone over the two men
+    split(t, () => maxShot(t, FRAME_MAX)(), () => theoShot(t, FRAME_THEO, { act: { smile: .6 } })());
+    const k = ss(pr(t, 36.0, 36.3)); blurPan(10 * k); veil(.6 * k); if (k >= 1) AUDIT.log = AUDIT.log.filter(e => e.k !== 'subject' && e.k !== 'text');
+    card(540, 820, 'ASK ONE QUESTION', 'MONEY IN, OR OUT?', { w: 760, bigPx: 76, s: pop_(t, 38.1) }); }
+  const c = CAPTIONS.find(([a, , b]) => t >= a && t < b); capEl.innerHTML = c ? c[1] : '';
+};
+function text_small(x, y, str, s) { if (s <= .01) return; banner(x, y, str, s * .6, { px: 44, w: 300, fill: '#fbf6ea', col: '#6b5a4a' }); }
+const MOVES = [[4.8, 8.15], [28.85, 36.0]];   // the camera travels: scenery passes the frame edge
+window.audit = t => { AUDIT.on = true; AUDIT.log = []; window.renderAt(t); AUDIT.on = false;
+  return auditFrame(AUDIT.log, 1080, 1920, { moving: MOVES.some(([a, b]) => t >= a && t <= b), capBox: capEl.innerHTML ? [60, 1395, 1020, 1500] : null }); };
+window.DURATION = DURATION; window.done = true; window.renderAt(0);
+</script></body></html>

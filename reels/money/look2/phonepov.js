@@ -54,20 +54,32 @@ function lock(o) {   // the lock screen, notifications stacking: o.n how many sh
   for (let i = 0; i < N.length; i++) { const k = Math.max(0, Math.min(1, (o.n - i) * 1.6)); if (k <= 0) continue; const y = 44 + i * 21;
     push(); translate(32, y + 9); scale(.6 + .4 * k, .6 + .4 * k); shape(rr(-28, -9, 56, 18, 4), { fill: i === 3 ? '#fde8e4' : 'rgba(255,255,255,.92)', lw: 2.5, line: i === 3 ? red : '#9a958a' });
     text(N[i][0], -24, -2.5, { font: F(4.4), fill: N[i][2], align: 'left' }); text(N[i][1], -24, 4.5, { font: F(3.8), fill: '#4a4048', align: 'left' }); pop(); } }
-export const SCREENS = { checkout, payments, lock };
+// an investing app: the index fund's line rising over the years (o.k 0..1 draws it), a long-run note, and the fine print
+function fund(o) {
+  statusBar(); text('INVESTING', 32, 13, { font: F(5.2), fill: ink });
+  text('INDEX FUND', 32, 24, { font: F(6.2), fill: teal });
+  shape(rr(5, 31, 54, 56, 4), { fill: '#ffffff', lw: 2.5, line: '#9a958a', boil: .2 });
+  for (let i = 1; i < 4; i++) stroke([[8, 31 + i * 14], [56, 31 + i * 14]], 1, { line: 'rgba(60,60,60,.18)', boil: 0 });
+  const N = 60, k = Math.max(.02, o.k ?? 1), pts = [];   // a wobbly long-run rise: up overall, never a straight line
+  for (let i = 0; i <= N * k; i++) { const x = i / N, y = Math.pow(x, 1.6) * .8 + .06 * Math.sin(x * 23) + .04 * Math.sin(x * 51 + 1) - (x > .42 && x < .5 ? .12 * Math.sin((x - .42) / .08 * Math.PI) : 0); pts.push([9 + x * 46, 82 - Math.max(0, y) * 46]); }
+  if (pts.length > 1) stroke(pts, 4, { line: teal, boil: .1 });
+  text('LONG RUN, AFTER', 34, 94, { font: F(4.2), fill: '#6b5a4a' }); text('INFLATION', 34, 99.5, { font: F(4.2), fill: '#6b5a4a' }); text('~7% A YEAR', 34, 109, { font: F(7.6), fill: teal });
+  text('NOT A PROMISE', 34, 121, { font: F(3.8), fill: '#6b5a4a' }); text('NOT ADVICE', 34, 127, { font: F(3.8), fill: '#6b5a4a' }); }   // set right of centre: his left thumb lies along the left edge
+export const SCREENS = { checkout, payments, lock, fund };
 // ---- the phone in his hands ----
 // at: screen point of the phone's centre; k: pixels per metre there (cam.P); rot: a little handheld roll; screen(t) draws the glass;
 // tap: { u, v, k } the right thumb reaching to a point on the glass (k 0 = at rest on the corner, 1 = on the point)
 // skin with a toon shadow: the shape fills dark, then light again shifted up-left (toward the light), leaving a shadow crescent low-right
-function skinShape(pts, o = {}) { const d = o.d ?? 2.6; return shape(pts, { fill: MAXC.skinS, lw: o.lw, shade: () => { fillOnly(pts.map(([x, y]) => [x - d * .7, y - d]), MAXC.skin, { boil: .2 }); o.inner && o.inner(); } }); }   // inner: drawn clipped to the skin (a watch band)
+let SK = { skin: MAXC.skin, skinS: MAXC.skinS, watch: true };   // whose hands: set by drawPovPhone({ hands })
+function skinShape(pts, o = {}) { const d = o.d ?? 2.6; return shape(pts, { fill: SK.skinS, lw: o.lw, shade: () => { fillOnly(pts.map(([x, y]) => [x - d * .7, y - d]), SK.skin, { boil: .2 }); o.inner && o.inner(); } }); }   // inner: drawn clipped to the skin (a watch band)
 const nrm = (x, y) => { const l = Math.hypot(x, y) || 1; return [x / l, y / l]; };
 const add = (p, v, k = 1) => [p[0] + v[0] * k, p[1] + v[1] * k];
 // the left hand cradles the phone: the palm under its lower half, three fingertips wrapping round the right edge, the thumb along the
 // left edge, the wrist running down out of frame with his gold watch on it. In mm, phone centre at 0, 0 (edges at x +-36, y +-75).
 function leftHandBack(lw) {
-  skinShape(spline([[-38, 215], [-50, 150], [-52, 96], [-44, 52], [-24, 40], [12, 58], [30, 76], [26, 104], [10, 132], [0, 215]]), { lw, d: 4, inner: () => {   // palm and wrist behind the phone
+  skinShape(spline([[-38, 215], [-50, 150], [-52, 96], [-44, 52], [-24, 40], [12, 58], [30, 76], [26, 104], [10, 132], [0, 215]]), { lw, d: 4, inner: () => { if (!SK.watch) return;   // palm and wrist behind the phone
     shape([[-70, 120], [30, 115], [30, 129], [-70, 134]], { fill: '#d9a83a', lw, shade: () => fillOnly([[-70, 128], [30, 124], [30, 130], [-70, 135]], '#b0822a', { boil: .2 }) }); } });   // the gold watch band round the wrist
-  shape(rr(-28, 112, 20, 26, 5), { fill: '#d9a83a', lw }); shape(rr(-25, 115, 14, 20, 4), { fill: '#f3ead2', lw: lw * .5 });     // its face, turned to us
+  if (SK.watch) { shape(rr(-28, 112, 20, 26, 5), { fill: '#d9a83a', lw }); shape(rr(-25, 115, 14, 20, 4), { fill: '#f3ead2', lw: lw * .5 }); }     // its face, turned to us
 }
 function leftHandFront(lw) {
   for (const [y, len] of [[-16, 13], [2, 14.5], [20, 14], [38, 11.5]]) {   // fingertips round the right edge, the little finger shortest
@@ -92,7 +104,9 @@ function rightHand(tip, lw) {
 // ---- the phone in his hands ----
 // at: screen point of the phone's centre; k: pixels per metre there (cam.P); rot: a little handheld roll; screen() draws the glass;
 // tap: { u, v, k } his right index finger reaching to a point on the glass (k 0 = resting below the phone, 1 = on the point)
-export function drawPovPhone({ at = [540, 760], k = 5800, rot = 0, screen, glass = '#f4f1ea', tap = null, over = null } = {}) {
+// hands: { skin, skinS, watch } (Max's by default: his skin and his gold watch)
+export function drawPovPhone({ at = [540, 760], k = 5800, rot = 0, screen, glass = '#f4f1ea', tap = null, over = null, hands = null } = {}) {
+  SK = { skin: MAXC.skin, skinS: MAXC.skinS, watch: true, ...(hands || {}) };
   const mm = k / 1000, lw = 6.5 * Math.min(1.5, k / 4600);
   push(); translate(at[0], at[1]); rotate(rot); scale(mm);
   leftHandBack(lw);
@@ -110,4 +124,4 @@ export function drawPovPhone({ at = [540, 760], k = 5800, rot = 0, screen, glass
   rightHand([rest[0] + (tgt[0] - rest[0]) * q, rest[1] + (tgt[1] - rest[1]) * q], lw);
   pop();
 }
-export { checkout, payments, alert, lock };
+export { checkout, payments, alert, lock, fund };

@@ -23,7 +23,7 @@ export function maxStanding(t, { outfit = 'work', act = {} } = {}) {
   maxUpper(t, { look: [0, 0], lid: .3, tilt: 0, outfit, bling: true, shades: true, subject: false, ...act });
 }
 // ---- Theo: three plain options. Same build, a longer, calmer face, his own hair instead of a cap ----
-const TSKIN = '#f0c8a2', TSKIN_S = '#d6a882';
+export const TSKIN = '#f0c8a2', TSKIN_S = '#d6a882';
 export const THEO = {
   A: { name: 'A · plain tee', shirt: '#4a6a8a', shirtS: '#3b5672', legs: { cloth: '#b9a888', clothS: '#9c8c70', shoe: '#5a4a3a', sole: '#e0d8c8', belt: '#5a4a3a' }, hair: 'part', hairCol: '#6b4a2e', sleeve: 'short', collar: 'crew', glasses: false, watch: null },
   B: { name: 'B · flannel + glasses', shirt: '#6d7f95', shirtS: '#566679', legs: { cloth: '#44597a', clothS: '#364761', shoe: '#3a3630', sole: '#d8d2c4', belt: '#3a3630' }, hair: 'mop', hairCol: '#3a2a20', sleeve: 'long', collar: 'shirt', glasses: true, watch: 'plain', check: true },
