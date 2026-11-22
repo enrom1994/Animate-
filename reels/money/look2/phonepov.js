@@ -98,18 +98,22 @@ const nrm = (x, y) => { const l = Math.hypot(x, y) || 1; return [x / l, y / l]; 
 const add = (p, v, k = 1) => [p[0] + v[0] * k, p[1] + v[1] * k];
 // the left hand cradles the phone: the palm under its lower half, three fingertips wrapping round the right edge, the thumb along the
 // left edge, the wrist running down out of frame with his gold watch on it. In mm, phone centre at 0, 0 (edges at x +-36, y +-75).
-function leftHandBack(lw) { }   // (the palm is drawn in front: everything of it that shows lies outside the phone)
+function leftHandBack(lw) {   // the palm and wrist, drawn before the phone and running up behind it (the phone's bottom edge is in front of the palm)
+  skinShape(spline([[-44, 300], [-52, 200], [-58, 130], [-62, 84], [-60, 54], [-52, 34], [-40, 10], [0, 0], [30, 20], [33, 104], [24, 140], [12, 200], [6, 300]]),
+    { lw, d: 3.4, audit: false, inner: () => { if (!SK.watch) return;
+      shape([[-70, 122], [40, 117], [40, 132], [-70, 137]], { fill: '#d9a83a', lw, shade: () => fillOnly([[-70, 130], [40, 126], [40, 132], [-70, 138]], '#b0822a', { boil: .2 }) }); } });   // the gold watch band round the wrist
+  if (SK.watch) { shape(rr(-30, 113, 20, 26, 5), { fill: '#d9a83a', lw }); shape(rr(-27, 116, 14, 20, 4), { fill: '#f3ead2', lw: lw * .5 }); }   // its face
+}
 function leftHandFront(lw) {
   for (const [y, len] of [[-16, 13], [2, 14.5], [20, 14], [38, 11.5]]) {   // fingertips round the right edge, the little finger shortest
     skinShape(spline([[34, y - 8.2], [34 + len - 4, y - 8], [34 + len + 1.5, y - 3], [34 + len + 1.5, y + 3.5], [34 + len - 4, y + 8.6], [34, y + 8.4]]), { lw, d: 1.8 });
     stroke([[34 + 2.4, y - 5], [34 + 2.8, y + 5]], lw * .45, { line: 'rgba(29,26,38,.55)' }); }   // where the finger bends round the edge
-  // one outline: up the wrist, the outside of the hand, the thumb up the phone's left side, back down its inner edge to the web, along
-  // just under the phone's bottom edge (the phone rests on the palm), and down the far side of the palm to the wrist
-  skinShape(spline([[-44, 300], [-52, 200], [-58, 130], [-62, 84], [-60, 54], [-52, 34], [-43, 20], [-33, 15], [-26, 21], [-26, 36],
-    [-30, 58], [-33, 74], [-26, 79], [-4, 80], [18, 81], [32, 86], [33, 104], [24, 140], [12, 200], [6, 300]]),
-    { lw, d: 3.4, audit: false, inner: () => { if (!SK.watch) return;
-      shape([[-70, 122], [40, 117], [40, 132], [-70, 137]], { fill: '#d9a83a', lw, shade: () => fillOnly([[-70, 130], [40, 126], [40, 132], [-70, 138]], '#b0822a', { boil: .2 }) }); } });   // the gold watch band round the wrist
-  if (SK.watch) { shape(rr(-30, 113, 20, 26, 5), { fill: '#d9a83a', lw }); shape(rr(-27, 116, 14, 20, 4), { fill: '#f3ead2', lw: lw * .5 }); }   // its face
+  // the thumb over the phone's left side: filled down into the palm with no line across its base, so it grows out of the hand;
+  // its ink runs only round the thumb itself, the inner edge fading into the crease round the ball of the thumb
+  const TH = [[-62, 96], [-61, 70], [-58, 50], [-51, 33], [-43, 20], [-33, 15], [-26, 21], [-26, 36], [-30, 58], [-34, 76], [-40, 96]];
+  fillOnly(spline(TH), SK.skin, { boil: .2, audit: false });
+  fillOnly(spline([[-30, 40], [-26, 36], [-30, 58], [-34, 76], [-40, 96], [-36, 96], [-31, 74], [-28, 56]]), SK.skinS, { boil: .2, audit: false });   // its shadowed inner side
+  stroke(spline(TH.slice(1, -1), false, 6), lw, { line: '#1b1422' });
   AUDIT.parts([[[-62, 15], [-26, 15], [-26, 79], [-62, 79]], [[-62, 79], [33, 79], [33, 300], [-62, 300]]]);   // what it covers: the thumb up the side, the palm below the phone
   shape(spline([[-38, 23], [-31.5, 19], [-27.5, 24], [-28.5, 32], [-35.5, 32]]), { fill: '#f3c7a6', lw: lw * .5 });   // the thumbnail
   stroke(spline([[-30, 60], [-40, 76], [-48, 100]], false, 6), lw * .45, { line: 'rgba(29,26,38,.5)' });              // the crease round the ball of the thumb
