@@ -33,7 +33,7 @@ function povShot(t) {   // his eyes 1.62 m up behind the counter, looking down a
   const u = ss(pr(t, 0, 2.75)), sway = [Math.sin(t * 1.7) * .004, Math.sin(t * 2.3 + 1) * .003];
   const look = [POV_BILL[0] + sway[0], mix(POV_BILL[1] - .03, POV_BILL[1], u) + sway[1], mix(POV_BILL[2] - .03, POV_BILL[2], u)];   // a little below the page's middle, so the page sits high, clear of the caption
   const eye = [STORE.counterX, 1.62, STORE.maxZ], L = Math.hypot(eye[1] - look[1], eye[2] - look[2]), down = Math.atan2(eye[1] - look[1], look[2] - eye[2]);
-  const cam = { ...camOf({ look, L, down, F: lmix(1900, 2500, u) }), yaw: Math.PI };
+  const cam = { ...camOf({ look, L, down, F: lmix(1450, 1800, u) }), yaw: Math.PI };   /* pulled back so both hands, fingers and all, are in the frame */
   frame(t); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#141b30'; g.fillRect(0, 0, 1080, 1920);
   const n0 = AUDIT.log.length; drawStore(t, cam, { pov: true }); AUDIT.log.length = n0;   // the shop behind, out of focus (not checked: it is a blur)
   blurPan(9); drawPovBill(t, cam);
