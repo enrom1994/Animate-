@@ -1,6 +1,6 @@
 # Upload sheet: Ten Years On, ep. 2 (buy now, pay later)
 
-- **File:** `ep02-bnpl.mp4` (41.5 s, 1080 x 1920)
+- **File:** `ep02-bnpl.mp4` (42.7 s, 1080 x 1920)
 - **Title:** Buy Now, Pay Later: What 4 Payments Really Cost  (yt-package 94/100; 47 characters, a phone shows "Buy Now, Pay Later: What 4 Payments...")
 - **Hook it pairs with:** "Before you split 400 dollars into four payments, watch what happens to your next six weeks." (hook gate 67)
 - **Cover:** upload `cover_ep02.png` (1080 x 1920, no caption; made by `moneylook/cover.mjs`). If uploading is refused, pick the frame at 4.6 s, the lock screen full of payment alerts under "NEARLY HALF · PAID LATE, PAST YEAR"
