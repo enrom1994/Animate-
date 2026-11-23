@@ -8,7 +8,7 @@
 - **Not used:** "Pay in 4? Watch What Happens in 6 Weeks" (100/100): "Pay in 4" is also a named product of one large payments company
 
 ## Before upload
-- Confirm the late-fee figures ($7 to $8 a missed payment, capped at 25% of the order) on the lenders' own pages (SOURCES.md).
+- Late fee checked on Afterpay's own US terms (23 Nov 2026): up to $8 after 10 days unpaid, capped at 25% of the order. The film now says so.
 
 ## Search
 - **Queries it should win:** buy now pay later · buy now pay later late fees · buy now pay later trap (each one's words are in the title or the first two lines)
@@ -17,7 +17,7 @@
 
 ## Description
 ```
-Buy now, pay later turns $400 into four payments of $100. Here's what happens when the plans stack up: three loans, payments every two weeks, one late fee.
+Buy now, pay later turns $400 into four payments of $100. Here's what happens when the plans stack up: three loans, payments every two weeks, and one that bounces.
 Nearly half of buy now, pay later users paid late in the past year (LendingTree, 2026), and 1 in 4 has had three or more loans at once.
 
 Figures (US): LendingTree BNPL survey, March 2026; CFPB research, January 2025; Maesen & Ang, Journal of Marketing (2024).
@@ -37,6 +37,7 @@ Sources (US, checked November 2026):
   https://www.consumerfinance.gov/about-us/newsroom/cfpb-research-reveals-heavy-buy-now-pay-later-use-among-borrowers-with-high-credit-balances-and-multiple-pay-in-four-loans
 • About 10% more spent when the price can be split: Maesen & Ang, Journal of Marketing (2024), one large US retailer
   https://ama.org/2025/02/04/buy-now-pay-later-increases-customer-spending
-• Late fees of up to $7 to $8 a missed payment, capped at 25% of the order, at two large lenders (NerdWallet reviews, Nov 2026); some lenders charge none.
+• Late fee: Afterpay's US terms charge up to $8 if a payment stays unpaid 10 days after it's due, capped at 25% of the order
+  https://www.afterpay.com/en-US/installment-agreement (other lenders differ; some charge none).
 Prices in the story are illustrative. Education, not financial advice.
 ```

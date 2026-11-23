@@ -60,11 +60,11 @@ const renderShot = t => {   // t in the first take's seconds (see TW below)
     const it = t < 14.55 ? ITEMS.phone : ITEMS.console, t0 = t < 14.55 ? 13.9 : 15.2;
     pov(t, () => checkout({ ...it, row: 1, press: t > t0 - .05 && t < t0 + .2 ? 1 : 0, approved: ss(pr(t, t0 + .1, t0 + .4)) }), { tap: { u: 55, v: 127.5, k: tapAt(t, t0) }, t0: 12.6, t1: 15.65 }); }
   else if (t < 19.9) {   // now three plans take money every two weeks; payday lands two days after one of them
-    pov(t, () => payments({ plans: PLANS(t).map(([i, e]) => [i, e, 1]), payday: pr(t, 18.25, 18.6), late: t > 19.0 ? 1 : 0, total: pr(t, 16.6, 16.9) }), { t0: 15.65, t1: 19.9 });
+    pov(t, () => payments({ plans: PLANS(t).map(([i, e]) => [i, e, 1]), payday: t > 18.25 ? 1 : 0,   /* the chip appears whole (growing in, it slid under the row below for a moment) */ late: t > 19.0 ? 1 : 0, total: pr(t, 16.6, 16.9) }), { t0: 15.65, t1: 19.9 });
     card(540, 160, 'EVERY TWO WEEKS', '$375', { col: '#b8302a', w: 520, s: pop_(t, 16.7) * (t < 18.1 ? 1 : 0) });
-    if (t > 18.1) card(540, 160, 'DUE MAR 4 · PAID MAR 6', 'TWO DAYS SHORT', { col: '#b8302a', w: 600, bigPx: 80, s: pop_(t, 18.3) }); }
+    if (t > 18.1) card(540, 160, 'DUE MAR 4 · PAYDAY MAR 6', 'PAYMENT BOUNCES', { col: '#b8302a', w: 600, bigPx: 76, s: pop_(t, 18.3) }); }   // a bounced payment is not yet a fee: the lender's terms give 10 days
   else if (t < 20.6) {   // late fee
-    pov(t, () => payments({ plans: PLANS(t).map(([i, e]) => [i, e, 1]), payday: 1, late: 1, total: 1 }), { over: () => alert({ k: pr(t, 19.9, 20.15) }), t0: 15.65, t1: 20.6 });
+    pov(t, () => payments({ plans: PLANS(t).map(([i, e]) => [i, e, 1]), payday: 1, late: 1, total: 1 }), { over: () => alert({ k: pr(t, 19.9, 20.15), text: 'UP TO $8 AFTER 10 DAYS' }), t0: 15.65, t1: 20.6 });
     stamp(540, 160, 'LATE FEE', pop_(t, 20.0)); }
   else if (t < 24.2) {   // one in four users has had three or more at once: three boxes on Max's doorstep
     const u = ss(pr(t, 20.6, 24.2)), st = { look: [mix(2.25, 2.05, u), 1.05, -10.8], L: lmix(6.6, 5.4, u), down: .16, F: 2300 };
