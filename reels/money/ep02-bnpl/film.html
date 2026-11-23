@@ -46,8 +46,8 @@ const PLANS = t => [['sneakers', 100, 1], ['phone', 150, pop_(t, 13.9)], ['conso
 const renderShot = t => {   // t in the first take's seconds (see TW below)
   AUDIT.subjects = 0; STREET.focus = true;
   if (t < 3.8) {   // the hook, a flash-forward: his lock screen fills with payment alerts
-    pov(t, () => lock({ n: mix(0, 4, pr(t, .2, 2.6)) }), { glass: '#2b4a63', F0: 2500, F1: 2800, t1: 3.8 });
-    card(540, 160, 'PAID LATE, PAST YEAR', 'NEARLY HALF', { col: '#b8302a', w: 640, bigPx: 92, s: pop_(t, .3) }); }
+    pov(t, () => lock({ n: mix(2.6, 4, pr(t, .3, 1.6)) }),   /* frame 0 already shows the stack of payment alerts: the hook is visible before a word is heard */ { glass: '#2b4a63', F0: 2500, F1: 2800, t1: 3.8 });
+    card(540, 160, 'PAID LATE, PAST YEAR', 'NEARLY HALF', { col: '#b8302a', w: 640, bigPx: 92 }); }   // on screen from frame 0
   else if (t < 10.8) {   // the sneakers: $400, or four payments of $100; he taps pay later
     const press = t > 9.8 && t < 10.05 ? 1 : 0, appr = ss(pr(t, 10.0, 10.3));
     pov(t, () => checkout({ ...ITEMS.sneakers, row: pr(t, 6.35, 6.45), press, approved: appr }), { tap: { u: 55, v: 127.5, k: tapAt(t, 9.85) }, t0: 3.8, t1: 10.8 });

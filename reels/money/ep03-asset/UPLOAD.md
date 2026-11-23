@@ -3,7 +3,7 @@
 - **File:** `ep03-asset.mp4` (42.7 s, 1080 x 1920)
 - **Title:** Is Your Car an Asset? 4 Things, Tested  (yt-package 100/100, 38 characters: no cut on any screen)
 - **Hook it pairs with:** "Stop. Before you call your car an asset, see which of these 4 things actually pays you." (hook gate 73, STRONG)
-- **Cover frame:** 14.0 s, the coupe under "$25,000 · −$787 · LIABILITY" (cover text and title carry different words)
+- **Cover:** upload `cover_ep03.png` (1080 x 1920, no caption; made by `moneylook/cover.mjs`). If uploading is refused, pick the frame at 14.0 s, the coupe under "$25,000 · −$787 · LIABILITY" (cover text and title carry different words)
 - **Runner-up titles:** Asset or Liability: 4 Things You Own (100) · 4 Things You Own: Asset or Liability? (100)
 
 ## Search

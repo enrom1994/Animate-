@@ -43,8 +43,8 @@ window.renderAt = t => {
   AUDIT.subjects = 0; STREET.focus = true;
   if (t < 4.8) {   // the hook: Max beside his coupe. Is it an asset?
     const st = push_(FRAME_MAX, ss(pr(t, 0, 4.8)), 7.5); maxShot(t, st, { act: { smile: .5 } })();
-    const [a, b] = pin(MCAR[0], MCAR[1], 2.4); stamp(clamp(a, 300, 780), b - 40, 'ASSET?', pop_(t, 1.6), { col: GOLD });
-    banner(540, 300, '4 THINGS · WHICH PAY YOU?', pop_(t, 2.9), { px: 52, w: 640, fill: '#fbf6ea' }); }
+    const [a, b] = pin(MCAR[0], MCAR[1], 2.4); stamp(clamp(a, 300, 780), b - 40, 'ASSET?', pop_(t, 1.6), { col: GOLD });   // lands on the word 'asset'; the question card above carries frame 0
+    banner(540, 300, 'IS YOUR CAR AN ASSET?', 1, { px: 60, w: 680, fill: '#fbf6ea' }); }   // the question, readable at frame 0
   else if (t < 8.15) {   // an asset puts money in your pocket; a liability takes it out
     STREET.focus = false; const u = io(pr(t, 4.8, 8.15));
     drawWide(t, { ...camOf({ look: [mix(6, 20, u), 0, mix(-8, -6, u)], L: 70, down: .8, F: 2600 }), extras: [theoEx(t), maxEx(t), ...carsEx()] }, { tilt: true });

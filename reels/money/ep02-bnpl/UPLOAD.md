@@ -3,7 +3,7 @@
 - **File:** `ep02-bnpl.mp4` (41.5 s, 1080 x 1920)
 - **Title:** Buy Now, Pay Later: What 4 Payments Really Cost  (yt-package 94/100; 47 characters, a phone shows "Buy Now, Pay Later: What 4 Payments...")
 - **Hook it pairs with:** "Before you split 400 dollars into four payments, watch what happens to your next six weeks." (hook gate 67)
-- **Cover frame:** 4.6 s, the lock screen full of payment alerts under "NEARLY HALF · PAID LATE, PAST YEAR"
+- **Cover:** upload `cover_ep02.png` (1080 x 1920, no caption; made by `moneylook/cover.mjs`). If uploading is refused, pick the frame at 4.6 s, the lock screen full of payment alerts under "NEARLY HALF · PAID LATE, PAST YEAR"
 - **Runner-up title:** Split $400 Into 4 Payments? Watch This First (94/100; echoes the hook closely, but drops the words people search)
 - **Not used:** "Pay in 4? Watch What Happens in 6 Weeks" (100/100): "Pay in 4" is also a named product of one large payments company
 

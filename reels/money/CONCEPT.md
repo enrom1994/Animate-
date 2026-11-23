@@ -42,7 +42,8 @@ are mortgages, school costs, retirement. Viewers come back to see what happens t
 
 ## The episode formula (35 to 45 s Shorts)
 
-1. **Hook, 0 to 5 s:** passes the hook gate (below) before the voice is recorded. It says *you*, names what it costs, and leaves a
+1. **Hook, 0 to 5 s:** frame 0 already shows the question or the fact as a big card, and the thing at stake (ep. 1 opened without
+   one and 62% swiped away). The spoken line passes the hook gate (below) before the voice is recorded. It says *you*, names what it costs, and leaves a
    question open; the sourced fact can sit on screen as a card while the voice carries the hook.
 2. **The choice, to about 12 s:** each neighbor picks a side; the price lands on the thing.
 3. **The time jump or the test, to about 35 s:** numbers move on the objects (a car's value falls, a fund rises, payments stack).

@@ -23,6 +23,9 @@ can measure, so a film can be audited before it is rendered in full.
 - **The hook gate comes first.** Five or more candidate hooks against the 21 formulas (`.claude/skills/yt-script/hooks.json`),
   scored by `python3 reels/hookgate.py <film>` before the voice is recorded; the chosen line needs 60+. A flat fact scores about
   35: it gives the viewer nothing to stay for. The first line says *you*, names what it costs, and leaves a question open.
+- **Frame 0 carries the hook on screen.** A Short is judged before a word is heard: the first frame shows the question or the
+  fact as big text, and the thing at stake, never an empty or quiet frame with the card popping in later. (Ten Years On ep. 1
+  opened on a bill with no question on screen: 62% of the Shorts feed swiped away.)
 - **Open on the impossible-sounding fact**, in the first sentence, then explain why it is true. No scene-setting first. The
   fact can live on screen (a card over the first shot) while the voice carries the hook.
 - State the stakes (who loses what) inside the first 15 s, and the question the video answers inside 30 s.
