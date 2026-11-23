@@ -77,6 +77,10 @@ are mortgages, school costs, retirement. Viewers come back to see what happens t
 | 2 | `ep02-bnpl/` | Buy Now, Pay Later: What 4 Payments Really Cost (94) | "Before you split 400 dollars into four payments, watch what happens to your next six weeks." (67) | Money Traps | 41.5 s |
 | 3 | `ep03-asset/` | Is Your Car an Asset? 4 Things, Tested (100) | "Stop. Before you call your car an asset, see which of these 4 things actually pays you." (73) | Asset or Liability? | 42.7 s |
 
+**Upload log** (times South Africa, GMT+2):
+- Ep. 1: 22 Nov 2026, about 22:15. After ~12 h: 106 engaged views, 38.1% stayed to watch / 61.9% swiped away, average view 0:21 of 0:39; views stopped after ~3 h. Opened without an on-screen question at frame 0.
+- Ep. 2: 23 Nov 2026, 19:40. The first episode with the hook on screen at frame 0: compare its "stayed to watch" against 38%.
+
 Each folder has `SOURCES.md`, `hooks.txt` and `hooks_report.txt`, and `UPLOAD.md` (title, cover frame, description).
 Before uploading ep. 2: confirm the late-fee figures on the lenders' own pages.
 
