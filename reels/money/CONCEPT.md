@@ -128,7 +128,9 @@ how the book is searched; we answer the idea, never use the name.
 - **Point of view shots:** a letter or a phone in his hands, at true size, the background out of focus (`look2/phonepov.js`).
 - **Numbers live on cards pinned to the objects**, popping in and counting; stamps for verdicts (LIABILITY, ASSET, IT DEPENDS).
 - **Split screens** for comparisons; the last line alone over a blurred, darkened frame.
-- **The camera always travels:** pushes, pulls, pans, the pull-out through the shop window and over the town.
+- **The camera always travels:** pushes, pulls, pans, the pull-out through the shop window and over the town. The ground stays put:
+  ground shapes are clipped at the camera before they are drawn (`gfill` in `look2/wide.js`); a shape drawn with corners behind
+  the camera slides with it.
 
 ## Production
 

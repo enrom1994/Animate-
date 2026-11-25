@@ -18,6 +18,16 @@ const view = { P: 9, pitch: .95, cx: 0, cy: 0, cz: 0, dist: 0 };   // dist > 0: 
 const SIN = () => Math.sin(view.pitch), COS = () => Math.cos(view.pitch);
 const sc = (x, z, h = 0) => view.dist ? view.P * view.dist / Math.max(.05, view.dist - ((z - view.cz) * SIN() + (h - view.cy) * COS())) : view.P;   // px per metre there
 const pj = (x, z, h = 0) => { const k = sc(x, z, h); return [540 + (x - view.cx) * k, 960 + ((z - view.cz) * COS() - (h - view.cy) * SIN()) * k]; };
+// Ground shapes (roads, pavements, grass, lots, driveways) are huge flat quads. A corner behind the camera cannot be projected:
+// sc() clamps its depth, so it lands at a fixed spot on screen and the ground's edge slides with the camera ("the road moves").
+// gfill clips the shape in 3D against a plane just in front of the camera before projecting it, so only what is in view is drawn.
+const depthAt = (x, z, h = 0) => view.dist ? view.dist - ((z - view.cz) * SIN() + (h - view.cy) * COS()) : 1;
+function clipFront(P, E = .3) {
+  const out = []; for (let i = 0; i < P.length; i++) { const a = P[i], b = P[(i + 1) % P.length], da = depthAt(...a) - E, db = depthAt(...b) - E;
+    if (da >= 0) out.push(a); if ((da >= 0) !== (db >= 0)) { const u = da / (da - db); out.push(a.map((v, k) => v + ((b[k] ?? 0) - v) * u)); } }
+  return out; }
+const gfill = (P, col, o = {}) => { const c = clipFront(P); if (c.length >= 3) fillOnly(c.map(p => pj(...p)), col, { boil: 0, ...o }); };
+const gline = (a, b, lw, o = {}) => { const c = clipFront([a, b, b]); if (c.length >= 2) stroke([pj(...c[0]), pj(...c[1])], lw, o); };
 // a box building: footprint x0..x1, z0..z1 (z grows toward the camera), height h; the roof and the front face show
 function building(x0, z0, x1, z1, h, wall, wallS, roof, { lit = .5, sign = null, seed = 1, door = false } = {}) {
   const f = [pj(x0, z1, 0), pj(x1, z1, 0), pj(x1, z1, h), pj(x0, z1, h)];
@@ -113,18 +123,18 @@ export function drawWide(t, cam = null, { tilt = true } = {}) { T_ = t;
   view.pitch = .78; view.P = 12.5 - t * .25; view.cx = 2 + t * .7; view.cy = 0; view.cz = 14 - t * .4; view.dist = 0; view.near = undefined; if (cam) Object.assign(view, cam);
   if (view.dist) view.near = Math.min(view.near ?? 1e9, eyeOf(view)[2]);   // nothing behind the camera
   g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = C.sky; g.fillRect(0, 0, 1080, 1920);
-  fillOnly([pj(-300, -300), pj(300, -300), pj(300, 300), pj(-300, 300)], C.grass, { boil: 0 });
-  for (const z of ZS) { fillOnly([pj(-300, z - PW), pj(300, z - PW), pj(300, z + PW), pj(-300, z + PW)], C.walk, { boil: 0 }); }
-  for (const x of XS) { fillOnly([pj(x - PW, -300), pj(x + PW, -300), pj(x + PW, 300), pj(x - PW, 300)], C.walk, { boil: 0 }); }
-  for (const z of ZS) { fillOnly([pj(-300, z - RW), pj(300, z - RW), pj(300, z + RW), pj(-300, z + RW)], C.road, { boil: 0 }); for (let x = -300; x < 300; x += 6) fillOnly([pj(x, z - .15), pj(x + 3, z - .15), pj(x + 3, z + .15), pj(x, z + .15)], C.mark, { boil: 0 }); }
-  for (const x of XS) { fillOnly([pj(x - RW, -300), pj(x + RW, -300), pj(x + RW, 300), pj(x - RW, 300)], C.road, { boil: 0 }); for (let z = -300; z < 300; z += 6) if (!ZS.some(zz => Math.abs(z - zz) < 6)) fillOnly([pj(x - .15, z), pj(x + .15, z), pj(x + .15, z + 3), pj(x - .15, z + 3)], C.mark, { boil: 0 }); }
-  for (const x of XS) for (const z of ZS) for (let i = 0; i < 5; i++) fillOnly([pj(x - RW + .4 + i * 1.6, z + PW), pj(x - RW + 1.2 + i * 1.6, z + PW), pj(x - RW + 1.2 + i * 1.6, z + PW + 3), pj(x - RW + .4 + i * 1.6, z + PW + 3)], C.mark, { boil: 0 });   // crossings
+  gfill([[-300, -300], [300, -300], [300, 300], [-300, 300]], C.grass);
+  for (const z of ZS) { gfill([[-300, z - PW], [300, z - PW], [300, z + PW], [-300, z + PW]], C.walk); }
+  for (const x of XS) { gfill([[x - PW, -300], [x + PW, -300], [x + PW, 300], [x - PW, 300]], C.walk); }
+  for (const z of ZS) { gfill([[-300, z - RW], [300, z - RW], [300, z + RW], [-300, z + RW]], C.road); for (let x = -300; x < 300; x += 6) gfill([[x, z - .15], [x + 3, z - .15], [x + 3, z + .15], [x, z + .15]], C.mark); }
+  for (const x of XS) { gfill([[x - RW, -300], [x + RW, -300], [x + RW, 300], [x - RW, 300]], C.road); for (let z = -300; z < 300; z += 6) if (!ZS.some(zz => Math.abs(z - zz) < 6)) gfill([[x - .15, z], [x + .15, z], [x + .15, z + 3], [x - .15, z + 3]], C.mark); }
+  for (const x of XS) for (const z of ZS) for (let i = 0; i < 5; i++) gfill([[x - RW + .4 + i * 1.6, z + PW], [x - RW + 1.2 + i * 1.6, z + PW], [x - RW + 1.2 + i * 1.6, z + PW + 3], [x - RW + .4 + i * 1.6, z + PW + 3]], C.mark);   // crossings
   // the store's lot and its bays, and the light spilling from its windows
-  fillOnly([pj(-14, 26.5), pj(22, 26.5), pj(22, 39), pj(-14, 39)], C.lot, { boil: 0 });
-  for (let i = 0; i <= 12; i++) stroke([pj(-13 + i * M.parking.w, 33.5), pj(-13 + i * M.parking.w, 33.5 + M.parking.l)], 2, { line: '#d9d4b8' });
-  fillOnly([pj(-7, 27.2, 0), pj(13, 27.2, 0), pj(15, 32, 0), pj(-9, 32, 0)], 'rgba(255,230,160,.2)', { boil: 0 });
-  for (const H of Object.values(HOMES)) { const dx = H === HOMES.max ? H.x + 4.1 : H.x + 2.5; fillOnly([pj(dx - 1.7, H.z + H.d / 2), pj(dx + 1.7, H.z + H.d / 2), pj(dx + 1.7, -5.5), pj(dx - 1.7, -5.5)], '#5a5d66', { boil: 0 });   // the driveway
-    const px = H.x - H.w / 2 + (H === HOMES.max ? 2.0 : 3.6); fillOnly([pj(px - .6, H.z + H.d / 2 + 1.3), pj(px + .6, H.z + H.d / 2 + 1.3), pj(px + .6, -5.5), pj(px - .6, -5.5)], '#8a857a', { boil: 0 }); }   // the path to the door
+  gfill([[-14, 26.5], [22, 26.5], [22, 39], [-14, 39]], C.lot);
+  for (let i = 0; i <= 12; i++) gline([-13 + i * M.parking.w, 33.5], [-13 + i * M.parking.w, 33.5 + M.parking.l], 2, { line: '#d9d4b8' });
+  gfill([[-7, 27.2, 0], [13, 27.2, 0], [15, 32, 0], [-9, 32, 0]], 'rgba(255,230,160,.2)');
+  for (const H of Object.values(HOMES)) { const dx = H === HOMES.max ? H.x + 4.1 : H.x + 2.5; gfill([[dx - 1.7, H.z + H.d / 2], [dx + 1.7, H.z + H.d / 2], [dx + 1.7, -5.5], [dx - 1.7, -5.5]], '#5a5d66');   // the driveway
+    const px = H.x - H.w / 2 + (H === HOMES.max ? 2.0 : 3.6); gfill([[px - .6, H.z + H.d / 2 + 1.3], [px + .6, H.z + H.d / 2 + 1.3], [px + .6, -5.5], [px - .6, -5.5]], '#8a857a'); }   // the path to the door
   // trees and streetlights behind everything that stands
   for (const [x, z] of TREES) { if (z > (view.near ?? 1e9)) continue; const [a, b] = pj(x, z, 4), k = sc(x, z, 4); shape(ell(a, b, k * 2.4, k * 2.0, 20), { fill: '#24402e', lw: 3 }); }
   for (const x of XS) for (const z of ZS) { streetLight(x + PW, z + PW); }
