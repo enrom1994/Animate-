@@ -45,11 +45,11 @@ window.renderAt = t => {
     const st = push_(FRAME_MAX, ss(pr(t, 0, 4.8)), 7.5); maxShot(t, st, { act: { smile: .5 } })();
     const [a, b] = pin(MCAR[0], MCAR[1], 2.4); stamp(clamp(a, 300, 780), b - 40, 'ASSET?', pop_(t, 1.6), { col: GOLD });   // lands on the word 'asset'; the question card above carries frame 0
     banner(540, 300, 'IS YOUR CAR AN ASSET?', 1, { px: 60, w: 680, fill: '#fbf6ea' }); }   // the question, readable at frame 0
-  else if (t < 8.15) {   // an asset puts money in your pocket; a liability takes it out
-    STREET.focus = false; const u = io(pr(t, 4.8, 8.15));
-    drawWide(t, { ...camOf({ look: [mix(6, 20, u), 0, mix(-8, -6, u)], L: 70, down: .8, F: 2600 }), extras: [theoEx(t), maxEx(t), ...carsEx()] }, { tilt: true });
-    card(540, 560, 'ASSET', '+ MONEY IN', { col: '#2f6f73', w: 560, s: pop_(t, 4.95) });
-    card(540, 900, 'LIABILITY', '− MONEY OUT', { col: '#b8302a', w: 560, s: pop_(t, 6.8) }); }
+  else if (t < 8.15) {   // an asset puts money in your pocket; a liability takes it out: the two men, split, a verdict card on each
+    // (it was a drift over the town: ep. 1 lost half its audience during just such a shot, 3 to 8 s in)
+    split(t, () => { maxShot(t, FRAME_MAX, { act: { lid: .45 } })(); const [a, b] = pin(MCAR[0], MCAR[1], 2.6); card(clamp(a, 300, 780), Math.max(b - 60, 640), 'LIABILITY', '− MONEY OUT', { col: '#b8302a', w: 460, bigPx: 72, s: pop_(t, 6.8) }); },
+      () => { theoShot(t, FRAME_THEO, { act: { smile: .6 } })(); const [a, b] = pin(TCAR[0], TCAR[1], 2.6); card(clamp(a, 300, 780), Math.max(b - 60, 640), 'ASSET', '+ MONEY IN', { col: '#2f6f73', w: 460, bigPx: 72, s: pop_(t, 4.95) }); },
+      { reveal: pr(t, 4.8, 5.1) }); }
   else if (t < 14.45) {   // Max's coupe: half its value gone in five years, and a payment every month: liability
     const st = { ...FRAME_MAX, look: [mix(9.2, 9.45, ss(pr(t, 8.15, 14.45))), 1.0, -7.4], L: lmix(10, 9.2, ss(pr(t, 8.15, 14.45))) }, [a, b] = pin(MCAR[0], MCAR[1], 2.5);   /* on the coupe, Max at the edge */ maxShot(t, st, { old: t > 11.3, act: { lid: .45 } })();
     const yr = Math.floor(5 * ss(pr(t, 9.2, 11.3)));
@@ -78,7 +78,7 @@ window.renderAt = t => {
   const c = CAPTIONS.find(([a, , b]) => t >= a && t < b); capEl.innerHTML = c ? c[1] : '';
 };
 function text_small(x, y, str, s) { if (s <= .01) return; banner(x, y, str, s * .6, { px: 44, w: 300, fill: '#fbf6ea', col: '#6b5a4a' }); }
-const MOVES = [[4.8, 8.15], [28.85, 36.0]];   // the camera travels: scenery passes the frame edge
+const MOVES = [[28.85, 36.0]];   // the camera travels: scenery passes the frame edge
 window.audit = t => { AUDIT.on = true; AUDIT.log = []; window.renderAt(t); AUDIT.on = false;
   return auditFrame(AUDIT.log, 1080, 1920, { moving: MOVES.some(([a, b]) => t >= a && t <= b), capBox: capEl.innerHTML ? [60, 1395, 1020, 1500] : null }); };
 window.DURATION = DURATION; window.done = true; window.renderAt(0);

@@ -45,6 +45,8 @@ are mortgages, school costs, retirement. Viewers come back to see what happens t
 1. **Hook, 0 to 5 s:** frame 0 already shows the question or the fact as a big card, and the thing at stake (ep. 1 opened without
    one and 62% swiped away). The spoken line passes the hook gate (below) before the voice is recorded. It says *you*, names what it costs, and leaves a
    question open; the sourced fact can sit on screen as a card while the voice carries the hook.
+   The first 10 s: the spoken hook about 5 s at most, no travel or establishing shot, and the stakes on screen by about 3 s (the
+   people or a moving number). Ep. 1 broke all three and lost half its audience between 3 and 8 s; ep. 2 kept them and held above 80%.
 2. **The choice, to about 12 s:** each neighbor picks a side; the price lands on the thing.
 3. **The time jump or the test, to about 35 s:** numbers move on the objects (a car's value falls, a fund rises, payments stack).
 4. **The reason:** why, in one line (depreciation, compound growth, stacked due dates).
@@ -79,7 +81,9 @@ are mortgages, school costs, retirement. Viewers come back to see what happens t
 
 **Upload log** (times South Africa, GMT+2):
 - Ep. 1: 22 Nov 2026, about 22:15. After ~12 h: 106 engaged views, 38.1% stayed to watch / 61.9% swiped away, average view 0:21 of 0:39; views stopped after ~3 h. Opened without an on-screen question at frame 0.
-- Ep. 2: 23 Nov 2026, 19:40. The first episode with the hook on screen at frame 0: compare its "stayed to watch" against 38%.
+- Ep. 2: 23 Nov 2026, 19:40. The first episode with the hook on screen at frame 0. After 31 h: 31 views, 14 engaged, 70.0% stayed
+  (ep. 1: 38.1%), average view 0:42 of 0:43 (98.7%), retention above about 80% throughout. The video holds; the reach (about 20
+  feed impressions) is the limit.
 
 Each folder has `SOURCES.md`, `hooks.txt` and `hooks_report.txt`, and `UPLOAD.md` (title, cover frame, description).
 Before uploading ep. 2: confirm the late-fee figures on the lenders' own pages.

@@ -29,7 +29,10 @@ New money choices every week · @TenYearsOnShorts
 ```
 
 ## Pinned comment (post it, then pin it)
+The question goes first: comments are a signal the Shorts test can use.
 ```
+Your turn: would you split a $400 purchase into four payments? Yes or no, and why.
+
 Sources (US, checked November 2026):
 • 47% of BNPL users paid late in the past year; 25% have had 3+ loans at once: LendingTree, survey of 2,060 US adults, March 2026
   https://www.lendingtree.com/personal/buy-now-pay-later-loan-statistics/

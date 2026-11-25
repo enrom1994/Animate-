@@ -26,6 +26,12 @@ can measure, so a film can be audited before it is rendered in full.
 - **Frame 0 carries the hook on screen.** A Short is judged before a word is heard: the first frame shows the question or the
   fact as big text, and the thing at stake, never an empty or quiet frame with the card popping in later. (Ten Years On ep. 1
   opened on a bill with no question on screen: 62% of the Shorts feed swiped away.)
+- **The first ten seconds, from Ten Years On's retention curves** (ep. 1 fell from about 110% to 60% between 3 and 8 s; ep. 2,
+  built the other way, held above 80% to the end):
+  - the spoken hook lasts **about 5 s at most** (ep. 1's ran 7.2 s); `reels/hookgate.py` voices the hook and fails it over 5.5 s;
+  - **no travel or establishing shot in the first 10 s** (a drift over a town, a pull-out to show the place): the pretty move is
+    where people leave;
+  - **the stakes are on screen by about 3 s**: a moving number, or the people facing the choice, not scenery.
 - **Open on the impossible-sounding fact**, in the first sentence, then explain why it is true. No scene-setting first. The
   fact can live on screen (a card over the first shot) while the voice carries the hook.
 - State the stakes (who loses what) inside the first 15 s, and the question the video answers inside 30 s.

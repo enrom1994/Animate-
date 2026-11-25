@@ -5,7 +5,7 @@ the film against its section 5 before a full render.
 
 **The hook gate, for every new Short, video or script, on every channel.** Before any voice is recorded, write at least five
 candidate hooks against the 21 formulas in `.claude/skills/yt-script/hooks.json` into `<film>/hooks.txt`, put the chosen one as
-line 1 of `<film>/script.json`, and run `python3 reels/hookgate.py <film>`. It must pass (score 60 or more, the top scorer or
+line 1 of `<film>/script.json`, and run `python3 reels/hookgate.py <film>`. It must pass (5.5 s or less spoken, score 60 or more, the top scorer or
 within 5 points of it) and its `hooks_report.txt` stays with the film. Write the hook and the title as a pair: line 1 confirms
 what the title promises. Finished films are not reopened for their hooks; the gate exists so they never need to be.
 

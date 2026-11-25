@@ -25,7 +25,10 @@ New money choices every week · @TenYearsOnShorts
 ```
 
 ## Pinned comment (post it, then pin it)
+The question goes first: comments are a signal the Shorts test can use.
 ```
+Your turn: which of the four would you call an asset? Car, index fund, side hustle or house?
+
 Sources (US, checked November 2026):
 • A new car loses about half its value in five years: Kelley Blue Book https://www.kbb.com/car-depreciation
   and Carfax via Experian https://www.experian.com/blogs/ask-experian/how-much-do-cars-depreciate-per-year/
